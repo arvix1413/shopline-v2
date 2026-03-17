@@ -9,7 +9,7 @@ echo "🚀 开始部署 SHOPLINE 到生产环境..."
 
 # 固定的生产域名
 FRONTEND_DOMAIN="https://shopline-frontend.pages.dev"
-BACKEND_DOMAIN="https://shopline-clone-backend.arvix1413.workers.dev"
+BACKEND_DOMAIN="https://shopline-backend.arvix1413.workers.dev"
 
 echo "📦 构建前端..."
 cd frontend

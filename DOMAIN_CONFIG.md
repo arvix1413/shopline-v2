@@ -9,10 +9,10 @@
 - **购物车**: `https://shopline-frontend.pages.dev/cart`
 
 ### 后端域名
-- **API 基础地址**: `https://shopline-clone-backend.arvix1413.workers.dev`
-- **商品 API**: `https://shopline-clone-backend.arvix1413.workers.dev/api/products`
-- **上传 API**: `https://shopline-clone-backend.arvix1413.workers.dev/api/upload`
-- **图片代理**: `https://shopline-clone-backend.arvix1413.workers.dev/images/*`
+- **API 基础地址**: `https://shopline-backend.arvix1413.workers.dev`
+- **商品 API**: `https://shopline-backend.arvix1413.workers.dev/api/products`
+- **上传 API**: `https://shopline-backend.arvix1413.workers.dev/api/upload`
+- **图片代理**: `https://shopline-backend.arvix1413.workers.dev/images/*`
 
 ## 存储配置
 
@@ -25,7 +25,7 @@
 
 ### 前端配置 (`frontend/.env.local`)
 ```env
-NEXT_PUBLIC_API_URL=https://shopline-clone-backend.arvix1413.workers.dev
+NEXT_PUBLIC_API_URL=https://shopline-backend.arvix1413.workers.dev
 ```
 
 ### 后端 CORS 配置 (`backend/src/index.ts`)
@@ -96,12 +96,12 @@ curl -s "https://shopline-frontend.pages.dev" | grep -o "SHOPLINE"
 
 ### 检查后端
 ```bash
-curl -s "https://shopline-clone-backend.arvix1413.workers.dev"
+curl -s "https://shopline-backend.arvix1413.workers.dev"
 ```
 
 ### 检查 API
 ```bash
-curl -s "https://shopline-clone-backend.arvix1413.workers.dev/api/products" | jq 'length'
+curl -s "https://shopline-backend.arvix1413.workers.dev/api/products" | jq 'length'
 ```
 
 ## 常见问题
@@ -122,7 +122,7 @@ A: 预览域名用于测试和验证，不影响生产环境的固定域名。
 
 ✅ **固定域名已配置完成**
 - 前端: `https://shopline-frontend.pages.dev`
-- 后端: `https://shopline-clone-backend.arvix1413.workers.dev`
+- 后端: `https://shopline-backend.arvix1413.workers.dev`
 - 这些域名不会改变，用户始终访问固定地址
 
 ✅ **预览域名是正常现象**

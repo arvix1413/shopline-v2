@@ -164,10 +164,10 @@ npm run test
 ### API 测试
 ```bash
 # 测试商品 API
-curl https://shopline-clone-backend.arvix1413.workers.dev/api/products
+curl https://shopline-backend.arvix1413.workers.dev/api/products
 
 # 测试图片上传
-curl -X POST -F "file=@image.jpg" https://shopline-clone-backend.arvix1413.workers.dev/api/upload
+curl -X POST -F "file=@image.jpg" https://shopline-backend.arvix1413.workers.dev/api/upload
 ```
 
 ## 🔧 配置说明
@@ -176,11 +176,11 @@ curl -X POST -F "file=@image.jpg" https://shopline-clone-backend.arvix1413.worke
 1. **D1 数据库**: `shopline-db`
 2. **R2 存储桶**: `shopline-v2`
 3. **Pages 项目**: `shopline-frontend`
-4. **Workers 项目**: `shopline-clone-backend`
+4. **Workers 项目**: `shopline-backend`
 
 ### 域名配置
 - 前端: `https://shopline-frontend.pages.dev`
-- 后端: `https://shopline-clone-backend.arvix1413.workers.dev`
+- 后端: `https://shopline-backend.arvix1413.workers.dev`
 
 ## 📈 性能优化
 
