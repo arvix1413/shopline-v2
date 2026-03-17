@@ -1,0 +1,15 @@
+name = "shopline-clone-backend"
+main = "src/index.ts"
+compatibility_date = "2024-01-15"
+
+[vars]
+R2_DOMAIN = "https://pub-51908639511240656e3a5d46a004f299.r2.dev"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "shopline-db"
+database_id = "dcd227af-5f80-4c1e-941c-7b58bb0aed01"
+
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "shopline-v2"

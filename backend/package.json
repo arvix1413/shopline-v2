@@ -1,0 +1,22 @@
+{
+  "name": "shopline-clone-backend",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:generate": "wrangler d1 execute shopline-db --local --file=./schema.sql",
+    "db:seed": "wrangler d1 execute shopline-db --local --file=./seed.sql",
+    "db:migrate": "wrangler d1 migrations apply shopline-db"
+  },
+  "dependencies": {
+    "hono": "^4.0.0",
+    "drizzle-orm": "^0.29.0",
+    "@cloudflare/workers-types": "^4.20231025.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.0",
+    "drizzle-kit": "^0.20.4",
+    "typescript": "^5.2.2",
+    "wrangler": "^3.15.0"
+  }
+}
