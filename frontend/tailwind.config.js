@@ -9,11 +9,11 @@ module.exports = {
     extend: {
       colors: {
         shopline: {
-          blue: '#0066ff',
-          navy: '#1a1a6e',
-          purple: '#4a3fa0',
-          green: '#00cc66',
-          orange: '#ff6600',
+          blue: '#356DFF',
+          navy: '#00142D',
+          dark: '#354253',
+          bg: '#F2F7FC',
+          purple: '#A56DFF',
         }
       },
       fontFamily: {

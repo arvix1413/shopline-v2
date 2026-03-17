@@ -55,3 +55,6 @@ test-screenshots/
 # Misc docs & reports
 *.md
 !README.md
+
+# Crawler (local dev tool only)
+crawler/
