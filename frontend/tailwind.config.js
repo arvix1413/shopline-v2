@@ -8,26 +8,17 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: {
-          50: '#f0f9ff',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-        },
         shopline: {
-          blue: '#0066cc',
+          blue: '#0066ff',
+          navy: '#1a1a6e',
+          purple: '#4a3fa0',
           green: '#00cc66',
           orange: '#ff6600',
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', 'sans-serif'],
       },
-      spacing: {
-        '18': '4.5rem',
-        '88': '22rem',
-      }
     },
   },
   plugins: [],
