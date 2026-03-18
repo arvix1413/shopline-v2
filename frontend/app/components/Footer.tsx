@@ -1,64 +1,66 @@
+import Link from 'next/link'
+
 export default function Footer() {
   const cols = [
     {
       title: '網路開店',
       links: [
-        { label: '特色總覽', href: '#' },
-        { label: '功能介紹', href: '#' },
-        { label: '版型主題', href: '#' },
-        { label: 'SHOP Builder', href: '#' },
-        { label: '客戶案例', href: '#' },
+        { label: '特色總覽', href: '/online-store' },
+        { label: '功能介紹', href: '/online-store/features' },
+        { label: '版型主題', href: '/templates' },
+        { label: 'SHOP Builder', href: '/online-store/shop-builder' },
+        { label: '客戶案例', href: '/showcase' },
       ],
     },
     {
       title: '社群購物',
       links: [
-        { label: '特色總覽', href: '#' },
-        { label: '功能介紹', href: '#' },
-        { label: 'Instagram 直播', href: '#' },
+        { label: '特色總覽', href: '/social-commerce' },
+        { label: '功能介紹', href: '/social-commerce/features' },
+        { label: 'Instagram 直播', href: '/social-commerce/instagram-live' },
       ],
     },
     {
       title: '零售 POS',
       links: [
-        { label: '特色總覽', href: '#' },
-        { label: '功能介紹', href: '#' },
-        { label: '週邊硬體', href: '#' },
+        { label: '特色總覽', href: '/pos' },
+        { label: '功能介紹', href: '/pos/features' },
+        { label: '週邊硬體', href: '/pos/hardware' },
       ],
     },
     {
       title: '我要開店',
       links: [
-        { label: '方案費用', href: '#' },
-        { label: '開店講座', href: 'https://seminar.shopline.tw' },
-        { label: '顧問諮詢', href: 'https://consultation.shopline.tw' },
+        { label: '方案費用', href: '/about/pricing' },
+        { label: '開店講座', href: 'https://seminar.shopline.tw', external: true },
+        { label: '顧問諮詢', href: 'https://consultation.shopline.tw', external: true },
       ],
     },
     {
       title: '更多資源',
       links: [
-        { label: '擴充功能商店', href: 'https://apps.shopline.tw' },
-        { label: '新手問答', href: '#' },
-        { label: '電商教室', href: 'https://blog.shopline.tw/' },
-        { label: '電商成長學苑', href: 'https://course.shopline.tw/' },
-        { label: '電商數據庫', href: 'https://trends.shopline.tw/' },
-        { label: 'LINE 官方帳號', href: '#' },
+        { label: '擴充功能商店', href: 'https://apps.shopline.tw', external: true },
+        { label: '新手問答', href: '/faq/overview' },
+        { label: '電商教室', href: 'https://blog.shopline.tw/', external: true },
+        { label: '電商成長學苑', href: 'https://course.shopline.tw/', external: true },
+        { label: '電商數據庫', href: 'https://trends.shopline.tw/', external: true },
+        { label: 'LINE 官方帳號', href: 'https://partners.shopline.tw/line-account', external: true },
       ],
     },
     {
       title: '產品支援',
       links: [
-        { label: '產品最新動態', href: '#' },
-        { label: '常見問題中心', href: 'https://support.shoplineapp.com/' },
+        { label: '產品最新動態', href: '/changelog' },
+        { label: '常見問題中心', href: 'https://support.shoplineapp.com/', external: true },
       ],
     },
     {
       title: 'SHOPLINE',
       links: [
-        { label: '加入我們', href: '#' },
-        { label: '合作機會', href: '#' },
-        { label: '精選夥伴', href: '#' },
-        { label: '資格與認證', href: '#' },
+        { label: '加入我們', href: 'https://marketing.shopline.tw/job', external: true },
+        { label: '合作機會', href: '/cooperate' },
+        { label: '精選夥伴', href: '/selectedpartners' },
+        { label: '資格與認證', href: '/compliance-center' },
       ],
     },
   ]
@@ -71,14 +73,25 @@ export default function Footer() {
     { label: 'LINE', href: 'https://line.me/R/ti/p/%40prs5793t', icon: 'L' },
   ]
 
+  const bottomLinks = [
+    { label: '網站地圖', href: '/about/sitemap' },
+    { label: '隱私權政策', href: '/about/privacy' },
+    { label: '會員條款', href: '/about/terms' },
+  ]
+
   return (
     <footer style={{ backgroundColor: '#00142D', color: '#fff' }}>
       {/* Top bar */}
       <div className="border-b border-white/10">
         <div className="max-w-7xl mx-auto px-6 py-6 flex flex-wrap items-center gap-4">
-          <a href="#" className="text-white font-bold text-sm hover:text-white/80 transition-colors">關於我們</a>
-          <a href="#" className="text-white font-bold text-sm hover:text-white/80 transition-colors">最新消息</a>
-          <a href="#" className="border border-white/40 text-white text-sm font-semibold px-4 py-1.5 rounded-full hover:bg-white/10 transition-colors">
+          <Link href="/about" className="text-white font-bold text-sm hover:text-white/80 transition-colors">關於我們</Link>
+          <Link href="/about/press" className="text-white font-bold text-sm hover:text-white/80 transition-colors">最新消息</Link>
+          <a
+            href="https://marketing.shopline.tw/anti-fraud"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="border border-white/40 text-white text-sm font-semibold px-4 py-1.5 rounded-full hover:bg-white/10 transition-colors"
+          >
             資訊安全保護專區
           </a>
         </div>
@@ -93,15 +106,25 @@ export default function Footer() {
               <ul className="space-y-2">
                 {col.links.map((link) => (
                   <li key={link.label}>
-                    <a
-                      href={link.href}
-                      className="text-sm transition-colors hover:text-white"
-                    style={{ color: '#B1BFC9' }}
-                      target={link.href.startsWith('http') ? '_blank' : undefined}
-                      rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                    >
-                      {link.label}
-                    </a>
+                    {(link as any).external ? (
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm transition-colors hover:text-white"
+                        style={{ color: '#B1BFC9' }}
+                      >
+                        {link.label}
+                      </a>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        className="text-sm transition-colors hover:text-white"
+                        style={{ color: '#B1BFC9' }}
+                      >
+                        {link.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -125,8 +148,10 @@ export default function Footer() {
               </a>
             ))}
             <div className="flex gap-4 ml-2">
-              {['網站地圖', '隱私權政策', '會員條款'].map((item) => (
-                <a key={item} href="#" className="text-gray-500 hover:text-white text-xs transition-colors">{item}</a>
+              {bottomLinks.map((item) => (
+                <Link key={item.label} href={item.href} className="text-gray-500 hover:text-white text-xs transition-colors">
+                  {item.label}
+                </Link>
               ))}
             </div>
           </div>
