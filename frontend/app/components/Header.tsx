@@ -221,6 +221,8 @@ export default function Header() {
                                     ? { color: '#356DFF', backgroundColor: '#EBF1F8', fontWeight: 600 }
                                     : { color: '#354253' }
                                   }
+                                  onMouseEnter={e => { if (li !== 0) { (e.currentTarget as HTMLElement).style.color = '#356DFF'; (e.currentTarget as HTMLElement).style.backgroundColor = '#EBF1F8' } }}
+                                  onMouseLeave={e => { if (li !== 0) { (e.currentTarget as HTMLElement).style.color = '#354253'; (e.currentTarget as HTMLElement).style.backgroundColor = '' } }}
                                 >
                                   {link.label}
                                 </Link>
@@ -240,7 +242,7 @@ export default function Header() {
                               <ul className="space-y-1">
                                 {col.links.map((link) => (
                                   <li key={link.label}>
-                                    <Link href={link.href} className="block text-sm py-1 hover:text-[#356DFF] transition-colors" style={{ color: '#354253' }}>
+                                    <Link href={link.href} className="block text-sm py-1.5 px-2 rounded-md hover:text-[#356DFF] hover:bg-blue-50 transition-colors" style={{ color: '#354253' }}>
                                       {link.label}
                                     </Link>
                                   </li>
@@ -251,8 +253,8 @@ export default function Header() {
                           {(item.dropdown as ColsDropdown).featured && (
                             <div className="pl-4 min-w-[180px]" style={{ borderLeft: '1px solid #E0E3E8' }}>
                               {(item.dropdown as ColsDropdown).featured!.map((f) => (
-                                <Link key={f.name} href={f.href} className="block py-2 px-2 rounded-lg hover:bg-gray-50 transition-colors">
-                                  <div className="text-sm font-semibold" style={{ color: '#00142D' }}>{f.name}</div>
+                                <Link key={f.name} href={f.href} className="block py-2 px-2 rounded-lg hover:bg-blue-50 transition-colors group">
+                                  <div className="text-sm font-semibold group-hover:text-[#356DFF] transition-colors" style={{ color: '#00142D' }}>{f.name}</div>
                                   <div className="text-xs mt-0.5" style={{ color: '#687280' }}>{f.desc}</div>
                                 </Link>
                               ))}
