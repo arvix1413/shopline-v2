@@ -27,7 +27,7 @@ export default function Hero() {
         </p>
         {/* Hero CTA: white bg, #356DFF text, 30px radius, 18px/700 */}
         <a
-          href="https://admin.shoplineapp.com/users/sign_up?locale=zh-hant"
+          href="https://admin.shoplineapp.com/users/sign_up?locale=zh-hant&ref=shopline.tw"
           className="inline-block font-bold transition-colors mb-16"
           style={{
             backgroundColor: '#fff',

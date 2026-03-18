@@ -54,7 +54,7 @@ export default function Integration() {
               <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.8)' }}>讓我們的專業顧問為你量身打造最佳零售解決方案</p>
             </div>
             {/* 了解更多: transparent bg, #356DFF color */}
-            <a href="#" className="mt-8 inline-block font-bold text-sm hover:underline" style={{ color: '#356DFF' }}>
+            <a href="/solutions" className="mt-8 inline-block font-bold text-sm hover:underline" style={{ color: '#356DFF' }}>
               了解更多 →
             </a>
           </div>

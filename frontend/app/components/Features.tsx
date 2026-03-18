@@ -5,35 +5,31 @@ const features = [
     tag: '一站到位',
     title: '快速上手',
     description: '不論新手創業還是大型品牌，從網路開店、社群導購、OMO POS 系統到全通路整合，一站為你實現全通路零售升級，加速業績成長！',
-    color: 'from-blue-500 to-indigo-600',
-    bg: 'rgba(255,255,255,0.08)',
-    icon: '🚀',
+    img: 'https://img.shoplineapp.com/media/image_clips/67d00cb52f7713000e5432de/original.png?1741687989',
+    alt: '不論是新手創業還是大型品牌，透過 SHOPLINE 讓你一站到位',
   },
   {
     tag: '成長引擎',
     title: '業績翻倍',
     description: '突破業績有訣竅！善用會員分級結合第一方數據與精準再行銷，深入掌握顧客需求、降低獲客成本；此外，多元第三方應用程式，讓你靈活應對各種銷售需求。',
-    color: 'from-purple-500 to-pink-600',
-    bg: 'rgba(255,255,255,0.08)',
-    icon: '📈',
+    img: 'https://img.shoplineapp.com/media/image_clips/67d00e02baf202000c8de8fd/original.png?1741688321',
+    alt: '透過 SHOPLINE 的強大功能及多元第三方應用程式，讓你深入掌握顧客需求、降低成本、業績翻倍',
   },
   {
     tag: '極致升級',
     title: '全通路整合',
     description: '整合全通路開店包含社群商務、品牌 APP、POS、數據資料及開放的 API 等，大幅降低成本，加上專業的顧問服務與豐富生態圈，讓你快速推進，品牌成長無阻！',
-    color: 'from-green-500 to-teal-600',
-    bg: 'rgba(255,255,255,0.08)',
-    icon: '🔗',
+    img: 'https://img.shoplineapp.com/media/image_clips/67d00e022b6b85000ccb3585/original.png?1741688321',
+    alt: 'SHOPLINE 整合全通路開店所需，加上專業顧問服務與豐富生態圈，讓品牌成長無阻',
   },
 ]
 
 export default function Features() {
   return (
-    /* Section 2: bg #00142D, color white */
     <section className="py-20" style={{ backgroundColor: '#00142D', color: '#fff' }}>
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-4xl lg:text-5xl font-black mb-2" style={{ color: '#fff', fontSize: 40 }}>
+          <h2 className="text-4xl font-black mb-2" style={{ color: '#fff', fontSize: 40 }}>
             適用各種規模
           </h2>
           <p className="text-xl font-medium" style={{ color: 'rgba(255,255,255,0.8)' }}>無論是個人創業還是全球品牌</p>
@@ -44,21 +40,28 @@ export default function Features() {
 
         <div className="grid md:grid-cols-3 gap-8">
           {features.map((f, i) => (
-            <div key={i} className="rounded-3xl p-8 hover:shadow-xl transition-all duration-300 group" style={{ backgroundColor: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
-              <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${f.color} flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform`}>
-                {f.icon}
+            <div key={i} className="rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300 group"
+              style={{ backgroundColor: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <div className="overflow-hidden">
+                <img
+                  src={f.img}
+                  alt={f.alt}
+                  className="w-full h-auto group-hover:scale-105 transition-transform duration-500"
+                  style={{ display: 'block' }}
+                />
               </div>
-              <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#A56DFF' }}>{f.tag}</div>
-              <h3 className="text-2xl font-black mb-4" style={{ color: '#fff' }}>{f.title}</h3>
-              <p className="leading-relaxed text-sm" style={{ color: '#354253' }}>{f.description}</p>
+              <div className="p-8">
+                <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#A56DFF' }}>{f.tag}</div>
+                <h3 className="text-2xl font-black mb-4" style={{ color: '#fff' }}>{f.title}</h3>
+                <p className="leading-relaxed text-sm" style={{ color: '#B1BFC9' }}>{f.description}</p>
+              </div>
             </div>
           ))}
         </div>
 
         <div className="text-center mt-12">
-          {/* 了解所有方案: bg #356DFF, white text, radius 30px, 18px/700 */}
           <a
-            href="#"
+            href="/about/pricing"
             className="inline-block font-bold transition-all hover:opacity-90"
             style={{
               backgroundColor: '#356DFF',
