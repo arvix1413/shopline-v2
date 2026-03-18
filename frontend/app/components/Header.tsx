@@ -212,17 +212,12 @@ export default function Header() {
                             </div>
                           </div>
                           <ul className="py-3 px-2 flex-1">
-                            {(item.dropdown as SolutionsDropdown).links.map((link, li) => (
+                            {(item.dropdown as SolutionsDropdown).links.map((link) => (
                               <li key={link.label}>
                                 <Link
                                   href={link.href}
-                                  className="block px-3 py-2 text-sm rounded-lg transition-colors"
-                                  style={li === 0
-                                    ? { color: '#356DFF', backgroundColor: '#EBF1F8', fontWeight: 600 }
-                                    : { color: '#354253' }
-                                  }
-                                  onMouseEnter={e => { if (li !== 0) { (e.currentTarget as HTMLElement).style.color = '#356DFF'; (e.currentTarget as HTMLElement).style.backgroundColor = '#EBF1F8' } }}
-                                  onMouseLeave={e => { if (li !== 0) { (e.currentTarget as HTMLElement).style.color = '#354253'; (e.currentTarget as HTMLElement).style.backgroundColor = '' } }}
+                                  className="block px-3 py-2 text-sm rounded-lg transition-colors hover:text-[#356DFF] hover:bg-blue-50"
+                                  style={{ color: '#354253' }}
                                 >
                                   {link.label}
                                 </Link>
