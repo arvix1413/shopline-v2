@@ -16,7 +16,7 @@ interface TrialSystem {
 }
 
 export default function TrialPage() {
-  const { user, isLoading } = useAuth()
+  const { user, token, isLoading } = useAuth()
   const router = useRouter()
   const [systems, setSystems] = useState<TrialSystem[]>([])
   const [fetching, setFetching] = useState(true)
@@ -65,7 +65,7 @@ export default function TrialPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {systems.map(sys => (
-              <a key={sys.id} href={sys.url} target="_blank" rel="noopener noreferrer"
+              <a key={sys.id} href={`${sys.url}?token=${encodeURIComponent(token || '')}&email=${encodeURIComponent(user.email)}&name=${encodeURIComponent(user.name || user.email)}`} target="_blank" rel="noopener noreferrer"
               onClick={() => track('enter_dashboard', { system: sys.name }, user.id)}
                 className="group relative rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl cursor-pointer"
                 style={{ background: sys.bg, border: `1px solid ${sys.border}`, boxShadow: '0 4px 24px rgba(0,0,0,0.2)' }}>
