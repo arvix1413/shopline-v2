@@ -1,55 +1,50 @@
 'use client'
 
+import { useI18n } from '../../contexts/I18nContext'
+import { useAuth } from '../../contexts/AuthContext'
+
 export default function Hero() {
+  const { t } = useI18n()
+  const { user, isLoading } = useAuth()
+
   return (
-    <section
-      className="relative overflow-hidden text-white text-center"
-      style={{ backgroundColor: '#F2F7FC' }}
-    >
-      {/* Left radial gradient */}
-      <div className="absolute inset-0 pointer-events-none" style={{
-        background: 'radial-gradient(100% 102.19% at 0% 0%, #381095 0%, #011259 49.9%, #00142D 100%)',
-        height: '150%', top: 0, left: 0, zIndex: 0,
-      }} />
-      {/* Right radial gradient */}
-      <div className="absolute inset-0 pointer-events-none" style={{
-        background: 'radial-gradient(50% 50.01% at 100% 0%, #3083EC 0%, #130ABD 37.53%, rgba(19,10,189,0) 100%)',
-        zIndex: 0,
-      }} />
+    <section className="relative overflow-hidden text-white text-center" style={{ backgroundColor: '#08081A' }}>
+      <div className="absolute pointer-events-none" style={{ width: 700, height: 700, borderRadius: '50%', background: 'radial-gradient(circle, rgba(30,64,175,0.18) 0%, transparent 70%)', top: -200, left: -200, zIndex: 0 }} />
+      <div className="absolute pointer-events-none" style={{ width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(29,78,216,0.14) 0%, transparent 70%)', top: -100, right: -150, zIndex: 0 }} />
+      <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)', backgroundSize: '60px 60px', zIndex: 0 }} />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 pt-20 pb-0">
-        <h1 className="font-black leading-tight mb-6 tracking-tight text-white" style={{ fontSize: 48 }}>
-          全方位零售整合專家
+      <div className="relative z-10 max-w-7xl mx-auto px-6 pt-24 pb-0">
+        <div className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 rounded-full text-xs font-semibold"
+          style={{ background: 'rgba(30,64,175,0.15)', border: '1px solid rgba(30,64,175,0.3)', color: '#93C5FD' }}>
+          <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#1E40AF', display: 'inline-block' }} />
+          {t.hero.badge}
+        </div>
+
+        <h1 className="font-black leading-tight mb-6 tracking-tight text-white" style={{ fontSize: 52 }}>
+          {t.hero.title}
         </h1>
-        <p className="text-lg leading-relaxed mb-10 mx-auto text-white" style={{ maxWidth: 580 }}>
-          SHOPLINE 提供全方位的零售解決方案，一站實現全通路整合，<br className="hidden lg:block" />
-          並透過知識賦能與生態圈服務拓展商機、驅動成長！
+        <p className="text-lg leading-relaxed mb-10 mx-auto" style={{ maxWidth: 560, color: 'rgba(255,255,255,0.65)' }}>
+          {t.hero.subtitle}
         </p>
-        {/* Hero CTA: white bg, #356DFF text, 30px radius, 18px/700 */}
-        <a
-          href="https://admin.shoplineapp.com/users/sign_up?locale=zh-hant&ref=shopline.tw"
-          className="inline-block font-bold transition-colors mb-16"
-          style={{
-            backgroundColor: '#fff',
-            color: '#356DFF',
-            borderRadius: 30,
-            fontSize: 18,
-            fontWeight: 700,
-            padding: '12px 40px',
-          }}
-        >
-          免費試用
-        </a>
 
-        {/* Dashboard screenshot */}
-        <div className="overflow-hidden text-center">
+        {!isLoading && (
+          <a href="/trial-redirect"
+            className="inline-block font-bold transition-all mb-16 btn-glow"
+            style={{ background: 'linear-gradient(135deg, #1E40AF 0%, #1D4ED8 100%)', color: '#fff', borderRadius: 30, fontSize: 17, fontWeight: 700, padding: '13px 44px' }}>
+            {t.hero.cta}
+          </a>
+        )}
+        {isLoading && (
+          <div className="inline-block mb-16" style={{ height: 50 }} />
+        )}
+
+        <div className="overflow-hidden text-center" style={{ borderRadius: '16px 16px 0 0', border: '1px solid rgba(255,255,255,0.08)', borderBottom: 'none' }}>
           <img
-            src="https://shoplineimg.com/59c0fd06080f0690b5000cd1/67a177ab434c8c000cb94b4e/1598.webp?source_format=png"
-            alt="SHOPLINE 全方位整合零售專家"
-            width={1597}
-            height={465}
+            src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1600&q=80"
+            alt="ARVIX"
+            width={1597} height={465}
             className="h-auto"
-            style={{ maxWidth: 'unset', position: 'relative', left: '50%', transform: 'translateX(-50%)', width: '111%' }}
+            style={{ maxWidth: 'unset', position: 'relative', left: '50%', transform: 'translateX(-50%)', width: '111%', objectFit: 'cover', objectPosition: 'center top', opacity: 0.85 }}
           />
         </div>
       </div>

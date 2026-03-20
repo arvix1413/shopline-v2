@@ -4,8 +4,10 @@ export const users = sqliteTable('users', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   email: text('email').notNull().unique(),
   name: text('name').notNull(),
+  passwordHash: text('password_hash').notNull().default(''),
   phone: text('phone'),
   address: text('address'),
+  isAdmin: integer('is_admin').default(0),
   createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
   updatedAt: text('updated_at').default('CURRENT_TIMESTAMP')
 })
@@ -52,10 +54,25 @@ export const orderItems = sqliteTable('order_items', {
 
 export const cartItems = sqliteTable('cart_items', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  sessionId: text('session_id').notNull(), // 用于匿名用户的购物车
-  userId: integer('user_id').references(() => users.id), // 用于登录用户
+  sessionId: text('session_id').notNull(),
+  userId: integer('user_id').references(() => users.id),
   productId: integer('product_id').references(() => products.id).notNull(),
   quantity: integer('quantity').notNull().default(1),
   createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
   updatedAt: text('updated_at').default('CURRENT_TIMESTAMP')
+})
+
+export const trialSystems = sqliteTable('trial_systems', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  desc: text('desc').notNull().default(''),
+  url: text('url').notNull(),
+  color: text('color').notNull().default('#3B82F6'),
+  bg: text('bg').notNull().default('rgba(59,130,246,0.08)'),
+  border: text('border').notNull().default('rgba(59,130,246,0.2)'),
+  emoji: text('emoji').notNull().default('🌐'),
+  tags: text('tags').notNull().default('[]'), // JSON array string
+  active: integer('active').notNull().default(1),
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
 })

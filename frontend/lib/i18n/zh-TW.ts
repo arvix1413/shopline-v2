@@ -1,0 +1,127 @@
+const zhTW = {
+  nav: {
+    solutions: '解決方案',
+    solutionsTitle: '核心產品',
+    products: '產品與服務',
+    pricing: '方案費用',
+    resources: '更多資源',
+    getStarted: '新手上路',
+    apps: '擴充功能',
+    login: '登入',
+    freeTrial: '免費試用',
+    region: '台灣',
+  },
+  banner: '🎁 限時優惠！電商平台前三個月免費，立即體驗',
+  hero: {
+    badge: '台灣企業首選開發團隊',
+    title: '全方位零售整合專家',
+    subtitle: 'ARVIX 提供 SaaS 電商平台、APP 開發、ERP、CRM 及 AI 辨識會計系統，一站滿足企業數位化需求，驅動業績持續成長！ ',
+    cta: '免費試用',
+  },
+  features: {
+    eyebrow: '適用各種規模',
+    title: '無論是個人創業還是大型企業',
+    subtitle: '從網路開店、社群導購、客製化系統開發、行動 APP 到 AI 智能會計，一站為你實現全面數位升級',
+    learnMore: '了解所有方案',
+    items: [
+      {
+        tag: '快速上線', title: '電商平台',
+        desc: '不需要技術背景，輕鬆開設品牌電商網站。內建訂單管理、金流串接、會員系統與行銷工具，讓你專心賣貨、加速業績成長！',
+      },
+      {
+        tag: '客製彈性', title: '業客製化系統開發',
+        desc: '標準產品無法滿足你？ARVIX 提供完全客製化的網站、APP、ERP 與 CRM 開發服務，資深工程師團隊量身打造，精準符合你的業務需求。',
+      },
+      {
+        tag: 'AI 賦能', title: '全通路整合',
+        desc: '告別人工對帳！ARVIX AI 辨識會計系統自動讀取發票、單據，智能分類帳目、即時產出財務報表，大幅降低人力成本，讓財務管理更精準高效。',
+      },
+    ],
+  },
+  solutions: {
+    eyebrow: '核心產品線',
+    title: '六大產品，全面覆蓋企業需求',
+    subtitle: '從電商開店到企業內部系統，ARVIX 提供完整的數位化解決方案，助你一站升級競爭力',
+    learnMore: '了解更多',
+    items: [
+      { icon: '🛒', title: '網路商店', desc: '網路開店的所需一切，ARVIX 都幫你準備好了！商品上架、金物流串接、會員管理、行銷推廣與訂單後台，一個平台輕鬆搞定，快速上線開賣。' },
+      { icon: '📱', title: 'APP 開發', desc: '原生 iOS / Android 與跨平台 APP 開發，結合推播通知、會員卡、購物車與支付整合，打造流暢的行動購物體驗，深化品牌黏著度。' },
+      { icon: '🏪', title: 'ERP 系統', desc: '整合採購、庫存、銷售、財務與人資的企業資源規劃系統。即時數據同步、自動化流程，大幅提升營運效率，讓管理決策更有依據。' },
+      { icon: '👥', title: 'CRM 系統', desc: '集中管理客戶資料、銷售流程與售後追蹤。透過智能分眾與自動化行銷，精準提升客戶回購率，降低獲客成本，讓業務團隊效率倍增。' },
+      { icon: '🤖', title: 'AI 辨識會計', desc: '告別人工對帳！AI 辨識會計系統自動讀取發票、單據，智能分類帳目、即時產出財務報表，大幅降低人力成本，讓財務管理更精準高效。' },
+    ],
+   },
+  integration: {
+    eyebrow: '解決方案',
+    title: '全方位零售解決方案',
+    subtitle: '無論你是電商品牌、傳統企業還是新創團隊，ARVIX 都有對應的解決方案',
+    learnMore: '了解更多',
+    ctaTitle: '找到最適合你的方案',
+    ctaDesc: '讓我們的專業顧問為你量身打造最佳零售解決方案',
+    items: [
+      { icon: '🎯', title: '電商品牌開店方案', desc: '從零到一快速建立品牌電商！SaaS 平台開店 + 行銷工具 + 數據分析，協助品牌突破流量瓶頸，輕鬆實現線上線下整合銷售。' },
+      { icon: '🏭', title: '傳統企業數位轉型', desc: '導入 ERP + CRM 系統，整合採購、庫存、客戶與財務流程，告別人工作業，全面提升企業營運效率與管理精準度。' },
+      { icon: '🤖', title: 'AI 財務自動化方案', desc: '結合 AI 辨識技術與會計系統，自動化處理發票、單據與帳務分類，節省 80% 財務人力，即時掌握企業財務健康狀況。' },
+      { icon: '📲', title: '行動 APP 開發方案', desc: '為品牌打造專屬 iOS / Android APP，整合購物、會員、推播與支付功能，建立穩定的行動流量池，深化顧客黏著度。' },
+      { icon: '⚙️', title: '客製系統整合方案', desc: '當標準產品無法滿足特殊需求，ARVIX 提供完全客製化開發。從需求分析、系統設計到上線維護，全程專業陪跑。' },
+    ],
+  },
+  oneStop: {
+    eyebrow: '一站掌握',
+    title: '一個後台，全面掌握',
+    subtitle: '強大齊全的功能及彈性的架構，從後端營運管理到前端銷售，助你高效經營、快速拓展市場。',
+    items:  [
+      { name: 'ARVIX 電商平台', desc: '快速建立品牌電商網站' },
+      { name: 'ARVIX Payments', desc: '安全便利的金流收款' },
+      { name: 'ARVIX ERP', desc: '企業資源一站管理' },
+      { name: 'ARVIX CRM', desc: '智慧客戶關係管理' },
+      { name: 'ARVIX AI 會計', desc: '自動化財務辨識系統' },
+    ],
+  },
+  footer:  {
+    about: '關於我們',
+    news: '最新消息',
+    security: '資訊安全保護專區',
+    serviceHours: '服務時間 星期一至五 上午 9 點至下午 6 點',
+    copyright: '© Copyright 2026 ARVIX Pte. Ltd.',
+    cols: [
+      { title: 'SaaS 電商平台', links: ['功能介紹', '方案費用', '版型主題', '金流串接', '客戶案例'] },
+      { title: 'APP 開發', links: ['iOS 開發', 'Android 開發', '跨平台開發'] },
+      { title: '企業系統', links: ['ERP 系統', 'CRM 系統', 'AI 會計系統'] },
+      { title: '開始使用', links: ['免費試用', '方案費用', '預約諮詢'] },
+      { title: '更多資源', links: ['技術部落格', '開發文件', '常見問題', 'API 文件', 'LINE 官方帳號'] },
+      { title: '產品支援', links: ['產品更新日誌', '常見問題中心'] },
+      { title: 'ARVIX', links: ['加入我們', '合作機會', '關於我們', '聯絡我們'] },
+    ],
+  },
+  growth: {
+    eyebrow: '為什麼選擇 ARVIX',
+    title: '專業團隊，持續賦能',
+    learnMore: '了解更多',
+    items: [
+      { title: '技術部落格', desc: '定期分享電商趨勢、系統開發技術與 AI 應用知識，幫助台灣企業掌握數位化最新動態，做出更好的技術決策。' },
+      { title: '開放 API 生態圈', desc: '提供完整 API 文件與第三方整合支援，輕鬆串接物流、金流、行銷工具與企業內部系統，滿足各種業務擴展需求。' },
+    ],
+    supports: [
+      { icon: '💬', title: '專業顧問線上支援', desc: '資深顧問手把手協助，從需求規劃到系統上線全程陪跑，確保你的數位化專案順利推進。' },
+      { icon: '🎯', title: '客製化開發服務', desc: '具備豐富實務經驗的工程師團隊，針對複雜業務需求提供完全客製化解決方案，精準符合你的業務流程。' },
+      { icon: '🤖', title: 'AI 技術整合', desc: '結合最新 AI 技術，包含影像辨識、自然語言處理與預測分析，協助企業導入智能化流程，大幅提升營運效率。' },
+      { icon: '📊', title: '數據分析與洞察', desc: 'ARVIX 整合多平台數據，透過視覺化報表與智能分析，幫助你即時掌握業務狀況，加速決策、優化策略。' },
+    ],
+    testimonialsEyebrow: '客戶評價',
+    testimonialsTitle: '他們都在用 ARVIX',
+    testimonials: [
+      { quote: 'ARVIX 的 ERP 系統讓我們的庫存管理效率提升了將近兩倍，再也不用擔心人工對帳出錯的問題。', name: 'Kevin', brand: '台灣製造業客戶', role: '營運長' },
+      { quote: 'AI 會計辨識系統真的幫了我們大忙，每個月的對帳時間從兩週縮短到兩天，財務團隊終於可以專注在更重要的分析工作。', name: 'Mandy', brand: '連鎖零售品牌', role: '財務主管' },
+      { quote: 'ARVIX 幫我們從零打造了 APP，整個開發過程溝通非常順暢，上線後用戶反應也很好，回購率明顯提升。', name: 'Jason', brand: '電商品牌客戶', role: '品牌創辦人' },
+      { quote: '選擇 ARVIX 的 SaaS 電商平台後，我們的開店速度快很多，行銷工具也很齊全，業績在三個月內就成長了 40%。', name: '小雯', brand: '台灣時尚品牌', role: '店長' },
+      { quote: 'CRM 系統讓我們的業務團隊效率大幅提升，客戶追蹤再也不會漏掉，成交率也明顯提高了。', name: 'David', brand: 'B2B 企業客戶', role: '業務總監' },
+    ],
+    ctaEyebrow: '立即開始',
+    ctaTitle: '台灣超過 100 個企業已選擇 ARVIX',
+    ctaCta: '免費預約諮詢',
+  },
+}
+ 
+export default zhTW
+export type Translations = typeof zhTW

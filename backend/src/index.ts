@@ -3,11 +3,13 @@ import { cors } from 'hono/cors'
 import { drizzle } from 'drizzle-orm/d1'
 import { eq } from 'drizzle-orm'
 import * as schema from './schema'
+import { hashPassword, verifyPassword, signToken, verifyToken } from './auth'
 
 type Bindings = {
   DB: D1Database
   R2_BUCKET: R2Bucket
   R2_DOMAIN: string
+  JWT_SECRET: string
 }
 
 const app = new Hono<{ Bindings: Bindings }>()
@@ -22,6 +24,27 @@ app.use('*', cors({
 // 健康检查
 app.get('/', (c) => {
   return c.json({ message: 'SHOPLINE Clone API is running!' })
+})
+
+// Admin middleware
+const requireAdmin = async (c: any, next: any) => {
+  const authHeader = c.req.header('Authorization')
+  if (!authHeader?.startsWith('Bearer ')) return c.json({ error: '未授權' }, 401)
+  const token = authHeader.slice(7)
+  const payload = await verifyToken(token, c.env.JWT_SECRET)
+  if (!payload) return c.json({ error: 'Token 無效或已過期' }, 401)
+  if (!payload.isAdmin) return c.json({ error: '需要管理員權限' }, 403)
+  c.set('adminPayload', payload)
+  await next()
+}
+
+// Init admin account
+app.post('/api/init-admin', async (c) => {
+  const passwordHash = await hashPassword('admin123')
+  try {
+    await c.env.DB.prepare(`INSERT OR REPLACE INTO users (email, password_hash, name, is_admin) VALUES ('admin@admin.com', '${passwordHash}', 'Admin', 1)`).run()
+    return c.json({ ok: true, email: 'admin@admin.com', password: 'admin123' })
+  } catch (e: any) { return c.json({ error: String(e) }, 500) }
 })
 
 // 商品相关路由
@@ -199,11 +222,170 @@ app.get('/api/categories', async (c) => {
   return c.json(categories)
 })
 
-// 用户相关路由
-app.get('/api/users', async (c) => {
+// DB 初始化 / migration
+app.post('/api/init', async (c) => {
+  const stmts = [
+    `CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL UNIQUE, name TEXT NOT NULL, password_hash TEXT NOT NULL DEFAULT '', phone TEXT, address TEXT, is_admin INTEGER DEFAULT 0, created_at TEXT DEFAULT CURRENT_TIMESTAMP, updated_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
+    `CREATE TABLE IF NOT EXISTS categories (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT, image_url TEXT, created_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
+    `CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT, price REAL NOT NULL, image_url TEXT, category TEXT, stock INTEGER DEFAULT 0, featured INTEGER DEFAULT 0, created_at TEXT DEFAULT CURRENT_TIMESTAMP, updated_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
+    `CREATE TABLE IF NOT EXISTS orders (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER REFERENCES users(id), total_amount REAL NOT NULL, status TEXT DEFAULT 'pending', shipping_address TEXT, created_at TEXT DEFAULT CURRENT_TIMESTAMP, updated_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
+    `CREATE TABLE IF NOT EXISTS order_items (id INTEGER PRIMARY KEY AUTOINCREMENT, order_id INTEGER REFERENCES orders(id), product_id INTEGER REFERENCES products(id), quantity INTEGER NOT NULL, price REAL NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
+    `CREATE TABLE IF NOT EXISTS cart_items (id INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT NOT NULL, user_id INTEGER REFERENCES users(id), product_id INTEGER REFERENCES products(id) NOT NULL, quantity INTEGER NOT NULL DEFAULT 1, created_at TEXT DEFAULT CURRENT_TIMESTAMP, updated_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
+    `CREATE TABLE IF NOT EXISTS trial_systems (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, desc TEXT NOT NULL DEFAULT '', url TEXT NOT NULL, color TEXT NOT NULL DEFAULT '#3B82F6', bg TEXT NOT NULL DEFAULT 'rgba(59,130,246,0.08)', border TEXT NOT NULL DEFAULT 'rgba(59,130,246,0.2)', emoji TEXT NOT NULL DEFAULT '🌐', tags TEXT NOT NULL DEFAULT '[]', active INTEGER NOT NULL DEFAULT 1, sort_order INTEGER NOT NULL DEFAULT 0, created_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
+  ]
+  try {
+    for (const sql of stmts) {
+      await c.env.DB.prepare(sql).run()
+    }
+    // migration: add columns if missing
+    try { await c.env.DB.prepare(`ALTER TABLE users ADD COLUMN password_hash TEXT NOT NULL DEFAULT ''`).run() } catch {}
+    try { await c.env.DB.prepare(`ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0`).run() } catch {}
+    return c.json({ message: 'DB initialized' })
+  } catch (error) {
+    console.error('Init error:', error)
+    return c.json({ error: String(error) }, 500)
+  }
+})
+
+// Auth 路由
+app.post('/api/auth/register', async (c) => {
+  try {
+    const { email, password, name, phone, shopName } = await c.req.json()
+    if (!email || !password) return c.json({ error: '請填寫 Email 和密碼' }, 400)
+    if (password.length < 6) return c.json({ error: '密碼至少 6 個字元' }, 400)
+
+    const db = drizzle(c.env.DB, { schema })
+    const existing = await db.select().from(schema.users).where(eq(schema.users.email, email)).get()
+    if (existing) return c.json({ error: 'Email 已被註冊' }, 409)
+
+    const passwordHash = await hashPassword(password)
+    const user = await db.insert(schema.users).values({
+      email,
+      name: name || shopName || email.split('@')[0],
+      passwordHash,
+      phone: phone || null,
+    }).returning().get()
+
+    const token = await signToken({ userId: user.id, email: user.email, isAdmin: user.isAdmin }, c.env.JWT_SECRET)
+    return c.json({ token, user: { id: user.id, email: user.email, name: user.name, isAdmin: user.isAdmin } }, 201)
+  } catch (error) {
+    console.error('Register error:', error)
+    return c.json({ error: '註冊失敗，請重試' }, 500)
+  }
+})
+
+app.post('/api/auth/login', async (c) => {
+  try {
+    const { email, password } = await c.req.json()
+    if (!email || !password) return c.json({ error: '請填寫 Email 和密碼' }, 400)
+
+    const db = drizzle(c.env.DB, { schema })
+    const user = await db.select().from(schema.users).where(eq(schema.users.email, email)).get()
+    if (!user) return c.json({ error: 'Email 或密碼錯誤' }, 401)
+
+    const valid = await verifyPassword(password, user.passwordHash)
+    if (!valid) return c.json({ error: 'Email 或密碼錯誤' }, 401)
+
+    const token = await signToken({ userId: user.id, email: user.email, isAdmin: user.isAdmin }, c.env.JWT_SECRET)
+    return c.json({ token, user: { id: user.id, email: user.email, name: user.name, isAdmin: user.isAdmin } })
+  } catch (error) {
+    console.error('Login error:', error)
+    return c.json({ error: '登入失敗，請重試' }, 500)
+  }
+})
+
+app.get('/api/auth/me', async (c) => {
+  const authHeader = c.req.header('Authorization')
+  if (!authHeader?.startsWith('Bearer ')) return c.json({ error: '未授權' }, 401)
+  const token = authHeader.slice(7)
+  const payload = await verifyToken(token, c.env.JWT_SECRET)
+  if (!payload) return c.json({ error: 'Token 無效或已過期' }, 401)
+
   const db = drizzle(c.env.DB, { schema })
-  const users = await db.select().from(schema.users)
+  const user = await db.select().from(schema.users).where(eq(schema.users.id, payload.userId)).get()
+  if (!user) return c.json({ error: '用戶不存在' }, 404)
+  return c.json({ id: user.id, email: user.email, name: user.name, isAdmin: user.isAdmin })
+})
+
+// 用户相关路由 (admin only)
+app.get('/api/users', requireAdmin, async (c) => {
+  const db = drizzle(c.env.DB, { schema })
+  const users = await db.select({
+    id: schema.users.id,
+    email: schema.users.email,
+    name: schema.users.name,
+    phone: schema.users.phone,
+    isAdmin: schema.users.isAdmin,
+    createdAt: schema.users.createdAt,
+  }).from(schema.users)
   return c.json(users)
+})
+
+app.delete('/api/users/:id', requireAdmin, async (c) => {
+  const id = parseInt(c.req.param('id'))
+  try {
+    const db = drizzle(c.env.DB, { schema })
+    await db.delete(schema.users).where(eq(schema.users.id, id))
+    return c.json({ message: '用戶已刪除' })
+  } catch (e: any) { return c.json({ error: String(e) }, 500) }
+})
+
+// Trial systems CRUD (GET public, others admin only)
+app.get('/api/trial-systems', async (c) => {
+  const db = drizzle(c.env.DB, { schema })
+  const systems = await db.select().from(schema.trialSystems).orderBy(schema.trialSystems.sortOrder)
+  return c.json(systems.map(s => ({ ...s, tags: JSON.parse(s.tags || '[]') })))
+})
+
+app.post('/api/trial-systems', requireAdmin, async (c) => {
+  try {
+    const body = await c.req.json()
+    const db = drizzle(c.env.DB, { schema })
+    const item = await db.insert(schema.trialSystems).values({
+      name: body.name,
+      desc: body.desc || '',
+      url: body.url,
+      color: body.color || '#3B82F6',
+      bg: body.bg || 'rgba(59,130,246,0.08)',
+      border: body.border || 'rgba(59,130,246,0.2)',
+      emoji: body.emoji || '🌐',
+      tags: JSON.stringify(body.tags || []),
+      active: body.active ?? 1,
+      sortOrder: body.sortOrder ?? 0,
+    }).returning().get()
+    return c.json({ ...item, tags: JSON.parse(item.tags || '[]') }, 201)
+  } catch (e: any) { return c.json({ error: String(e) }, 500) }
+})
+
+app.put('/api/trial-systems/:id', requireAdmin, async (c) => {
+  const id = parseInt(c.req.param('id'))
+  try {
+    const body = await c.req.json()
+    const db = drizzle(c.env.DB, { schema })
+    const item = await db.update(schema.trialSystems).set({
+      name: body.name,
+      desc: body.desc || '',
+      url: body.url,
+      color: body.color || '#3B82F6',
+      bg: body.bg || 'rgba(59,130,246,0.08)',
+      border: body.border || 'rgba(59,130,246,0.2)',
+      emoji: body.emoji || '🌐',
+      tags: JSON.stringify(body.tags || []),
+      active: body.active ?? 1,
+      sortOrder: body.sortOrder ?? 0,
+    }).where(eq(schema.trialSystems.id, id)).returning().get()
+    if (!item) return c.json({ error: '不存在' }, 404)
+    return c.json({ ...item, tags: JSON.parse(item.tags || '[]') })
+  } catch (e: any) { return c.json({ error: String(e) }, 500) }
+})
+
+app.delete('/api/trial-systems/:id', requireAdmin, async (c) => {
+  const id = parseInt(c.req.param('id'))
+  try {
+    const db = drizzle(c.env.DB, { schema })
+    await db.delete(schema.trialSystems).where(eq(schema.trialSystems.id, id))
+    return c.json({ message: '已刪除' })
+  } catch (e: any) { return c.json({ error: String(e) }, 500) }
 })
 
 // 订单相关路由

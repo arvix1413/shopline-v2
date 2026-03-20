@@ -1,10 +1,30 @@
 export default function OnlineStoreSetupPage() {
   const steps = [
-    { num: '1', title: '建立你的品牌網站商店', items: ['設定你的商店名稱、品牌標誌 ( Logo )', '在 SHOPLINE 後台申請專屬的獨有網址', '自由選擇網店設計風格與版型架構'] },
-    { num: '2', title: '上架你的商品', items: ['新增商品資訊、圖片與價格', '設定商品分類與標籤', '管理庫存與商品變體'] },
-    { num: '3', title: '設定金流與物流', items: ['開通 SHOPLINE Payments 金流服務', '串接物流合作夥伴', '設定運費規則'] },
-    { num: '4', title: '行銷推廣', items: ['設定 SEO 關鍵字', '建立社群媒體連結', '設定首波促銷活動'] },
-    { num: '5', title: '正式開賣！', items: ['預覽並測試商店', '公開商店讓顧客瀏覽', '開始接收訂單'] },
+    {
+      num: '1',
+      title: '建立品牌網站商店',
+      items: ['設定商店名稱、品牌標誌 ( Logo )', '在 ARVIX 後台申請專屬的獨有網址'],
+    },
+    {
+      num: '2',
+      title: '打造獨特品牌風格',
+      items: ['自由選擇版型，挑選符合品牌調性的設計主題', '開始建置頁面，透過拖曳方式完成頁面編排'],
+    },
+    {
+      num: '3',
+      title: '設定物流送貨選項',
+      items: ['多樣物流選擇，整合黑貓、7-11、全家等主流物流', '設定運費規則，依重量、金額或地區彈性設定'],
+    },
+    {
+      num: '4',
+      title: '制定金流收款方式',
+      items: ['開通 ARVIX Payments，一次申請多種支付方式', '支援信用卡、ATM 轉帳、行動支付等多元收款'],
+    },
+    {
+      num: '5',
+      title: '上傳商品並建立分類',
+      items: ['新增商品資訊、圖片與價格，設定商品規格', '建立商品分類，讓顧客輕鬆找到想要的商品'],
+    },
   ]
 
   return (
@@ -15,7 +35,7 @@ export default function OnlineStoreSetupPage() {
             5 個步驟<br />輕鬆建立你的網路商店
           </h1>
           <p className="text-lg" style={{ color: '#687280' }}>
-            想架設品牌電商網站該怎麼開始？SHOPLINE 為你整理開店關鍵 5 大步驟，助你快速上線開賣！
+            想架設品牌電商網站該怎麼開始？ARVIX 為你整理開店關鍵 5 大步驟，助你快速上線開賣！
           </p>
         </div>
       </section>
@@ -47,7 +67,7 @@ export default function OnlineStoreSetupPage() {
       <section className="py-20 text-center" style={{ backgroundColor: '#00142D' }}>
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">大功告成！ 立即開始你的網路生意</h2>
-          <a href="/register" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
             立即免費試用
           </a>
         </div>

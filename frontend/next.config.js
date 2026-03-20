@@ -6,6 +6,8 @@ const nextConfig = {
       'img.shoplineapp.com',
       'shoplineimg.com',
       'd31xv78q8gnfco.cloudfront.net',
+      'cdn.prod.website-files.com',
+      'plus-shoplineapp-com.s3.ap-southeast-1.amazonaws.com',
     ],
     unoptimized: true,
   },

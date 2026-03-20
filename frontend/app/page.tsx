@@ -9,18 +9,17 @@ import Footer from './components/Footer'
 
 export default function Home() {
   return (
-    <main className="min-h-screen" style={{ backgroundColor: '#fff', color: '#00142D' }}>
+    <main className="min-h-screen" style={{ backgroundColor: '#08081A', color: '#fff' }}>
       <Header />
       <Hero />
-      {/* Dark navy block: Features + Solutions share #00142D background */}
-      <div style={{ backgroundColor: '#00142D' }}>
+      {/* Dark block: Features + Solutions */}
+      <div style={{ backgroundColor: '#0E0E2C' }}>
         <Features />
         <Solutions />
       </div>
       <Integration />
       <OneStop />
-      {/* White block: Growth sections */}
-      <div style={{ backgroundColor: '#fff' }}>
+      <div style={{ backgroundColor: '#08081A' }}>
         <Growth />
       </div>
       <Footer />

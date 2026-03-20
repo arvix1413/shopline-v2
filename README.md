@@ -198,6 +198,180 @@ curl -X POST -F "file=@image.jpg" https://shopline-backend.arvix1413.workers.dev
 - 📝 输入验证和清理
 - 🚫 SQL 注入防护
 
+## 🕷️ 原版爬取工具
+
+用于爬取 shopline.tw 所有页面的 HTML + 截图，作为复刻对比基准。
+
+### 安装依赖
+```bash
+pip install playwright
+python3 -m playwright install chromium
+```
+
+### 运行
+```bash
+cd shopline-v2/crawler
+python3 shopline_crawler.py
+```
+
+### 输出结构
+```
+shopline_output/
+├── screenshots/   # 每页全屏截图 (.png)
+├── html/          # 每页完整 HTML (.html)
+└── crawl_report.json
+```
+
+覆盖页面（36 个）：解決方案、網路商店、社群購物、零售POS、功能應用、方案費用、新手上路等所有导航子页面。
+
+### 爬虫脚本完整代码
+
+```python
+"""
+SHOPLINE.TW 完整爬取脚本
+- 抓取所有导航菜单子页面
+- 保存 HTML + 截图
+- 支持点击菜单跳转
+
+安装依赖:
+  pip install playwright
+  playwright install chromium
+
+运行:
+  python shopline_crawler.py
+"""
+
+import asyncio
+import json
+import os
+import re
+from pathlib import Path
+from urllib.parse import urljoin, urlparse
+from playwright.async_api import async_playwright
+
+BASE_URL = "https://shopline.tw"
+OUTPUT_DIR = Path("shopline_output")
+SCREENSHOTS_DIR = OUTPUT_DIR / "screenshots"
+HTML_DIR = OUTPUT_DIR / "html"
+TIMEOUT = 30_000  # ms
+
+NAV_PAGES = [
+    {"name": "解決方案總覽",          "url": "/solutions"},
+    {"name": "流量獲取與轉換",         "url": "/solutions/traffic-and-conversion"},
+    {"name": "會員回購",              "url": "/solutions/member-repurchase"},
+    {"name": "OMO 全通路整合",         "url": "/solutions/omo"},
+    {"name": "商店營運效率",           "url": "/solutions/shop-efficiency"},
+    {"name": "數據賦能",              "url": "/solutions/data-analysis"},
+    {"name": "網路商店特色總覽",        "url": "/online-store"},
+    {"name": "網路商店功能介紹",        "url": "/online-store/features"},
+    {"name": "客戶案例",              "url": "/showcase"},
+    {"name": "SHOP Builder",         "url": "/online-store/shop-builder"},
+    {"name": "版型主題",              "url": "/templates"},
+    {"name": "社群購物特色總覽",        "url": "/social-commerce"},
+    {"name": "社群購物功能介紹",        "url": "/social-commerce/features"},
+    {"name": "Instagram Live",       "url": "/social-commerce/instagram-live"},
+    {"name": "零售POS特色總覽",        "url": "/pos"},
+    {"name": "零售POS功能介紹",        "url": "/pos/features"},
+    {"name": "週邊硬體",              "url": "/pos/hardware"},
+    {"name": "RFIM 分眾行銷",         "url": "/targeted-marketing"},
+    {"name": "LINE 官方帳號整合",      "url": "/line-solution"},
+    {"name": "團購解決方案",           "url": "/group-buying"},
+    {"name": "Shoplytics 數據分析",   "url": "/shoplytics"},
+    {"name": "SHOPLINE Payments",    "url": "/payments"},
+    {"name": "Smart OMO",            "url": "/smart-omo"},
+    {"name": "Shopper App",          "url": "/shopper-app"},
+    {"name": "所有方案費用",           "url": "/about/pricing"},
+    {"name": "功能模組費用",           "url": "/about/pricing/module"},
+    {"name": "開店祕技",              "url": "/online-store-setup"},
+    {"name": "新手問答",              "url": "/faq/overview"},
+    {"name": "關於我們",              "url": "/about"},
+    {"name": "最新消息",              "url": "/about/press"},
+    {"name": "網站地圖",              "url": "/about/sitemap"},
+    {"name": "合作機會",              "url": "/cooperate"},
+    {"name": "精選夥伴",              "url": "/selectedpartners"},
+    {"name": "資格與認證",            "url": "/compliance-center"},
+    {"name": "產品最新動態",           "url": "/changelog"},
+]
+
+
+def slugify(text: str) -> str:
+    text = re.sub(r'[^\w\u4e00-\u9fff\-]', '_', text)
+    return text[:60]
+
+
+async def scrape_page(page, url: str, name: str):
+    full_url = urljoin(BASE_URL, url)
+    slug = slugify(name)
+    print(f"\n{'─'*60}")
+    print(f"  📄 {name}")
+    print(f"  🔗 {full_url}")
+
+    try:
+        await page.goto(full_url, wait_until="networkidle", timeout=TIMEOUT)
+        await page.wait_for_timeout(1500)
+
+        html_content = await page.content()
+        html_path = HTML_DIR / f"{slug}.html"
+        html_path.write_text(html_content, encoding="utf-8")
+        print(f"  ✅ HTML saved → {html_path.name}")
+
+        screenshot_path = SCREENSHOTS_DIR / f"{slug}.png"
+        await page.screenshot(path=str(screenshot_path), full_page=True)
+        print(f"  📸 Screenshot → {screenshot_path.name}")
+
+        links = await page.eval_on_selector_all(
+            "a[href]",
+            "els => els.map(el => el.getAttribute('href')).filter(h => h && h.startsWith('/') && !h.startsWith('//'))"
+        )
+        return {
+            "name": name, "url": full_url, "slug": slug,
+            "status": "success", "internal_links_found": len(set(links)),
+        }
+    except Exception as e:
+        print(f"  ❌ Error: {e}")
+        return {"name": name, "url": full_url, "slug": slug, "status": "error", "error": str(e)}
+
+
+async def main():
+    OUTPUT_DIR.mkdir(exist_ok=True)
+    SCREENSHOTS_DIR.mkdir(exist_ok=True)
+    HTML_DIR.mkdir(exist_ok=True)
+
+    results = []
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True, args=["--no-sandbox", "--disable-dev-shm-usage"])
+        context = await browser.new_context(
+            viewport={"width": 1440, "height": 900},
+            user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+            locale="zh-TW",
+        )
+        page = await context.new_page()
+
+        result = await scrape_page(page, "/", "首頁")
+        results.append(result)
+
+        for item in NAV_PAGES:
+            result = await scrape_page(page, item["url"], item["name"])
+            results.append(result)
+            await asyncio.sleep(0.5)
+
+        await browser.close()
+
+    report_path = OUTPUT_DIR / "crawl_report.json"
+    with open(report_path, "w", encoding="utf-8") as f:
+        json.dump(results, f, ensure_ascii=False, indent=2)
+
+    success = [r for r in results if r["status"] == "success"]
+    errors = [r for r in results if r["status"] == "error"]
+    print(f"\n✅ 成功: {len(success)} 页  ❌ 失败: {len(errors)} 页")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+---
+
 ## 🤝 贡献指南
 
 1. Fork 项目

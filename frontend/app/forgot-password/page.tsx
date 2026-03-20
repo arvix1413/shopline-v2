@@ -70,7 +70,7 @@ export default function ForgotPasswordPage() {
         )}
 
         <p className="mt-8 text-center text-white/40 text-xs">
-          © 2013–2026 SHOPLINE Limited
+          © 2013–2026 ARVIX Limited
         </p>
       </div>
     </div>
