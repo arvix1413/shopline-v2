@@ -71,8 +71,17 @@ export const trialSystems = sqliteTable('trial_systems', {
   bg: text('bg').notNull().default('rgba(59,130,246,0.08)'),
   border: text('border').notNull().default('rgba(59,130,246,0.2)'),
   emoji: text('emoji').notNull().default('🌐'),
-  tags: text('tags').notNull().default('[]'), // JSON array string
+  tags: text('tags').notNull().default('[]'),
   active: integer('active').notNull().default(1),
   sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+})
+
+export const events = sqliteTable('events', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  anonymousId: text('anonymous_id').notNull(),
+  userId: integer('user_id'),
+  event: text('event').notNull(), // visit_homepage | click_signup | sign_up_complete | enter_dashboard | create_product
+  properties: text('properties').default('{}'), // JSON
   createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
 })

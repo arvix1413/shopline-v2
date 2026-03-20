@@ -232,6 +232,7 @@ app.post('/api/init', async (c) => {
     `CREATE TABLE IF NOT EXISTS order_items (id INTEGER PRIMARY KEY AUTOINCREMENT, order_id INTEGER REFERENCES orders(id), product_id INTEGER REFERENCES products(id), quantity INTEGER NOT NULL, price REAL NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
     `CREATE TABLE IF NOT EXISTS cart_items (id INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT NOT NULL, user_id INTEGER REFERENCES users(id), product_id INTEGER REFERENCES products(id) NOT NULL, quantity INTEGER NOT NULL DEFAULT 1, created_at TEXT DEFAULT CURRENT_TIMESTAMP, updated_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
     `CREATE TABLE IF NOT EXISTS trial_systems (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, desc TEXT NOT NULL DEFAULT '', url TEXT NOT NULL, color TEXT NOT NULL DEFAULT '#3B82F6', bg TEXT NOT NULL DEFAULT 'rgba(59,130,246,0.08)', border TEXT NOT NULL DEFAULT 'rgba(59,130,246,0.2)', emoji TEXT NOT NULL DEFAULT '🌐', tags TEXT NOT NULL DEFAULT '[]', active INTEGER NOT NULL DEFAULT 1, sort_order INTEGER NOT NULL DEFAULT 0, created_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
+    `CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY AUTOINCREMENT, anonymous_id TEXT NOT NULL, user_id INTEGER, event TEXT NOT NULL, properties TEXT DEFAULT '{}', created_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
   ]
   try {
     for (const sql of stmts) {
@@ -606,6 +607,52 @@ app.get('/images/*', async (c) => {
     console.error('Image proxy error:', error)
     return c.json({ error: 'Failed to serve image' }, 500)
   }
+})
+
+// ── Events tracking ──────────────────────────────────────────────────────────
+app.post('/api/events', async (c) => {
+  try {
+    const { anonymousId, userId, event, properties } = await c.req.json()
+    if (!anonymousId || !event) return c.json({ error: 'missing fields' }, 400)
+    await c.env.DB.prepare(
+      `INSERT INTO events (anonymous_id, user_id, event, properties, created_at) VALUES (?, ?, ?, ?, datetime('now'))`
+    ).bind(anonymousId, userId ?? null, event, JSON.stringify(properties || {})).run()
+    return c.json({ ok: true })
+  } catch (e: any) { return c.json({ error: String(e) }, 500) }
+})
+
+// GET /api/admin/funnel — conversion funnel (admin only)
+app.get('/api/admin/funnel', requireAdmin, async (c) => {
+  try {
+    const steps = ['visit_homepage', 'click_signup', 'sign_up_complete', 'enter_dashboard', 'create_product']
+    const result: Record<string, number> = {}
+    for (const step of steps) {
+      const row = await c.env.DB.prepare(
+        `SELECT COUNT(DISTINCT anonymous_id) as cnt FROM events WHERE event = ?`
+      ).bind(step).first<{ cnt: number }>()
+      result[step] = row?.cnt ?? 0
+    }
+    // Recent user events (last 50)
+    const recent = await c.env.DB.prepare(
+      `SELECT e.anonymous_id, e.user_id, e.event, e.created_at, u.email, u.name
+       FROM events e LEFT JOIN users u ON e.user_id = u.id
+       ORDER BY e.created_at DESC LIMIT 50`
+    ).all()
+    // Per-user funnel progress
+    const userProgress = await c.env.DB.prepare(
+      `SELECT u.id, u.email, u.name, u.created_at,
+        MAX(CASE WHEN e.event='visit_homepage' THEN 1 ELSE 0 END) as visited,
+        MAX(CASE WHEN e.event='click_signup' THEN 1 ELSE 0 END) as clicked_signup,
+        MAX(CASE WHEN e.event='sign_up_complete' THEN 1 ELSE 0 END) as signed_up,
+        MAX(CASE WHEN e.event='enter_dashboard' THEN 1 ELSE 0 END) as entered_dashboard,
+        MAX(CASE WHEN e.event='create_product' THEN 1 ELSE 0 END) as created_product
+       FROM users u
+       LEFT JOIN events e ON u.id = e.user_id
+       WHERE u.is_admin = 0
+       GROUP BY u.id ORDER BY u.created_at DESC LIMIT 100`
+    ).all()
+    return c.json({ funnel: result, recent: recent.results, userProgress: userProgress.results })
+  } catch (e: any) { return c.json({ error: String(e) }, 500) }
 })
 
 export default app

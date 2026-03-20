@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
+import { track, bindUser } from '../../lib/tracker'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://shopline-backend.arvix1413.workers.dev'
 
@@ -33,6 +34,8 @@ export default function RegisterPage() {
       const data = await res.json()
       if (!res.ok) { setError(data.error || '註冊失敗'); return }
       login(data.token, data.user)
+      track('sign_up_complete', { email: form.email }, data.user.id)
+      bindUser(data.user.id)
       router.push('/')
     } catch {
       setError('網路錯誤，請重試')
@@ -79,6 +82,7 @@ export default function RegisterPage() {
             className="w-full px-5 py-4 rounded-lg bg-white text-gray-700 placeholder-gray-400 text-base outline-none focus:ring-2 focus:ring-blue-400 border-0" />
 
           <button type="submit" disabled={loading}
+            onClick={() => track('click_signup')}
             className="w-full flex items-center justify-center gap-3 py-4 rounded-lg text-white font-bold text-lg transition-all hover:brightness-110 active:scale-[0.99] disabled:opacity-60"
             style={{ background: 'linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)' }}>
             {loading ? '處理中...' : '立即註冊'}

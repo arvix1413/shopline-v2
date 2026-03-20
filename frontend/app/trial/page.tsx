@@ -6,6 +6,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import { ExternalLink } from 'lucide-react'
+import { track } from '../../lib/tracker'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8787'
 
@@ -65,6 +66,7 @@ export default function TrialPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {systems.map(sys => (
               <a key={sys.id} href={sys.url} target="_blank" rel="noopener noreferrer"
+              onClick={() => track('enter_dashboard', { system: sys.name }, user.id)}
                 className="group relative rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl cursor-pointer"
                 style={{ background: sys.bg, border: `1px solid ${sys.border}`, boxShadow: '0 4px 24px rgba(0,0,0,0.2)' }}>
                 <div className="text-4xl mb-4">{sys.emoji}</div>

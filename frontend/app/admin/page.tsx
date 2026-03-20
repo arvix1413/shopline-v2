@@ -11,7 +11,7 @@ const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8787'
 interface UserRow { id: number; email: string; name: string; phone: string | null; isAdmin: number | null; createdAt: string | null }
 interface TrialSystem { id: number; name: string; desc: string; url: string; color: string; bg: string; border: string; emoji: string; tags: string[]; active: number; sortOrder: number }
 
-const TABS = ['用戶管理', '試用系統管理'] as const
+const TABS = ['用戶管理', '試用系統管理', '行為漏斗', '店鋪報表'] as const
 type Tab = typeof TABS[number]
 
 
@@ -20,6 +20,15 @@ export default function AdminPage() {
   const router = useRouter()
   const [tab, setTab] = useState<Tab>('用戶管理')
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+
+  // Funnel state
+  const [funnel, setFunnel] = useState<Record<string, number>>({})
+  const [userProgress, setUserProgress] = useState<any[]>([])
+  const [funnelLoading, setFunnelLoading] = useState(false)
+
+  // Shop stats state
+  const [shopStats, setShopStats] = useState<any[]>([])
+  const [statsLoading, setStatsLoading] = useState(false)
 
   // Users state
   const [users, setUsers] = useState<UserRow[]>([])
@@ -56,11 +65,42 @@ export default function AdminPage() {
     } catch { showMsg('error', '獲取試用系統失敗') } finally { setSysLoading(false) }
   }, [])
 
+  const fetchFunnel = useCallback(async () => {
+    setFunnelLoading(true)
+    try {
+      const res = await fetch(`${API}/api/admin/funnel`, { headers: { Authorization: `Bearer ${token}` } })
+      const data = await res.json()
+      setFunnel(data.funnel || {})
+      setUserProgress(data.userProgress || [])
+    } catch { showMsg('error', '獲取漏斗數據失敗') } finally { setFunnelLoading(false) }
+  }, [token])
+
+  const SHOP_APIS = [
+    { name: 'TinyWearhouse', url: 'https://tinywearhouse-backend.arvix1413.workers.dev', emoji: '👗' },
+    { name: 'DAF Shoes', url: 'https://daf-shoes-backend.arvix1413.workers.dev', emoji: '👟' },
+    { name: 'MeierQ', url: 'https://meierq-api.arvix1413.workers.dev', emoji: '⌚' },
+    { name: 'Molava', url: 'https://xyn-api.arvix1413.workers.dev', emoji: '👜' },
+    { name: 'Zenlet', url: 'https://xyvn-shop-api.arvix1413.workers.dev', emoji: '💳' },
+    { name: 'IMS', url: 'https://ims-backend.arvix1413.workers.dev', emoji: '📦' },
+  ]
+
+  const fetchShopStats = useCallback(async () => {
+    setStatsLoading(true)
+    try {
+      const results = await Promise.allSettled(
+        SHOP_APIS.map(s => fetch(`${s.url}/api/admin/stats`).then(r => r.json()).then(d => ({ ...d, name: s.name, emoji: s.emoji })))
+      )
+      setShopStats(results.map((r, i) => r.status === 'fulfilled' ? r.value : { name: SHOP_APIS[i].name, emoji: SHOP_APIS[i].emoji, error: true }))
+    } catch { showMsg('error', '獲取店鋪數據失敗') } finally { setStatsLoading(false) }
+  }, [])
+
   useEffect(() => {
     if (!user || user.isAdmin !== 1) return
     if (tab === '用戶管理') fetchUsers()
     if (tab === '試用系統管理') fetchSystems()
-  }, [tab, user, fetchUsers, fetchSystems])
+    if (tab === '行為漏斗') fetchFunnel()
+    if (tab === '店鋪報表') fetchShopStats()
+  }, [tab, user, fetchUsers, fetchSystems, fetchFunnel, fetchShopStats])
 
   if (isLoading) return <main className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></main>
   if (!user || user.isAdmin !== 1) return null
@@ -251,6 +291,163 @@ export default function AdminPage() {
                 </table>
               )}
             </div>
+          </div>
+        )}
+
+        {/* ===== FUNNEL TAB ===== */}
+        {tab === '行為漏斗' && (
+          <div>
+            <h2 className="text-lg font-semibold mb-4">用戶轉換漏斗</h2>
+            {funnelLoading ? <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" /></div> : (
+              <>
+                {/* Funnel bars */}
+                <div className="bg-white rounded-lg shadow border p-6 mb-6">
+                  {[
+                    { key: 'visit_homepage', label: '進入首頁', color: '#3B82F6' },
+                    { key: 'click_signup', label: '點擊註冊', color: '#8B5CF6' },
+                    { key: 'sign_up_complete', label: '完成註冊', color: '#10B981' },
+                    { key: 'enter_dashboard', label: '進入後台', color: '#F59E0B' },
+                    { key: 'create_product', label: '建立商品', color: '#EF4444' },
+                  ].map((step, i, arr) => {
+                    const cnt = funnel[step.key] ?? 0
+                    const max = funnel['visit_homepage'] || 1
+                    const pct = Math.round((cnt / max) * 100)
+                    const prev = i > 0 ? (funnel[arr[i-1].key] ?? 0) : cnt
+                    const dropPct = prev > 0 ? Math.round(((prev - cnt) / prev) * 100) : 0
+                    return (
+                      <div key={step.key} className="mb-4">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-sm font-medium text-gray-700">{step.label}</span>
+                          <div className="flex items-center gap-3">
+                            {i > 0 && dropPct > 0 && <span className="text-xs text-red-500">-{dropPct}% 流失</span>}
+                            <span className="text-sm font-bold" style={{ color: step.color }}>{cnt.toLocaleString()} 人</span>
+                          </div>
+                        </div>
+                        <div className="h-8 bg-gray-100 rounded-lg overflow-hidden">
+                          <div className="h-full rounded-lg transition-all duration-500 flex items-center px-3"
+                            style={{ width: `${Math.max(pct, 2)}%`, backgroundColor: step.color, opacity: 0.85 }}>
+                            <span className="text-white text-xs font-bold">{pct}%</span>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+
+                {/* Per-user progress */}
+                <div className="bg-white rounded-lg shadow border overflow-hidden">
+                  <div className="px-4 py-3 border-b bg-gray-50">
+                    <h3 className="font-semibold text-sm">用戶進度明細</h3>
+                  </div>
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50 text-xs text-gray-500 uppercase">
+                      <tr>
+                        <th className="px-4 py-3 text-left">用戶</th>
+                        <th className="px-4 py-3 text-center">進入首頁</th>
+                        <th className="px-4 py-3 text-center">點擊註冊</th>
+                        <th className="px-4 py-3 text-center">完成註冊</th>
+                        <th className="px-4 py-3 text-center">進入後台</th>
+                        <th className="px-4 py-3 text-center">建立商品</th>
+                        <th className="px-4 py-3 text-left">卡在</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {userProgress.map((u: any) => {
+                        const steps = [u.visited, u.clicked_signup, u.signed_up, u.entered_dashboard, u.created_product]
+                        const labels = ['進入首頁','點擊註冊','完成註冊','進入後台','建立商品']
+                        const lastDone = steps.lastIndexOf(1)
+                        const stuck = lastDone < 4 ? labels[lastDone + 1] : null
+                        return (
+                          <tr key={u.id} className="hover:bg-gray-50">
+                            <td className="px-4 py-3">
+                              <div className="font-medium text-sm">{u.name}</div>
+                              <div className="text-xs text-gray-400">{u.email}</div>
+                            </td>
+                            {steps.map((s, i) => (
+                              <td key={i} className="px-4 py-3 text-center">
+                                <span className={`text-base ${s ? 'text-green-500' : 'text-gray-200'}`}>{s ? '✓' : '○'}</span>
+                              </td>
+                            ))}
+                            <td className="px-4 py-3">
+                              {stuck ? <span className="px-2 py-0.5 rounded-full text-xs bg-orange-100 text-orange-700">{stuck}</span> : <span className="text-xs text-green-600">✅ 完成</span>}
+                            </td>
+                          </tr>
+                        )
+                      })}
+                      {userProgress.length === 0 && <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-400">尚無用戶數據</td></tr>}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* ===== SHOP STATS TAB ===== */}
+        {tab === '店鋪報表' && (
+          <div>
+            <h2 className="text-lg font-semibold mb-4">客戶店鋪營業狀況</h2>
+            {statsLoading ? <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" /></div> : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {shopStats.map((s: any) => {
+                  const growth = s.lastMonthOrders > 0
+                    ? Math.round(((s.thisMonthOrders - s.lastMonthOrders) / s.lastMonthOrders) * 100)
+                    : s.thisMonthOrders > 0 ? 100 : 0
+                  return (
+                    <div key={s.name} className="bg-white rounded-xl shadow border p-5">
+                      <div className="flex items-center gap-2 mb-4">
+                        <span className="text-2xl">{s.emoji}</span>
+                        <div>
+                          <div className="font-bold text-gray-900">{s.name}</div>
+                          {s.error && <div className="text-xs text-red-400">無法連線</div>}
+                        </div>
+                      </div>
+                      {!s.error && (
+                        <>
+                          <div className="grid grid-cols-2 gap-3 mb-4">
+                            <div className="bg-blue-50 rounded-lg p-3">
+                              <div className="text-xs text-blue-500 mb-1">累積訂單</div>
+                              <div className="text-xl font-bold text-blue-700">{s.totalOrders?.toLocaleString()}</div>
+                            </div>
+                            <div className="bg-green-50 rounded-lg p-3">
+                              <div className="text-xs text-green-500 mb-1">累積金額</div>
+                              <div className="text-lg font-bold text-green-700">NT${Math.round(s.totalAmount || 0).toLocaleString()}</div>
+                            </div>
+                            <div className="bg-purple-50 rounded-lg p-3">
+                              <div className="text-xs text-purple-500 mb-1">本月訂單</div>
+                              <div className="text-xl font-bold text-purple-700">{s.thisMonthOrders?.toLocaleString()}</div>
+                            </div>
+                            <div className="bg-orange-50 rounded-lg p-3">
+                              <div className="text-xs text-orange-500 mb-1">月成長率</div>
+                              <div className={`text-xl font-bold ${growth >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                {growth >= 0 ? '+' : ''}{growth}%
+                              </div>
+                            </div>
+                          </div>
+                          {s.monthly && s.monthly.length > 0 && (
+                            <div>
+                              <div className="text-xs text-gray-400 mb-2">近 6 個月訂單</div>
+                              <div className="flex items-end gap-1 h-12">
+                                {s.monthly.map((m: any) => {
+                                  const maxCnt = Math.max(...s.monthly.map((x: any) => x.cnt), 1)
+                                  const h = Math.max(Math.round((m.cnt / maxCnt) * 100), 4)
+                                  return (
+                                    <div key={m.month} className="flex-1 flex flex-col items-center gap-0.5" title={`${m.month}: ${m.cnt} 筆`}>
+                                      <div className="w-full rounded-sm bg-blue-400" style={{ height: `${h}%` }} />
+                                      <div className="text-[9px] text-gray-400">{m.month?.slice(5)}</div>
+                                    </div>
+                                  )
+                                })}
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -6,10 +6,12 @@ import Integration from './components/Integration'
 import OneStop from './components/OneStop'
 import Growth from './components/Growth'
 import Footer from './components/Footer'
+import TrackPageView from './components/TrackPageView'
 
 export default function Home() {
   return (
     <main className="min-h-screen" style={{ backgroundColor: '#08081A', color: '#fff' }}>
+      <TrackPageView event="visit_homepage" />
       <Header />
       <Hero />
       {/* Dark block: Features + Solutions */}
