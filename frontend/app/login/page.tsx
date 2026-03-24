@@ -20,16 +20,19 @@ export default function LoginPage() {
     setError('')
     setLoading(true)
     try {
+      console.log('提交登录表单...', { email: form.email, apiBase: API_BASE })
       const res = await fetch(`${API_BASE}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: form.email, password: form.password }),
       })
       const data = await res.json()
+      console.log('登录响应:', { status: res.status, data })
       if (!res.ok) { setError(data.error || '登入失敗'); return }
       login(data.token, data.user)
       router.push('/')
-    } catch {
+    } catch (error) {
+      console.error('登录错误:', error)
       setError('網路錯誤，請重試')
     } finally {
       setLoading(false)
