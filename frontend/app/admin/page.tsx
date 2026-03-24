@@ -17,10 +17,35 @@ type Tab = typeof TABS[number]
 
 
 export default function AdminPage() {
-  const { user, token, isLoading } = useAuth()
+  // 直接从localStorage读取用户信息，避免AuthContext问题
+  const [user, setUser] = useState<any>(null)
+  const [token, setToken] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
   const [tab, setTab] = useState<Tab>('用戶管理')
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+
+  // 初始化用户信息
+  useEffect(() => {
+    try {
+      const storedToken = localStorage.getItem('token')
+      const storedUser = localStorage.getItem('user')
+      
+      if (storedToken && storedUser) {
+        setToken(storedToken)
+        setUser(JSON.parse(storedUser))
+      } else {
+        // 如果没有token，重定向到登录页
+        router.push('/login')
+        return
+      }
+    } catch (error) {
+      console.error('读取用户信息失败:', error)
+      router.push('/login')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [router])
 
   // Funnel state
   const [funnel, setFunnel] = useState<Record<string, number>>({})

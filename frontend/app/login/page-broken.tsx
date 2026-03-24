@@ -4,11 +4,13 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
+import { useAuth } from '../../contexts/AuthContext'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://shopline-backend.arvix1413.workers.dev'
 
 export default function LoginPage() {
   const router = useRouter()
+  const { login } = useAuth()
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -17,31 +19,18 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
-    
     try {
       console.log('提交登录表单...', { email: form.email, apiBase: API_BASE })
-      
       const res = await fetch(`${API_BASE}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: form.email, password: form.password }),
       })
-      
       const data = await res.json()
       console.log('登录响应:', { status: res.status, data })
-      
-      if (!res.ok) {
-        setError(data.error || '登入失敗')
-        return
-      }
-      
-      // 直接保存到localStorage
-      localStorage.setItem('token', data.token)
-      localStorage.setItem('user', JSON.stringify(data.user))
-      
-      // 跳转到管理后台
-      router.push('/admin')
-      
+      if (!res.ok) { setError(data.error || '登入失敗'); return }
+      login(data.token, data.user)
+      router.push('/')
     } catch (error) {
       console.error('登录错误:', error)
       setError('網路錯誤，請重試')
@@ -71,32 +60,19 @@ export default function LoginPage() {
         {error && (
           <div className="mb-3 px-4 py-3 rounded-lg bg-red-500/20 text-red-200 text-sm text-center">{error}</div>
         )}
-        
         <form onSubmit={handleSubmit} className="space-y-3">
-          <input 
-            type="email" 
-            placeholder="Email" 
-            value={form.email}
+          <input type="text" placeholder="Email 或帳號" value={form.email}
             onChange={e => setForm({ ...form, email: e.target.value })}
             className="w-full px-5 py-4 rounded-lg bg-white text-gray-700 placeholder-gray-400 text-base outline-none focus:ring-2 focus:ring-blue-400 border-0"
-            required 
-          />
-          
-          <input 
-            type="password" 
-            placeholder="密碼" 
-            value={form.password}
+            required />
+          <input type="password" placeholder="密碼" value={form.password}
             onChange={e => setForm({ ...form, password: e.target.value })}
             className="w-full px-5 py-4 rounded-lg bg-white text-gray-700 placeholder-gray-400 text-base outline-none focus:ring-2 focus:ring-blue-400 border-0"
-            required 
-          />
+            required />
 
-          <button 
-            type="submit" 
-            disabled={loading}
+          <button type="submit" disabled={loading}
             className="w-full flex items-center justify-center gap-3 py-4 rounded-lg text-white font-bold text-lg transition-all hover:brightness-110 active:scale-[0.99] disabled:opacity-60"
-            style={{ background: 'linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)' }}
-          >
+            style={{ background: 'linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)' }}>
             {loading ? '處理中...' : '登入'}
             {!loading && <ArrowRight size={22} />}
           </button>
