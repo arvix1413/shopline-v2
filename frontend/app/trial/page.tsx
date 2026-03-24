@@ -20,10 +20,23 @@ export default function TrialPage() {
   const router = useRouter()
   const [systems, setSystems] = useState<TrialSystem[]>([])
   const [fetching, setFetching] = useState(true)
+  const [ssoToken, setSsoToken] = useState<string | null>(null)
 
   useEffect(() => {
     if (!isLoading && !user) router.push('/login')
   }, [user, isLoading, router])
+
+  // Fetch SSO token (signed with SHOPLINE_JWT_SECRET for subsystems)
+  useEffect(() => {
+    if (!token) return
+    fetch(`${API}/api/auth/sso-token`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(r => r.json())
+      .then(data => { if (data.ssoToken) setSsoToken(data.ssoToken) })
+      .catch(() => {})
+  }, [token])
 
   useEffect(() => {
     if (!user) return
@@ -34,7 +47,7 @@ export default function TrialPage() {
       .finally(() => setFetching(false))
   }, [user])
 
-  if (isLoading || fetching) return (
+  if (isLoading || fetching || !ssoToken) return (
     <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#08081A' }}>
       <div className="text-white/40 text-sm">載入中...</div>
     </main>
@@ -65,7 +78,7 @@ export default function TrialPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {systems.map(sys => (
-              <a key={sys.id} href={`${sys.url}?token=${encodeURIComponent(token || '')}&email=${encodeURIComponent(user.email)}&name=${encodeURIComponent(user.name || user.email)}`} target="_blank" rel="noopener noreferrer"
+              <a key={sys.id} href={`${sys.url}?token=${encodeURIComponent(ssoToken || token || '')}&email=${encodeURIComponent(user.email)}&name=${encodeURIComponent(user.name || user.email)}`} target="_blank" rel="noopener noreferrer"
               onClick={() => track('enter_dashboard', { system: sys.name }, user.id)}
                 className="group relative rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl cursor-pointer"
                 style={{ background: sys.bg, border: `1px solid ${sys.border}`, boxShadow: '0 4px 24px rgba(0,0,0,0.2)' }}>

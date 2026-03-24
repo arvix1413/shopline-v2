@@ -9,14 +9,14 @@
     "db:migrate": "wrangler d1 migrations apply shopline-db"
   },
   "dependencies": {
-    "hono": "^4.0.0",
+    "@cloudflare/workers-types": "^4.20231025.0",
     "drizzle-orm": "^0.29.0",
-    "@cloudflare/workers-types": "^4.20231025.0"
+    "hono": "^4.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.8.0",
     "drizzle-kit": "^0.20.4",
     "typescript": "^5.2.2",
-    "wrangler": "^3.15.0"
+    "wrangler": "^4.76.0"
   }
 }

@@ -10,6 +10,7 @@ type Bindings = {
   R2_BUCKET: R2Bucket
   R2_DOMAIN: string
   JWT_SECRET: string
+  SHOPLINE_JWT_SECRET: string
 }
 
 const app = new Hono<{ Bindings: Bindings }>()
@@ -233,11 +234,51 @@ app.post('/api/init', async (c) => {
     `CREATE TABLE IF NOT EXISTS cart_items (id INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT NOT NULL, user_id INTEGER REFERENCES users(id), product_id INTEGER REFERENCES products(id) NOT NULL, quantity INTEGER NOT NULL DEFAULT 1, created_at TEXT DEFAULT CURRENT_TIMESTAMP, updated_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
     `CREATE TABLE IF NOT EXISTS trial_systems (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, desc TEXT NOT NULL DEFAULT '', url TEXT NOT NULL, color TEXT NOT NULL DEFAULT '#3B82F6', bg TEXT NOT NULL DEFAULT 'rgba(59,130,246,0.08)', border TEXT NOT NULL DEFAULT 'rgba(59,130,246,0.2)', emoji TEXT NOT NULL DEFAULT '🌐', tags TEXT NOT NULL DEFAULT '[]', active INTEGER NOT NULL DEFAULT 1, sort_order INTEGER NOT NULL DEFAULT 0, created_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
     `CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY AUTOINCREMENT, anonymous_id TEXT NOT NULL, user_id INTEGER, event TEXT NOT NULL, properties TEXT DEFAULT '{}', created_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
+    `CREATE TABLE IF NOT EXISTS audit_logs (id TEXT PRIMARY KEY, user_id TEXT, session_id TEXT NOT NULL, system_name TEXT NOT NULL, operation_type TEXT NOT NULL, operation_detail TEXT, ip_address TEXT, user_agent TEXT, device_type TEXT, location_country TEXT, location_city TEXT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, response_status INTEGER, response_time INTEGER, error_message TEXT, created_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
+    `CREATE TABLE IF NOT EXISTS user_sessions (session_id TEXT PRIMARY KEY, user_id TEXT, system_name TEXT NOT NULL, ip_address TEXT, user_agent TEXT, device_type TEXT, start_time DATETIME DEFAULT CURRENT_TIMESTAMP, last_activity DATETIME DEFAULT CURRENT_TIMESTAMP, page_count INTEGER DEFAULT 1, is_active BOOLEAN DEFAULT 1)`,
+    `CREATE TABLE IF NOT EXISTS operation_types (id TEXT PRIMARY KEY, category TEXT NOT NULL, action TEXT NOT NULL, description TEXT, risk_level INTEGER DEFAULT 1)`,
+    `CREATE TABLE IF NOT EXISTS audit_systems (id TEXT PRIMARY KEY, name TEXT NOT NULL, display_name TEXT NOT NULL, url TEXT, color TEXT DEFAULT '#3B82F6', active BOOLEAN DEFAULT 1)`,
   ]
   try {
     for (const sql of stmts) {
       await c.env.DB.prepare(sql).run()
     }
+    
+    // 插入初始化数据
+    const initData = [
+      `INSERT OR IGNORE INTO audit_systems (id, name, display_name, url, color) VALUES 
+        ('shopline', 'shopline', 'SHOPLINE 主系统', 'https://shopline-frontend.pages.dev', '#3B82F6'),
+        ('daf-shoes', 'daf-shoes', 'DAF Shoes', 'https://daf-shoes.pages.dev', '#10B981'),
+        ('molava', 'molava', 'XYN Shop', 'https://xyn-shop.pages.dev', '#8B5CF6'),
+        ('ims', 'ims', 'IMS 系统', 'https://ims.pages.dev', '#F59E0B'),
+        ('meierq', 'meierq', 'MeierQ', 'https://meierq.pages.dev', '#EF4444'),
+        ('tinywearhouse', 'tinywearhouse', 'Tiny Warehouse', 'https://tinywearhouse.pages.dev', '#EC4899'),
+        ('zenlet', 'zenlet', 'Zenlet', 'https://zenlet.pages.dev', '#6366F1')`,
+      `INSERT OR IGNORE INTO operation_types (id, category, action, description, risk_level) VALUES 
+        ('auth_login', '认证', '登录', '用户登录系统', 1),
+        ('auth_logout', '认证', '登出', '用户登出系统', 1),
+        ('auth_register', '认证', '注册', '新用户注册', 2),
+        ('page_view', '页面', '浏览', '用户浏览页面', 1),
+        ('product_view', '商品', '查看', '用户查看商品详情', 1),
+        ('product_search', '商品', '搜索', '用户搜索商品', 1),
+        ('cart_add', '购物车', '添加', '添加商品到购物车', 2),
+        ('cart_remove', '购物车', '移除', '从购物车移除商品', 2),
+        ('cart_clear', '购物车', '清空', '清空购物车', 2),
+        ('order_create', '订单', '创建', '用户创建订单', 3),
+        ('order_cancel', '订单', '取消', '用户取消订单', 3),
+        ('admin_login', '管理', '登录', '管理员登录', 3),
+        ('admin_product_create', '管理', '创建商品', '管理员创建商品', 3),
+        ('admin_product_update', '管理', '更新商品', '管理员更新商品', 3),
+        ('admin_product_delete', '管理', '删除商品', '管理员删除商品', 4),
+        ('admin_user_delete', '管理', '删除用户', '管理员删除用户', 4),
+        ('error_404', '错误', '404', '页面不存在', 2),
+        ('error_500', '错误', '500', '服务器错误', 3)`
+    ]
+    
+    for (const sql of initData) {
+      await c.env.DB.prepare(sql).run()
+    }
+    
     // migration: add columns if missing
     try { await c.env.DB.prepare(`ALTER TABLE users ADD COLUMN password_hash TEXT NOT NULL DEFAULT ''`).run() } catch {}
     try { await c.env.DB.prepare(`ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0`).run() } catch {}
@@ -653,6 +694,358 @@ app.get('/api/admin/funnel', requireAdmin, async (c) => {
     ).all()
     return c.json({ funnel: result, recent: recent.results, userProgress: userProgress.results })
   } catch (e: any) { return c.json({ error: String(e) }, 500) }
+})
+
+// GET /api/admin/audit-log — full event log with user filter (deprecated, use new audit APIs)
+app.get('/api/admin/audit-log', requireAdmin, async (c) => {
+  try {
+    const userId = c.req.query('userId') || ''
+    const event = c.req.query('event') || ''
+    const limit = Math.min(parseInt(c.req.query('limit') || '200'), 500)
+
+    let sql = `SELECT e.id, e.anonymous_id, e.user_id, e.event, e.properties, e.created_at,
+                      u.email, u.name
+               FROM events e LEFT JOIN users u ON e.user_id = u.id
+               WHERE 1=1`
+    const binds: any[] = []
+    if (userId) { sql += ` AND e.user_id = ?`; binds.push(userId) }
+    if (event) { sql += ` AND e.event = ?`; binds.push(event) }
+    sql += ` ORDER BY e.created_at DESC LIMIT ?`
+    binds.push(limit)
+
+    const rows = await c.env.DB.prepare(sql).bind(...binds).all()
+    return c.json({ logs: rows.results })
+  } catch (e: any) { return c.json({ error: String(e) }, 500) }
+})
+
+// ── 增强审计日志系统 ──────────────────────────────────────────────────────────
+
+// 审计日志收集中间件
+const auditLogMiddleware = async (c: any, next: any, operationType: string, operationDetail?: any) => {
+  const startTime = Date.now()
+  const userAgent = c.req.header('User-Agent') || ''
+  const ipAddress = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown'
+  const sessionId = c.req.header('X-Session-ID') || 'anonymous'
+  
+  // 获取设备类型
+  let deviceType = 'desktop'
+  if (userAgent.includes('Mobile')) deviceType = 'mobile'
+  else if (userAgent.includes('Tablet')) deviceType = 'tablet'
+  
+  // 获取地理位置信息
+  const country = c.req.header('CF-IPCountry') || 'unknown'
+  const city = c.req.header('CF-IPCity') || 'unknown'
+  
+  try {
+    await next()
+    
+    // 记录成功的操作
+    const responseTime = Date.now() - startTime
+    const responseStatus = c.res.status || 200
+    
+    await c.env.DB.prepare(`
+      INSERT INTO audit_logs (id, user_id, session_id, system_name, operation_type, operation_detail, 
+                              ip_address, user_agent, device_type, location_country, location_city, 
+                              timestamp, response_status, response_time, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+    `).bind(
+      crypto.randomUUID(),
+      c.get('userId') || null,
+      sessionId,
+      'shopline', // 默认系统名
+      operationType,
+      JSON.stringify(operationDetail || {}),
+      ipAddress,
+      userAgent,
+      deviceType,
+      country,
+      city,
+      new Date().toISOString(),
+      responseStatus,
+      responseTime
+    ).run()
+    
+    // 更新会话信息
+    await c.env.DB.prepare(`
+      INSERT OR REPLACE INTO user_sessions (session_id, user_id, system_name, ip_address, user_agent, 
+                                          device_type, last_activity, page_count, is_active)
+      VALUES (?, ?, ?, ?, ?, ?, datetime('now'), 
+              COALESCE((SELECT page_count FROM user_sessions WHERE session_id = ?), 0) + 1, 1)
+    `).bind(sessionId, c.get('userId') || null, 'shopline', ipAddress, userAgent, deviceType, sessionId).run()
+    
+  } catch (error: any) {
+    // 记录错误
+    const responseTime = Date.now() - startTime
+    await c.env.DB.prepare(`
+      INSERT INTO audit_logs (id, user_id, session_id, system_name, operation_type, operation_detail, 
+                              ip_address, user_agent, device_type, location_country, location_city, 
+                              timestamp, response_status, response_time, error_message, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+    `).bind(
+      crypto.randomUUID(),
+      c.get('userId') || null,
+      sessionId,
+      'shopline',
+      operationType,
+      JSON.stringify(operationDetail || {}),
+      ipAddress,
+      userAgent,
+      deviceType,
+      country,
+      city,
+      new Date().toISOString(),
+      500,
+      responseTime,
+      error.message
+    ).run()
+  }
+}
+
+// 审计日志查询API
+app.get('/api/admin/audit-logs', requireAdmin, async (c) => {
+  try {
+    const {
+      userId,
+      systemName,
+      operationType,
+      dateRangeStart,
+      dateRangeEnd,
+      ipAddress,
+      deviceType,
+      page = '1',
+      limit = '50',
+      sortBy = 'timestamp',
+      sortOrder = 'desc'
+    } = c.req.query()
+    
+    const offset = (parseInt(page) - 1) * parseInt(limit)
+    const binds: any[] = []
+    
+    let sql = `
+      SELECT al.*, u.email, u.name,
+             ot.category, ot.action, ot.description as op_description, ot.risk_level,
+             aud.display_name as system_display_name
+      FROM audit_logs al
+      LEFT JOIN users u ON al.user_id = u.id
+      LEFT JOIN operation_types ot ON al.operation_type = ot.id
+      LEFT JOIN audit_systems aud ON al.system_name = aud.id
+      WHERE 1=1
+    `
+    
+    if (userId) { sql += ` AND al.user_id = ?`; binds.push(userId) }
+    if (systemName) { sql += ` AND al.system_name = ?`; binds.push(systemName) }
+    if (operationType) { sql += ` AND al.operation_type = ?`; binds.push(operationType) }
+    if (dateRangeStart) { sql += ` AND al.timestamp >= ?`; binds.push(dateRangeStart) }
+    if (dateRangeEnd) { sql += ` AND al.timestamp <= ?`; binds.push(dateRangeEnd) }
+    if (ipAddress) { sql += ` AND al.ip_address = ?`; binds.push(ipAddress) }
+    if (deviceType) { sql += ` AND al.device_type = ?`; binds.push(deviceType) }
+    
+    sql += ` ORDER BY al.${sortBy} ${sortOrder.toUpperCase()} LIMIT ? OFFSET ?`
+    binds.push(parseInt(limit), offset)
+    
+    const logs = await c.env.DB.prepare(sql).bind(...binds).all()
+    
+    // 获取总数
+    let countSql = `SELECT COUNT(*) as total FROM audit_logs al WHERE 1=1`
+    const countBinds: any[] = []
+    if (userId) { countSql += ` AND al.user_id = ?`; countBinds.push(userId) }
+    if (systemName) { countSql += ` AND al.system_name = ?`; countBinds.push(systemName) }
+    if (operationType) { countSql += ` AND al.operation_type = ?`; countBinds.push(operationType) }
+    if (dateRangeStart) { countSql += ` AND al.timestamp >= ?`; countBinds.push(dateRangeStart) }
+    if (dateRangeEnd) { countSql += ` AND al.timestamp <= ?`; countBinds.push(dateRangeEnd) }
+    if (ipAddress) { countSql += ` AND al.ip_address = ?`; countBinds.push(ipAddress) }
+    if (deviceType) { countSql += ` AND al.device_type = ?`; countBinds.push(deviceType) }
+    
+    const countResult = await c.env.DB.prepare(countSql).bind(...countBinds).first<{ total: number }>()
+    
+    return c.json({
+      logs: logs.results,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total: countResult?.total || 0,
+        totalPages: Math.ceil((countResult?.total || 0) / parseInt(limit))
+      }
+    })
+  } catch (e: any) { return c.json({ error: String(e) }, 500) }
+})
+
+// 客户跟踪API
+app.get('/api/admin/customers/:userId/timeline', requireAdmin, async (c) => {
+  try {
+    const userId = c.req.param('userId')
+    
+    // 获取用户基本信息
+    const user = await c.env.DB.prepare(`
+      SELECT id, email, name, created_at FROM users WHERE id = ?
+    `).bind(userId).first()
+    
+    if (!user) {
+      return c.json({ error: '用户不存在' }, 404)
+    }
+    
+    // 获取用户会话
+    const sessions = await c.env.DB.prepare(`
+      SELECT * FROM user_sessions WHERE user_id = ? ORDER BY start_time DESC
+    `).bind(userId).all()
+    
+    // 获取用户操作日志
+    const logs = await c.env.DB.prepare(`
+      SELECT al.*, ot.category, ot.action, ot.description as op_description, aud.display_name as system_display_name
+      FROM audit_logs al
+      LEFT JOIN operation_types ot ON al.operation_type = ot.id
+      LEFT JOIN audit_systems aud ON al.system_name = aud.id
+      WHERE al.user_id = ?
+      ORDER BY al.timestamp DESC
+      LIMIT 100
+    `).bind(userId).all()
+    
+    // 统计信息
+    const stats = await c.env.DB.prepare(`
+      SELECT 
+        COUNT(*) as total_operations,
+        COUNT(DISTINCT al.system_name) as systems_visited,
+        COUNT(DISTINCT al.operation_type) as operation_types,
+        MIN(al.timestamp) as first_activity,
+        MAX(al.timestamp) as last_activity
+      FROM audit_logs al
+      WHERE al.user_id = ?
+    `).bind(userId).first()
+    
+    return c.json({
+      user,
+      sessions: sessions.results,
+      logs: logs.results,
+      statistics: stats
+    })
+  } catch (e: any) { return c.json({ error: String(e) }, 500) }
+})
+
+// 获取系统列表
+app.get('/api/admin/audit-systems', requireAdmin, async (c) => {
+  try {
+    const systems = await c.env.DB.prepare(`
+      SELECT * FROM audit_systems WHERE active = 1 ORDER BY display_name
+    `).all()
+    return c.json(systems.results)
+  } catch (e: any) { return c.json({ error: String(e) }, 500) }
+})
+
+// 获取操作类型列表
+app.get('/api/admin/operation-types', requireAdmin, async (c) => {
+  try {
+    const types = await c.env.DB.prepare(`
+      SELECT * FROM operation_types ORDER BY category, risk_level
+    `).all()
+    return c.json(types.results)
+  } catch (e: any) { return c.json({ error: String(e) }, 500) }
+})
+
+// 实时监控API
+app.get('/api/admin/audit-realtime', requireAdmin, async (c) => {
+  try {
+    const limit = parseInt(c.req.query('limit') || '20')
+    
+    // 获取最近的日志
+    const recentLogs = await c.env.DB.prepare(`
+      SELECT al.*, u.email, u.name,
+             ot.category, ot.action, aud.display_name as system_display_name
+      FROM audit_logs al
+      LEFT JOIN users u ON al.user_id = u.id
+      LEFT JOIN operation_types ot ON al.operation_type = ot.id
+      LEFT JOIN audit_systems aud ON al.system_name = aud.id
+      ORDER BY al.timestamp DESC
+      LIMIT ?
+    `).bind(limit).all()
+    
+    // 获取活跃会话数
+    const activeSessions = await c.env.DB.prepare(`
+      SELECT COUNT(*) as count FROM user_sessions WHERE is_active = 1 AND datetime(last_activity) > datetime('now', '-30 minutes')
+    `).first<{ count: number }>()
+    
+    // 获取今日统计
+    const todayStats = await c.env.DB.prepare(`
+      SELECT 
+        COUNT(*) as total_logs,
+        COUNT(DISTINCT user_id) as unique_users,
+        COUNT(DISTINCT session_id) as unique_sessions,
+        COUNT(DISTINCT system_name) as active_systems
+      FROM audit_logs
+      WHERE date(timestamp) = date('now')
+    `).first()
+    
+    // 获取高风险操作
+    const highRiskOps = await c.env.DB.prepare(`
+      SELECT al.*, u.email, u.name, aud.display_name as system_display_name
+      FROM audit_logs al
+      LEFT JOIN users u ON al.user_id = u.id
+      LEFT JOIN operation_types ot ON al.operation_type = ot.id
+      LEFT JOIN audit_systems aud ON al.system_name = aud.id
+      WHERE ot.risk_level >= 3 AND al.timestamp > datetime('now', '-1 hour')
+      ORDER BY al.timestamp DESC
+      LIMIT 10
+    `).all()
+    
+    return c.json({
+      recentLogs: recentLogs.results,
+      activeSessions: activeSessions?.count || 0,
+      todayStats,
+      highRiskOps: highRiskOps.results
+    })
+  } catch (e: any) { return c.json({ error: String(e) }, 500) }
+})
+
+// 搜索客户API
+app.get('/api/admin/customers/search', requireAdmin, async (c) => {
+  try {
+    const { q, page = '1', limit = '20' } = c.req.query()
+    const offset = (parseInt(page) - 1) * parseInt(limit)
+    
+    if (!q) {
+      return c.json({ error: '搜索关键词不能为空' }, 400)
+    }
+    
+    const searchPattern = `%${q}%`
+    const users = await c.env.DB.prepare(`
+      SELECT u.id, u.email, u.name, u.created_at,
+             COUNT(al.id) as operation_count,
+             MAX(al.timestamp) as last_activity
+      FROM users u
+      LEFT JOIN audit_logs al ON u.id = al.user_id
+      WHERE u.email LIKE ? OR u.name LIKE ?
+      GROUP BY u.id
+      ORDER BY operation_count DESC, last_activity DESC
+      LIMIT ? OFFSET ?
+    `).bind(searchPattern, searchPattern, parseInt(limit), offset).all()
+    
+    // 获取总数
+    const countResult = await c.env.DB.prepare(`
+      SELECT COUNT(*) as total FROM users WHERE email LIKE ? OR name LIKE ?
+    `).bind(searchPattern, searchPattern).first<{ total: number }>()
+    
+    return c.json({
+      users: users.results,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total: countResult?.total || 0,
+        totalPages: Math.ceil((countResult?.total || 0) / parseInt(limit))
+      }
+    })
+  } catch (e: any) { return c.json({ error: String(e) }, 500) }
+})
+
+// Generate SSO token for trial systems (signed with SHOPLINE_JWT_SECRET)
+app.post('/api/auth/sso-token', async (c) => {
+  const authHeader = c.req.header('Authorization')
+  if (!authHeader?.startsWith('Bearer ')) return c.json({ error: '未授權' }, 401)
+  const token = authHeader.slice(7)
+  const payload = await verifyToken(token, c.env.JWT_SECRET)
+  if (!payload) return c.json({ error: 'Token 無效或已過期' }, 401)
+
+  const ssoSecret = (c.env as any).SHOPLINE_JWT_SECRET || 'shopline_v2_jwt_secret_2026'
+  const ssoToken = await signToken({ userId: payload.userId, email: payload.email }, ssoSecret)
+  return c.json({ ssoToken })
 })
 
 export default app

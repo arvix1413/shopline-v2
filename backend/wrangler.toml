@@ -5,6 +5,7 @@ compatibility_date = "2024-01-15"
 [vars]
 R2_DOMAIN = "https://pub-51908639511240656e3a5d46a004f299.r2.dev"
 JWT_SECRET = "shopline_v2_jwt_secret_2026"
+SHOPLINE_JWT_SECRET = "shopline_v2_jwt_secret_2026"
 
 [[d1_databases]]
 binding = "DB"

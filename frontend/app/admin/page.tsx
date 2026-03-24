@@ -5,13 +5,14 @@ import { useRouter } from 'next/navigation'
 import Header from '../components/Header'
 import { useAuth } from '../../contexts/AuthContext'
 import { Plus, Edit, Trash2, AlertCircle, CheckCircle } from 'lucide-react'
+import EnhancedAuditLog from '../components/EnhancedAuditLog'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8787'
 
 interface UserRow { id: number; email: string; name: string; phone: string | null; isAdmin: number | null; createdAt: string | null }
 interface TrialSystem { id: number; name: string; desc: string; url: string; color: string; bg: string; border: string; emoji: string; tags: string[]; active: number; sortOrder: number }
 
-const TABS = ['用戶管理', '試用系統管理', '行為漏斗', '店鋪報表'] as const
+const TABS = ['用戶管理', '試用系統管理', '行為漏斗', '增強審計日誌', '店鋪報表'] as const
 type Tab = typeof TABS[number]
 
 
@@ -99,6 +100,9 @@ export default function AdminPage() {
     if (tab === '用戶管理') fetchUsers()
     if (tab === '試用系統管理') fetchSystems()
     if (tab === '行為漏斗') fetchFunnel()
+    if (tab === '增強審計日誌') {
+      // 增强审计日志不需要额外的数据获取
+    }
     if (tab === '店鋪報表') fetchShopStats()
   }, [tab, user, fetchUsers, fetchSystems, fetchFunnel, fetchShopStats])
 
@@ -381,6 +385,11 @@ export default function AdminPage() {
               </>
             )}
           </div>
+        )}
+
+        {/* ===== 增强审计日志 TAB ===== */}
+        {tab === '增強審計日誌' && (
+          <EnhancedAuditLog token={token!} />
         )}
 
         {/* ===== SHOP STATS TAB ===== */}
