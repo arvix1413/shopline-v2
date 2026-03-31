@@ -1,845 +1,403 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Search, Filter, Calendar, Globe, Monitor, Smartphone, Tablet, AlertTriangle, User, Clock, TrendingUp, Eye, X } from 'lucide-react'
+import { RefreshCw, X, ChevronDown, ChevronUp } from 'lucide-react'
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8787'
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://shopline-backend.arvix1413.workers.dev'
 
-interface AuditLog {
-  id: string
-  user_id: string
-  session_id: string
-  system_name: string
-  operation_type: string
-  operation_detail: string
-  ip_address: string
-  user_agent: string
-  device_type: string
-  location_country: string
-  location_city: string
-  timestamp: string
-  response_status: number
-  response_time: number
-  error_message?: string
-  email?: string
-  name?: string
-  category?: string
-  action?: string
-  op_description?: string
-  risk_level?: number
-  system_display_name?: string
+const EVENT_META: Record<string, { label: string; color: string; bg: string; icon: string }> = {
+  enter_dashboard: { label: '進入系統', color: '#3B82F6', bg: '#EFF6FF', icon: '🚀' },
+  create_product:  { label: '建立商品', color: '#10B981', bg: '#ECFDF5', icon: '📦' },
+  visit_homepage:  { label: '進入首頁', color: '#6B7280', bg: '#F9FAFB', icon: '🏠' },
+  click_signup:    { label: '點擊註冊', color: '#8B5CF6', bg: '#F5F3FF', icon: '✍️' },
+  sign_up_complete:{ label: '完成註冊', color: '#0EA5E9', bg: '#F0F9FF', icon: '✅' },
 }
 
-interface AuditSystem {
-  id: string
-  name: string
-  display_name: string
-  url: string
-  color: string
-  active: boolean
+const SYSTEM_COLORS: Record<string, string> = {
+  'Shopline': '#1E40AF',
+  'TinyWearhouse': '#7C3AED',
+  'DAF Shoes': '#DC2626',
+  'MeierQ': '#D97706',
+  'Molava': '#059669',
+  'Zenlet': '#0891B2',
+  'IMS 庫存管理': '#4F46E5',
 }
 
-interface OperationType {
-  id: string
-  category: string
-  action: string
-  description: string
-  risk_level: number
+function getSystemColor(name: string) {
+  return SYSTEM_COLORS[name] || '#6B7280'
 }
 
-interface Customer {
-  id: string
-  email: string
-  name: string
-  created_at: string
-  operation_count: number
-  last_activity: string
-}
-
-interface RealtimeData {
-  recentLogs: AuditLog[]
-  activeSessions: number
-  todayStats: {
-    total_logs: number
-    unique_users: number
-    unique_sessions: number
-    active_systems: number
-  }
-  highRiskOps: AuditLog[]
+function timeAgo(dateStr: string) {
+  const diff = Date.now() - new Date(dateStr).getTime()
+  const m = Math.floor(diff / 60000)
+  if (m < 1) return '剛剛'
+  if (m < 60) return `${m} 分鐘前`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `${h} 小時前`
+  return `${Math.floor(h / 24)} 天前`
 }
 
 export default function EnhancedAuditLog({ token }: { token: string }) {
-  // 状态管理
-  const [logs, setLogs] = useState<AuditLog[]>([])
-  const [systems, setSystems] = useState<AuditSystem[]>([])
-  const [operationTypes, setOperationTypes] = useState<OperationType[]>([])
-  const [customers, setCustomers] = useState<Customer[]>([])
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
-  const [customerTimeline, setCustomerTimeline] = useState<any>(null)
-  const [realtimeData, setRealtimeData] = useState<RealtimeData | null>(null)
-  
-  // 筛选状态
-  const [filters, setFilters] = useState({
-    userId: '',
-    systemName: '',
-    operationType: '',
-    dateRangeStart: '',
-    dateRangeEnd: '',
-    ipAddress: '',
-    deviceType: '',
-    searchQuery: ''
-  })
-  
-  // UI状态
+  const [logs, setLogs] = useState<any[]>([])
+  const [users, setUsers] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 50,
-    total: 0,
-    totalPages: 0
-  })
-  const [showFilters, setShowFilters] = useState(false)
-  const [showCustomerSearch, setShowCustomerSearch] = useState(false)
-  const [activeTab, setActiveTab] = useState<'logs' | 'realtime' | 'customer-tracking'>('logs')
+  const [userFilter, setUserFilter] = useState('')
+  const [eventFilter, setEventFilter] = useState('')
+  const [selectedUser, setSelectedUser] = useState<any>(null)
+  const [expandedRow, setExpandedRow] = useState<number | null>(null)
+  const [view, setView] = useState<'table' | 'timeline'>('table')
 
-  // 获取系统列表
-  const fetchSystems = useCallback(async () => {
+  const fetchUsers = useCallback(async () => {
     try {
-      const res = await fetch(`${API}/api/admin/audit-systems`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      if (res.ok) {
-        const data = await res.json()
-        setSystems(data)
-      }
-    } catch (error) {
-      console.error('获取系统列表失败:', error)
-    }
+      const res = await fetch(`${API}/api/users`, { headers: { Authorization: `Bearer ${token}` } })
+      if (res.ok) setUsers(await res.json())
+    } catch {}
   }, [token])
 
-  // 获取操作类型列表
-  const fetchOperationTypes = useCallback(async () => {
-    try {
-      const res = await fetch(`${API}/api/admin/operation-types`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      if (res.ok) {
-        const data = await res.json()
-        setOperationTypes(data)
-      }
-    } catch (error) {
-      console.error('获取操作类型失败:', error)
-    }
-  }, [token])
-
-  // 获取审计日志
-  const fetchLogs = useCallback(async (page = 1) => {
+  const fetchLogs = useCallback(async (uid = userFilter, ev = eventFilter) => {
     setLoading(true)
     try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: pagination.limit.toString(),
-        ...Object.fromEntries(
-          Object.entries(filters).filter(([_, v]) => v !== '')
-        )
-      })
-      
-      const res = await fetch(`${API}/api/admin/audit-logs?${params}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      
-      if (res.ok) {
-        const data = await res.json()
-        setLogs(data.logs)
-        setPagination(data.pagination)
-      }
-    } catch (error) {
-      console.error('获取审计日志失败:', error)
-    } finally {
-      setLoading(false)
-    }
-  }, [token, filters, pagination.limit])
+      const p = new URLSearchParams({ limit: '200' })
+      if (uid) p.set('userId', uid)
+      if (ev) p.set('event', ev)
+      const res = await fetch(`${API}/api/admin/audit-log?${p}`, { headers: { Authorization: `Bearer ${token}` } })
+      if (res.ok) setLogs((await res.json()).logs || [])
+    } catch {} finally { setLoading(false) }
+  }, [token, userFilter, eventFilter])
 
-  // 获取实时数据
-  const fetchRealtimeData = useCallback(async () => {
-    try {
-      const res = await fetch(`${API}/api/admin/audit-realtime`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      if (res.ok) {
-        const data = await res.json()
-        setRealtimeData(data)
-      }
-    } catch (error) {
-      console.error('获取实时数据失败:', error)
-    }
-  }, [token])
+  useEffect(() => { fetchUsers(); fetchLogs('', '') }, [])
 
-  // 搜索客户
-  const searchCustomers = useCallback(async (query: string) => {
-    if (!query.trim()) return
-    
-    try {
-      const res = await fetch(`${API}/api/admin/customers/search?q=${encodeURIComponent(query)}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      if (res.ok) {
-        const data = await res.json()
-        setCustomers(data.users)
-      }
-    } catch (error) {
-      console.error('搜索客户失败:', error)
-    }
-  }, [token])
-
-  // 获取客户时间线
-  const fetchCustomerTimeline = useCallback(async (userId: string) => {
-    try {
-      const res = await fetch(`${API}/api/admin/customers/${userId}/timeline`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      if (res.ok) {
-        const data = await res.json()
-        setCustomerTimeline(data)
-      }
-    } catch (error) {
-      console.error('获取客户时间线失败:', error)
-    }
-  }, [token])
-
-  // 初始化
-  useEffect(() => {
-    fetchSystems()
-    fetchOperationTypes()
-  }, [fetchSystems, fetchOperationTypes])
-
-  useEffect(() => {
-    if (activeTab === 'logs') {
-      fetchLogs()
-    } else if (activeTab === 'realtime') {
-      fetchRealtimeData()
-      // 每30秒刷新实时数据
-      const interval = setInterval(fetchRealtimeData, 30000)
-      return () => clearInterval(interval)
-    }
-  }, [activeTab, fetchLogs, fetchRealtimeData])
-
-  // 获取操作类型显示信息
-  const getOperationTypeDisplay = (type: string) => {
-    const opType = operationTypes.find(ot => ot.id === type)
-    if (!opType) return { label: type, color: 'bg-gray-100 text-gray-600', icon: '📋', risk: 1 }
-    
-    const riskColors = {
-      1: 'bg-green-100 text-green-800',
-      2: 'bg-yellow-100 text-yellow-800', 
-      3: 'bg-orange-100 text-orange-800',
-      4: 'bg-red-100 text-red-800'
-    }
-    
-    const categoryIcons = {
-      '认证': '🔐',
-      '页面': '📄',
-      '商品': '🛍️',
-      '购物车': '🛒',
-      '订单': '📋',
-      '管理': '⚙️',
-      '错误': '⚠️'
-    }
-    
-    return {
-      label: opType.action,
-      color: riskColors[opType.risk_level as keyof typeof riskColors] || riskColors[1],
-      icon: categoryIcons[opType.category as keyof typeof categoryIcons] || '📋',
-      risk: opType.risk_level
-    }
+  const handleUserChange = (uid: string) => {
+    setUserFilter(uid)
+    setSelectedUser(uid ? users.find((u: any) => String(u.id) === uid) || null : null)
+    fetchLogs(uid, eventFilter)
   }
 
-  // 获取设备图标
-  const getDeviceIcon = (deviceType: string) => {
-    switch (deviceType) {
-      case 'mobile': return <Smartphone className="w-4 h-4" />
-      case 'tablet': return <Tablet className="w-4 h-4" />
-      default: return <Monitor className="w-4 h-4" />
-    }
+  // ── Stats ──────────────────────────────────────────────────────────────────
+  const stats = {
+    total: logs.length,
+    uniqueUsers: new Set(logs.filter(l => l.user_id).map(l => l.user_id)).size,
+    systems: (() => {
+      const m: Record<string, number> = {}
+      logs.forEach(l => {
+        let p: any = {}; try { p = JSON.parse(l.properties || '{}') } catch {}
+        const s = p.system || 'Shopline'
+        m[s] = (m[s] || 0) + 1
+      })
+      return Object.entries(m).sort((a, b) => b[1] - a[1])
+    })(),
+    events: (() => {
+      const m: Record<string, number> = {}
+      logs.forEach(l => { m[l.event] = (m[l.event] || 0) + 1 })
+      return Object.entries(m).sort((a, b) => b[1] - a[1])
+    })(),
   }
 
-  // 获取风险等级显示
-  const getRiskLevelDisplay = (level: number) => {
-    if (level >= 4) return { color: 'text-red-600', label: '高风险' }
-    if (level >= 3) return { color: 'text-orange-600', label: '中风险' }
-    if (level >= 2) return { color: 'text-yellow-600', label: '低风险' }
-    return { color: 'text-green-600', label: '安全' }
-  }
+  // ── User activity summary (for selected user) ──────────────────────────────
+  const userActivity = selectedUser ? (() => {
+    const userLogs = logs.filter(l => String(l.user_id) === userFilter)
+    const systemsVisited = new Set<string>()
+    const productsCreated: string[] = []
+    userLogs.forEach(l => {
+      let p: any = {}; try { p = JSON.parse(l.properties || '{}') } catch {}
+      if (p.system) systemsVisited.add(p.system)
+      if (l.event === 'create_product' && p.productName) productsCreated.push(p.productName)
+    })
+    return { count: userLogs.length, systemsVisited: Array.from(systemsVisited), productsCreated, firstSeen: userLogs[userLogs.length - 1]?.created_at, lastSeen: userLogs[0]?.created_at }
+  })() : null
+
+  return (
+    <div className="space-y-5">
+
+      {/* ── Top stats ── */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {[
+          { label: '總事件數', value: stats.total, icon: '📊', color: '#3B82F6' },
+          { label: '活躍用戶', value: stats.uniqueUsers, icon: '👥', color: '#8B5CF6' },
+          { label: '涉及系統', value: stats.systems.length, icon: '🌐', color: '#10B981' },
+          { label: '事件類型', value: stats.events.length, icon: '🏷️', color: '#F59E0B' },
+        ].map(s => (
+          <div key={s.label} className="bg-white rounded-xl border p-4 flex items-center gap-3">
+            <div className="text-2xl">{s.icon}</div>
+            <div>
+              <div className="text-2xl font-bold" style={{ color: s.color }}>{s.value}</div>
+              <div className="text-xs text-gray-500">{s.label}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── System breakdown ── */}
+      {stats.systems.length > 0 && (
+        <div className="bg-white rounded-xl border p-4">
+          <div className="text-sm font-semibold text-gray-700 mb-3">各系統活動分佈</div>
+          <div className="space-y-2">
+            {stats.systems.map(([name, cnt]) => {
+              const pct = Math.round((cnt / stats.total) * 100)
+              const color = getSystemColor(name)
+              return (
+                <div key={name} className="flex items-center gap-3">
+                  <div className="w-24 text-xs text-gray-600 truncate">{name}</div>
+                  <div className="flex-1 h-5 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full rounded-full flex items-center px-2 transition-all"
+                      style={{ width: `${Math.max(pct, 3)}%`, backgroundColor: color }}>
+                      <span className="text-white text-[10px] font-bold">{pct}%</span>
+                    </div>
+                  </div>
+                  <div className="w-8 text-xs text-gray-500 text-right">{cnt}</div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── Filters + view toggle ── */}
+      <div className="flex flex-wrap items-end gap-3">
+        <div>
+          <label className="block text-xs font-medium text-gray-500 mb-1">篩選用戶</label>
+          <select className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 min-w-[220px]"
+            value={userFilter} onChange={e => handleUserChange(e.target.value)}>
+            <option value="">全部用戶</option>
+            {users.filter((u: any) => !u.isAdmin).map((u: any) => (
+              <option key={u.id} value={String(u.id)}>{u.email}{u.name ? ` (${u.name})` : ''}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-500 mb-1">篩選事件</label>
+          <select className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 min-w-[160px]"
+            value={eventFilter} onChange={e => { setEventFilter(e.target.value); fetchLogs(userFilter, e.target.value) }}>
+            <option value="">全部事件</option>
+            {Object.entries(EVENT_META).map(([k, v]) => <option key={k} value={k}>{v.icon} {v.label}</option>)}
+          </select>
+        </div>
+        <button onClick={() => fetchLogs()} className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700">
+          <RefreshCw size={14} /> 重新整理
+        </button>
+        <div className="ml-auto flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+          {(['table', 'timeline'] as const).map(v => (
+            <button key={v} onClick={() => setView(v)}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${view === v ? 'bg-white shadow text-gray-800' : 'text-gray-500 hover:text-gray-700'}`}>
+              {v === 'table' ? '📋 表格' : '⏱ 時間軸'}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Selected user card ── */}
+      {selectedUser && userActivity && (
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg">
+                {selectedUser.email[0].toUpperCase()}
+              </div>
+              <div>
+                <div className="font-semibold text-blue-900">{selectedUser.email}</div>
+                {selectedUser.name && <div className="text-sm text-blue-600">{selectedUser.name}</div>}
+              </div>
+            </div>
+            <button onClick={() => { setUserFilter(''); setSelectedUser(null); fetchLogs('', eventFilter) }}
+              className="text-blue-400 hover:text-blue-700"><X size={16} /></button>
+          </div>
+          <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="bg-white rounded-lg p-3 text-center">
+              <div className="text-xl font-bold text-blue-700">{userActivity.count}</div>
+              <div className="text-xs text-gray-500">總操作次數</div>
+            </div>
+            <div className="bg-white rounded-lg p-3 text-center">
+              <div className="text-xl font-bold text-purple-700">{userActivity.systemsVisited.length}</div>
+              <div className="text-xs text-gray-500">訪問系統數</div>
+            </div>
+            <div className="bg-white rounded-lg p-3 text-center">
+              <div className="text-xl font-bold text-green-700">{userActivity.productsCreated.length}</div>
+              <div className="text-xs text-gray-500">建立商品數</div>
+            </div>
+            <div className="bg-white rounded-lg p-3 text-center">
+              <div className="text-xs font-medium text-gray-700">{userActivity.lastSeen ? timeAgo(userActivity.lastSeen) : '-'}</div>
+              <div className="text-xs text-gray-500">最後活動</div>
+            </div>
+          </div>
+          {userActivity.systemsVisited.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {userActivity.systemsVisited.map(s => (
+                <span key={s} className="px-2.5 py-1 rounded-full text-xs font-medium text-white"
+                  style={{ backgroundColor: getSystemColor(s) }}>{s}</span>
+              ))}
+            </div>
+          )}
+          {userActivity.productsCreated.length > 0 && (
+            <div className="mt-2 text-xs text-blue-700">
+              建立商品：{userActivity.productsCreated.join('、')}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Main content ── */}
+      {loading ? (
+        <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-7 w-7 border-b-2 border-blue-600" /></div>
+      ) : view === 'timeline' ? (
+        <TimelineView logs={logs} onUserClick={handleUserChange} />
+      ) : (
+        <TableView logs={logs} expandedRow={expandedRow} setExpandedRow={setExpandedRow} onUserClick={handleUserChange} />
+      )}
+    </div>
+  )
+}
+
+function TableView({ logs, expandedRow, setExpandedRow, onUserClick }: any) {
+  return (
+    <div className="bg-white rounded-xl border overflow-hidden">
+      <div className="px-4 py-3 border-b bg-gray-50 flex items-center justify-between">
+        <span className="text-sm font-semibold text-gray-700">共 {logs.length} 筆記錄</span>
+        <span className="text-xs text-gray-400">最新 200 筆 · 點擊行展開詳情</span>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-50 text-xs text-gray-500 uppercase">
+            <tr>
+              <th className="px-4 py-3 text-left w-36">時間</th>
+              <th className="px-4 py-3 text-left">用戶</th>
+              <th className="px-4 py-3 text-left">事件</th>
+              <th className="px-4 py-3 text-left">系統</th>
+              <th className="px-4 py-3 text-left">詳情</th>
+              <th className="px-4 py-3 w-8"></th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {logs.map((log: any, i: number) => {
+              let props: any = {}; try { props = JSON.parse(log.properties || '{}') } catch {}
+              const meta = EVENT_META[log.event] || { label: log.event, color: '#6B7280', bg: '#F9FAFB', icon: '📋' }
+              const system = props.system || 'Shopline'
+              const isExpanded = expandedRow === i
+              return (
+                <>
+                  <tr key={log.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => setExpandedRow(isExpanded ? null : i)}>
+                    <td className="px-4 py-3 text-xs text-gray-500 whitespace-nowrap">
+                      <div>{new Date(log.created_at).toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' })}</div>
+                      <div className="text-gray-400">{new Date(log.created_at).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</div>
+                    </td>
+                    <td className="px-4 py-3">
+                      {log.email ? (
+                        <button className="text-left" onClick={e => { e.stopPropagation(); onUserClick(String(log.user_id)) }}>
+                          <div className="font-medium text-blue-700 hover:underline">{log.email}</div>
+                          {log.name && <div className="text-xs text-gray-400">{log.name}</div>}
+                        </button>
+                      ) : <span className="text-xs text-gray-400">匿名</span>}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
+                        style={{ backgroundColor: meta.bg, color: meta.color }}>
+                        {meta.icon} {meta.label}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-medium">
+                        <span className="w-2 h-2 rounded-full inline-block" style={{ backgroundColor: getSystemColor(system) }} />
+                        {system}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-xs text-gray-500">
+                      {props.productName && <span>商品：{props.productName}</span>}
+                    </td>
+                    <td className="px-4 py-3 text-gray-400">
+                      {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                    </td>
+                  </tr>
+                  {isExpanded && (
+                    <tr key={`${log.id}-exp`} className="bg-blue-50">
+                      <td colSpan={6} className="px-6 py-4">
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-xs">
+                          <div><span className="text-gray-500">事件 ID：</span><span className="font-mono text-gray-700">{log.id}</span></div>
+                          <div><span className="text-gray-500">用戶 ID：</span><span className="font-mono text-gray-700">{log.user_id || '匿名'}</span></div>
+                          <div><span className="text-gray-500">匿名 ID：</span><span className="font-mono text-gray-700">{log.anonymous_id}</span></div>
+                          <div><span className="text-gray-500">完整時間：</span><span className="text-gray-700">{new Date(log.created_at).toLocaleString('zh-TW')}</span></div>
+                          <div><span className="text-gray-500">系統：</span><span className="text-gray-700">{system}</span></div>
+                          {props.productName && <div><span className="text-gray-500">商品名稱：</span><span className="text-gray-700">{props.productName}</span></div>}
+                          {Object.keys(props).filter(k => k !== 'system' && k !== 'productName').map(k => (
+                            <div key={k}><span className="text-gray-500">{k}：</span><span className="text-gray-700">{String(props[k])}</span></div>
+                          ))}
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </>
+              )
+            })}
+            {logs.length === 0 && (
+              <tr><td colSpan={6} className="px-4 py-12 text-center text-gray-400">尚無操作記錄</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
+function TimelineView({ logs, onUserClick }: any) {
+  // Group by date
+  const grouped: Record<string, any[]> = {}
+  logs.forEach((l: any) => {
+    const d = new Date(l.created_at).toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' })
+    if (!grouped[d]) grouped[d] = []
+    grouped[d].push(l)
+  })
 
   return (
     <div className="space-y-6">
-      {/* 标签页导航 */}
-      <div className="border-b border-gray-200">
-        <nav className="flex space-x-8">
-          {[
-            { id: 'logs', label: '审计日志', icon: <Eye className="w-4 h-4" /> },
-            { id: 'realtime', label: '实时监控', icon: <TrendingUp className="w-4 h-4" /> },
-            { id: 'customer-tracking', label: '客户跟踪', icon: <User className="w-4 h-4" /> }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              {tab.icon}
-              {tab.label}
-            </button>
-          ))}
-        </nav>
-      </div>
-
-      {/* 审计日志标签页 */}
-      {activeTab === 'logs' && (
-        <>
-          {/* 筛选栏 */}
-          <div className="bg-white rounded-lg shadow border p-4">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200"
-                >
-                  <Filter className="w-4 h-4" />
-                  筛选
-                  {Object.values(filters).filter(v => v !== '').length > 0 && (
-                    <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full">
-                      {Object.values(filters).filter(v => v !== '').length}
-                    </span>
-                  )}
-                </button>
-                
-                <button
-                  onClick={() => {
-                    setFilters({
-                      userId: '',
-                      systemName: '',
-                      operationType: '',
-                      dateRangeStart: '',
-                      dateRangeEnd: '',
-                      ipAddress: '',
-                      deviceType: '',
-                      searchQuery: ''
-                    })
-                    fetchLogs(1)
-                  }}
-                  className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800"
-                >
-                  重置
-                </button>
-              </div>
-              
-              <div className="text-sm text-gray-500">
-                共 {pagination.total} 条记录
-              </div>
-            </div>
-
-            {showFilters && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">系统</label>
-                  <select
-                    className="w-full border rounded-lg px-3 py-2"
-                    value={filters.systemName}
-                    onChange={(e) => setFilters({ ...filters, systemName: e.target.value })}
-                  >
-                    <option value="">全部系统</option>
-                    {systems.map(system => (
-                      <option key={system.id} value={system.id}>{system.display_name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">操作类型</label>
-                  <select
-                    className="w-full border rounded-lg px-3 py-2"
-                    value={filters.operationType}
-                    onChange={(e) => setFilters({ ...filters, operationType: e.target.value })}
-                  >
-                    <option value="">全部操作</option>
-                    {operationTypes.map(op => (
-                      <option key={op.id} value={op.id}>{op.description}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">设备类型</label>
-                  <select
-                    className="w-full border rounded-lg px-3 py-2"
-                    value={filters.deviceType}
-                    onChange={(e) => setFilters({ ...filters, deviceType: e.target.value })}
-                  >
-                    <option value="">全部设备</option>
-                    <option value="desktop">桌面</option>
-                    <option value="mobile">移动</option>
-                    <option value="tablet">平板</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">IP地址</label>
-                  <input
-                    type="text"
-                    className="w-full border rounded-lg px-3 py-2"
-                    placeholder="输入IP地址"
-                    value={filters.ipAddress}
-                    onChange={(e) => setFilters({ ...filters, ipAddress: e.target.value })}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">开始时间</label>
-                  <input
-                    type="datetime-local"
-                    className="w-full border rounded-lg px-3 py-2"
-                    value={filters.dateRangeStart}
-                    onChange={(e) => setFilters({ ...filters, dateRangeStart: e.target.value })}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">结束时间</label>
-                  <input
-                    type="datetime-local"
-                    className="w-full border rounded-lg px-3 py-2"
-                    value={filters.dateRangeEnd}
-                    onChange={(e) => setFilters({ ...filters, dateRangeEnd: e.target.value })}
-                  />
-                </div>
-
-                <div className="lg:col-span-2">
-                  <button
-                    onClick={() => fetchLogs(1)}
-                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                  >
-                    应用筛选
-                  </button>
-                </div>
-              </div>
-            )}
+      {Object.entries(grouped).map(([date, dayLogs]) => (
+        <div key={date}>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="px-3 py-1 bg-gray-800 text-white text-xs font-semibold rounded-full">{date}</div>
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-xs text-gray-400">{dayLogs.length} 筆</span>
           </div>
-
-          {/* 日志列表 */}
-          <div className="bg-white rounded-lg shadow border overflow-hidden">
-            {loading ? (
-              <div className="flex justify-center py-10">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" />
-              </div>
-            ) : (
-              <>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead className="bg-gray-50 text-xs text-gray-500 uppercase">
-                      <tr>
-                        <th className="px-4 py-3 text-left">时间</th>
-                        <th className="px-4 py-3 text-left">用户</th>
-                        <th className="px-4 py-3 text-left">系统</th>
-                        <th className="px-4 py-3 text-left">操作</th>
-                        <th className="px-4 py-3 text-left">设备</th>
-                        <th className="px-4 py-3 text-left">位置</th>
-                        <th className="px-4 py-3 text-left">响应时间</th>
-                        <th className="px-4 py-3 text-left">风险</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {logs.map((log) => {
-                        const opDisplay = getOperationTypeDisplay(log.operation_type)
-                        const riskDisplay = getRiskLevelDisplay(log.risk_level || 1)
-                        const systemInfo = systems.find(s => s.id === log.system_name)
-                        
-                        return (
-                          <tr key={log.id} className="hover:bg-gray-50">
-                            <td className="px-4 py-3 text-xs text-gray-500 whitespace-nowrap">
-                              <div className="flex items-center gap-1">
-                                <Clock className="w-3 h-3" />
-                                {new Date(log.timestamp).toLocaleString('zh-TW', {
-                                  month: '2-digit',
-                                  day: '2-digit',
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                  second: '2-digit'
-                                })}
-                              </div>
-                            </td>
-                            
-                            <td className="px-4 py-3">
-                              {log.email ? (
-                                <div>
-                                  <div className="font-medium text-blue-700">{log.email}</div>
-                                  {log.name && <div className="text-xs text-gray-400">{log.name}</div>}
-                                </div>
-                              ) : (
-                                <span className="text-xs text-gray-400">匿名用户</span>
-                              )}
-                            </td>
-                            
-                            <td className="px-4 py-3">
-                              <div className="flex items-center gap-2">
-                                <div 
-                                  className="w-3 h-3 rounded-full"
-                                  style={{ backgroundColor: systemInfo?.color || '#3B82F6' }}
-                                />
-                                <span className="text-xs font-medium">
-                                  {systemInfo?.display_name || log.system_name}
-                                </span>
-                              </div>
-                            </td>
-                            
-                            <td className="px-4 py-3">
-                              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${opDisplay.color}`}>
-                                <span>{opDisplay.icon}</span>
-                                {opDisplay.label}
-                              </span>
-                              {log.operation_detail && (
-                                <div className="text-xs text-gray-400 mt-1 truncate max-w-xs">
-                                  {JSON.parse(log.operation_detail || '{}').summary || ''}
-                                </div>
-                              )}
-                            </td>
-                            
-                            <td className="px-4 py-3">
-                              <div className="flex items-center gap-2 text-gray-600">
-                                {getDeviceIcon(log.device_type)}
-                                <span className="text-xs">{log.device_type}</span>
-                              </div>
-                            </td>
-                            
-                            <td className="px-4 py-3 text-xs text-gray-600">
-                              <div className="flex items-center gap-1">
-                                <Globe className="w-3 h-3" />
-                                {log.location_country !== 'unknown' ? (
-                                  <span>{log.location_country} {log.location_city}</span>
-                                ) : (
-                                  <span className="text-gray-400">未知</span>
-                                )}
-                              </div>
-                            </td>
-                            
-                            <td className="px-4 py-3 text-xs text-gray-600">
-                              <div className="flex items-center gap-1">
-                                <span className={log.response_time > 1000 ? 'text-red-600' : 'text-green-600'}>
-                                  {log.response_time}ms
-                                </span>
-                              </div>
-                            </td>
-                            
-                            <td className="px-4 py-3">
-                              <div className="flex items-center gap-1">
-                                {log.risk_level && log.risk_level >= 3 && (
-                                  <AlertTriangle className="w-3 h-3 text-orange-500" />
-                                )}
-                                <span className={`text-xs font-medium ${riskDisplay.color}`}>
-                                  {riskDisplay.label}
-                                </span>
-                              </div>
-                            </td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* 分页 */}
-                {pagination.totalPages > 1 && (
-                  <div className="px-4 py-3 border-t bg-gray-50 flex items-center justify-between">
-                    <div className="text-sm text-gray-500">
-                      显示第 {((pagination.page - 1) * pagination.limit) + 1} - {Math.min(pagination.page * pagination.limit, pagination.total)} 条，共 {pagination.total} 条
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => fetchLogs(pagination.page - 1)}
-                        disabled={pagination.page <= 1}
-                        className="px-3 py-1 text-sm border rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        上一页
-                      </button>
-                      <span className="text-sm">
-                        {pagination.page} / {pagination.totalPages}
+          <div className="relative pl-6 space-y-3">
+            <div className="absolute left-2 top-0 bottom-0 w-px bg-gray-200" />
+            {dayLogs.map((log: any) => {
+              let props: any = {}; try { props = JSON.parse(log.properties || '{}') } catch {}
+              const meta = EVENT_META[log.event] || { label: log.event, color: '#6B7280', bg: '#F9FAFB', icon: '📋' }
+              const system = props.system || 'Shopline'
+              return (
+                <div key={log.id} className="relative flex gap-3">
+                  <div className="absolute -left-4 w-4 h-4 rounded-full border-2 border-white flex items-center justify-center text-[10px]"
+                    style={{ backgroundColor: meta.color, top: '10px' }}>
+                  </div>
+                  <div className="flex-1 bg-white border rounded-xl p-3 hover:shadow-sm transition-shadow">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
+                          style={{ backgroundColor: meta.bg, color: meta.color }}>
+                          {meta.icon} {meta.label}
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 text-xs text-gray-600">
+                          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: getSystemColor(system) }} />
+                          {system}
+                        </span>
+                        {props.productName && (
+                          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">📦 {props.productName}</span>
+                        )}
+                      </div>
+                      <span className="text-xs text-gray-400 whitespace-nowrap">
+                        {new Date(log.created_at).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}
                       </span>
-                      <button
-                        onClick={() => fetchLogs(pagination.page + 1)}
-                        disabled={pagination.page >= pagination.totalPages}
-                        className="px-3 py-1 text-sm border rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        下一页
+                    </div>
+                    {log.email && (
+                      <button className="mt-1.5 text-xs text-blue-600 hover:underline" onClick={() => onUserClick(String(log.user_id))}>
+                        👤 {log.email}{log.name ? ` (${log.name})` : ''}
                       </button>
-                    </div>
+                    )}
                   </div>
-                )}
-              </>
-            )}
+                </div>
+              )
+            })}
           </div>
-        </>
-      )}
-
-      {/* 实时监控标签页 */}
-      {activeTab === 'realtime' && (
-        <div className="space-y-6">
-          {realtimeData ? (
-            <>
-              {/* 统计卡片 */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-white rounded-lg shadow border p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-sm text-gray-500">今日日志</div>
-                      <div className="text-2xl font-bold text-blue-600">
-                        {realtimeData.todayStats.total_logs.toLocaleString()}
-                      </div>
-                    </div>
-                    <TrendingUp className="w-8 h-8 text-blue-200" />
-                  </div>
-                </div>
-                
-                <div className="bg-white rounded-lg shadow border p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-sm text-gray-500">活跃用户</div>
-                      <div className="text-2xl font-bold text-green-600">
-                        {realtimeData.todayStats.unique_users.toLocaleString()}
-                      </div>
-                    </div>
-                    <User className="w-8 h-8 text-green-200" />
-                  </div>
-                </div>
-                
-                <div className="bg-white rounded-lg shadow border p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-sm text-gray-500">活跃会话</div>
-                      <div className="text-2xl font-bold text-purple-600">
-                        {realtimeData.activeSessions.toLocaleString()}
-                      </div>
-                    </div>
-                    <Eye className="w-8 h-8 text-purple-200" />
-                  </div>
-                </div>
-                
-                <div className="bg-white rounded-lg shadow border p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-sm text-gray-500">活跃系统</div>
-                      <div className="text-2xl font-bold text-orange-600">
-                        {realtimeData.todayStats.active_systems.toLocaleString()}
-                      </div>
-                    </div>
-                    <Globe className="w-8 h-8 text-orange-200" />
-                  </div>
-                </div>
-              </div>
-
-              {/* 高风险操作 */}
-              {realtimeData.highRiskOps.length > 0 && (
-                <div className="bg-white rounded-lg shadow border p-4">
-                  <h3 className="text-lg font-semibold text-red-600 mb-4 flex items-center gap-2">
-                    <AlertTriangle className="w-5 h-5" />
-                    高风险操作 (最近1小时)
-                  </h3>
-                  <div className="space-y-2">
-                    {realtimeData.highRiskOps.map((log) => {
-                      const opDisplay = getOperationTypeDisplay(log.operation_type)
-                      return (
-                        <div key={log.id} className="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200">
-                          <div className="flex items-center gap-3">
-                            <span className="text-lg">{opDisplay.icon}</span>
-                            <div>
-                              <div className="font-medium text-red-800">{opDisplay.label}</div>
-                              <div className="text-sm text-red-600">{log.email} • {log.system_display_name}</div>
-                            </div>
-                          </div>
-                          <div className="text-xs text-red-500">
-                            {new Date(log.timestamp).toLocaleString('zh-TW')}
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* 最近日志 */}
-              <div className="bg-white rounded-lg shadow border p-4">
-                <h3 className="text-lg font-semibold mb-4">实时日志流</h3>
-                <div className="space-y-2 max-h-96 overflow-y-auto">
-                  {realtimeData.recentLogs.map((log) => {
-                    const opDisplay = getOperationTypeDisplay(log.operation_type)
-                    return (
-                      <div key={log.id} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
-                        <div className="flex items-center gap-3">
-                          <span className="text-sm">{opDisplay.icon}</span>
-                          <div>
-                            <div className="text-sm font-medium">{opDisplay.label}</div>
-                            <div className="text-xs text-gray-500">{log.email} • {log.system_display_name}</div>
-                          </div>
-                        </div>
-                        <div className="text-xs text-gray-400">
-                          {new Date(log.timestamp).toLocaleTimeString('zh-TW')}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="flex justify-center py-10">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" />
-            </div>
-          )}
         </div>
-      )}
-
-      {/* 客户跟踪标签页 */}
-      {activeTab === 'customer-tracking' && (
-        <div className="space-y-6">
-          {/* 客户搜索 */}
-          <div className="bg-white rounded-lg shadow border p-4">
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <input
-                    type="text"
-                    placeholder="搜索客户邮箱或姓名..."
-                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                    onChange={(e) => {
-                      if (e.target.value.length > 2) {
-                        searchCustomers(e.target.value)
-                      }
-                    }}
-                  />
-                </div>
-              </div>
-              <button
-                onClick={() => setShowCustomerSearch(!showCustomerSearch)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                {showCustomerSearch ? '隐藏搜索' : '显示搜索'}
-              </button>
-            </div>
-
-            {showCustomerSearch && customers.length > 0 && (
-              <div className="mt-4 space-y-2">
-                {customers.map((customer) => (
-                  <div
-                    key={customer.id}
-                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
-                    onClick={() => {
-                      setSelectedCustomer(customer)
-                      fetchCustomerTimeline(customer.id)
-                    }}
-                  >
-                    <div>
-                      <div className="font-medium text-blue-700">{customer.email}</div>
-                      <div className="text-sm text-gray-500">{customer.name}</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-medium">{customer.operation_count} 次操作</div>
-                      <div className="text-xs text-gray-400">
-                        最后活动: {new Date(customer.last_activity).toLocaleDateString()}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* 客户时间线 */}
-          {selectedCustomer && customerTimeline && (
-            <div className="bg-white rounded-lg shadow border p-4">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="text-lg font-semibold">客户跟踪: {selectedCustomer.email}</h3>
-                  <div className="text-sm text-gray-500">{selectedCustomer.name}</div>
-                </div>
-                <button
-                  onClick={() => {
-                    setSelectedCustomer(null)
-                    setCustomerTimeline(null)
-                  }}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* 统计信息 */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <div className="bg-blue-50 rounded-lg p-3">
-                  <div className="text-sm text-blue-500">总操作数</div>
-                  <div className="text-xl font-bold text-blue-700">
-                    {customerTimeline.statistics.total_operations}
-                  </div>
-                </div>
-                <div className="bg-green-50 rounded-lg p-3">
-                  <div className="text-sm text-green-500">访问系统</div>
-                  <div className="text-xl font-bold text-green-700">
-                    {customerTimeline.statistics.systems_visited}
-                  </div>
-                </div>
-                <div className="bg-purple-50 rounded-lg p-3">
-                  <div className="text-sm text-purple-500">操作类型</div>
-                  <div className="text-xl font-bold text-purple-700">
-                    {customerTimeline.statistics.operation_types}
-                  </div>
-                </div>
-                <div className="bg-orange-50 rounded-lg p-3">
-                  <div className="text-sm text-orange-500">活跃天数</div>
-                  <div className="text-xl font-bold text-orange-700">
-                    {Math.ceil((new Date(customerTimeline.statistics.last_activity).getTime() - 
-                      new Date(customerTimeline.statistics.first_activity).getTime()) / (1000 * 60 * 60 * 24))}
-                  </div>
-                </div>
-              </div>
-
-              {/* 时间线 */}
-              <div className="space-y-2">
-                <h4 className="font-semibold text-gray-700">操作时间线</h4>
-                <div className="max-h-96 overflow-y-auto">
-                  {customerTimeline.logs.map((log: any) => {
-                    const opDisplay = getOperationTypeDisplay(log.operation_type)
-                    return (
-                      <div key={log.id} className="flex items-start gap-3 p-3 border-l-2 border-blue-200 bg-blue-50">
-                        <div className="mt-1">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm">{opDisplay.icon}</span>
-                            <span className="font-medium">{opDisplay.label}</span>
-                            <span className="text-xs text-gray-500">
-                              {new Date(log.timestamp).toLocaleString('zh-TW')}
-                            </span>
-                          </div>
-                          <div className="text-sm text-gray-600 mt-1">
-                            系统: {log.system_display_name} • 设备: {log.device_type}
-                          </div>
-                          {log.operation_detail && (
-                            <div className="text-xs text-gray-400 mt-1">
-                              {JSON.parse(log.operation_detail || '{}').summary || ''}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+      ))}
+      {logs.length === 0 && (
+        <div className="text-center py-12 text-gray-400">尚無操作記錄</div>
       )}
     </div>
   )

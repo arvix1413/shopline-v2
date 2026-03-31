@@ -15,12 +15,126 @@ type Bindings = {
 
 const app = new Hono<{ Bindings: Bindings }>()
 
-// CORS 配置
+// CORS 配置 - 支持跨系统审计上报
 app.use('*', cors({
-  origin: ['https://shopline-frontend.pages.dev', 'http://localhost:3000'],
+  origin: [
+    'https://shopline-frontend.pages.dev', 
+    'https://tinywearhouse-frontend.pages.dev',
+    'https://tinywearhouse-v2.pages.dev',
+    'https://ims-frontend.pages.dev',
+    'https://ims-v2.pages.dev',
+    'https://daf-shoes-frontend.pages.dev',
+    'https://daf-shoes-v2.pages.dev',
+    'https://molava-frontend.pages.dev',
+    'https://molava-v2.pages.dev',
+    'https://zenlet-frontend.pages.dev',
+    'https://zenlet-v2.pages.dev',
+    'https://meierq-frontend.pages.dev',
+    'https://meierq-v2.pages.dev',
+    'http://localhost:3000',
+    'http://localhost:3001'
+  ],
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowHeaders: ['Content-Type', 'Authorization'],
+  allowHeaders: ['Content-Type', 'Authorization', 'X-System-Source'],
 }))
+
+// 统一审计切面中间件（类似 Java AOP）
+app.use('/api/*', async (c, next) => {
+  const startTime = Date.now()
+  const method = c.req.method
+  const url = c.req.url
+  const path = new URL(url).pathname
+  
+  // 跳过不需要审计的路径
+  const skipPaths = ['/', '/api/init', '/api/init-admin', '/api/auth/login', '/api/auth/register']
+  if (skipPaths.includes(path)) {
+    await next()
+    return
+  }
+  
+  // 提取用户信息
+  let userId = null
+  let userEmail = null
+  const authHeader = c.req.header('Authorization')
+  if (authHeader?.startsWith('Bearer ')) {
+    try {
+      const token = authHeader.slice(7)
+      const payload = await verifyToken(token, c.env.JWT_SECRET)
+      if (payload) {
+        userId = payload.userId?.toString()
+        userEmail = payload.email
+      }
+    } catch {
+      // Token 无效，继续处理
+    }
+  }
+  
+  // 执行原始请求
+  await next()
+  
+  // 记录审计日志
+  const endTime = Date.now()
+  const responseTime = endTime - startTime
+  const responseStatus = c.res.status
+  
+  // 只记录有用户信息的操作
+  if (userId && userEmail) {
+    try {
+      const auditId = `audit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      
+      // 解析操作类型
+      let operationType = 'unknown'
+      let operationDetail = ''
+      
+      if (path.includes('/products')) {
+        if (method === 'GET' && path.includes('/')) {
+          operationType = 'product_view'
+          operationDetail = '查看商品详情'
+        } else if (method === 'GET') {
+          operationType = 'product_list_view'
+          operationDetail = '浏览商品列表'
+        }
+      } else if (path.includes('/cart')) {
+        operationType = 'cart_operation'
+        operationDetail = '购物车操作'
+      } else if (path.includes('/orders')) {
+        operationType = 'order_operation'
+        operationDetail = '订单操作'
+      } else if (path.includes('/trial')) {
+        operationType = 'trial_operation'
+        operationDetail = '试用系统操作'
+      } else if (path.includes('/admin')) {
+        operationType = 'admin_operation'
+        operationDetail = '管理员操作'
+      }
+      
+      await c.env.DB.prepare(`
+        INSERT INTO audit_logs (
+          id, user_id, session_id, system_name, operation_type, operation_detail,
+          ip_address, user_agent, device_type, location_country, location_city,
+          timestamp, response_status, response_time
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        auditId,
+        userId,
+        `session_${Date.now()}`,
+        'SHOPLINE',
+        operationType,
+        operationDetail,
+        c.req.header('CF-Connecting-IP') || '',
+        c.req.header('User-Agent') || '',
+        'web',
+        c.req.header('CF-IPCountry') || '',
+        c.req.header('CF-IPCity') || '',
+        new Date().toISOString(),
+        responseStatus,
+        responseTime
+      ).run()
+    } catch (e) {
+      console.error('Audit logging error:', e)
+    }
+  }
+})
 
 // 健康检查
 app.get('/', (c) => {
@@ -226,18 +340,21 @@ app.get('/api/categories', async (c) => {
 // DB 初始化 / migration
 app.post('/api/init', async (c) => {
   const stmts = [
-    `CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL UNIQUE, name TEXT NOT NULL, password_hash TEXT NOT NULL DEFAULT '', phone TEXT, address TEXT, is_admin INTEGER DEFAULT 0, created_at TEXT DEFAULT CURRENT_TIMESTAMP, updated_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
-    `CREATE TABLE IF NOT EXISTS categories (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT, image_url TEXT, created_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
-    `CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT, price REAL NOT NULL, image_url TEXT, category TEXT, stock INTEGER DEFAULT 0, featured INTEGER DEFAULT 0, created_at TEXT DEFAULT CURRENT_TIMESTAMP, updated_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
-    `CREATE TABLE IF NOT EXISTS orders (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER REFERENCES users(id), total_amount REAL NOT NULL, status TEXT DEFAULT 'pending', shipping_address TEXT, created_at TEXT DEFAULT CURRENT_TIMESTAMP, updated_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
-    `CREATE TABLE IF NOT EXISTS order_items (id INTEGER PRIMARY KEY AUTOINCREMENT, order_id INTEGER REFERENCES orders(id), product_id INTEGER REFERENCES products(id), quantity INTEGER NOT NULL, price REAL NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
-    `CREATE TABLE IF NOT EXISTS cart_items (id INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT NOT NULL, user_id INTEGER REFERENCES users(id), product_id INTEGER REFERENCES products(id) NOT NULL, quantity INTEGER NOT NULL DEFAULT 1, created_at TEXT DEFAULT CURRENT_TIMESTAMP, updated_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
-    `CREATE TABLE IF NOT EXISTS trial_systems (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, desc TEXT NOT NULL DEFAULT '', url TEXT NOT NULL, color TEXT NOT NULL DEFAULT '#3B82F6', bg TEXT NOT NULL DEFAULT 'rgba(59,130,246,0.08)', border TEXT NOT NULL DEFAULT 'rgba(59,130,246,0.2)', emoji TEXT NOT NULL DEFAULT '🌐', tags TEXT NOT NULL DEFAULT '[]', active INTEGER NOT NULL DEFAULT 1, sort_order INTEGER NOT NULL DEFAULT 0, created_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
-    `CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY AUTOINCREMENT, anonymous_id TEXT NOT NULL, user_id INTEGER, event TEXT NOT NULL, properties TEXT DEFAULT '{}', created_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
-    `CREATE TABLE IF NOT EXISTS audit_logs (id TEXT PRIMARY KEY, user_id TEXT, session_id TEXT NOT NULL, system_name TEXT NOT NULL, operation_type TEXT NOT NULL, operation_detail TEXT, ip_address TEXT, user_agent TEXT, device_type TEXT, location_country TEXT, location_city TEXT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, response_status INTEGER, response_time INTEGER, error_message TEXT, created_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
-    `CREATE TABLE IF NOT EXISTS user_sessions (session_id TEXT PRIMARY KEY, user_id TEXT, system_name TEXT NOT NULL, ip_address TEXT, user_agent TEXT, device_type TEXT, start_time DATETIME DEFAULT CURRENT_TIMESTAMP, last_activity DATETIME DEFAULT CURRENT_TIMESTAMP, page_count INTEGER DEFAULT 1, is_active BOOLEAN DEFAULT 1)`,
+    `CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL UNIQUE, name TEXT NOT NULL, password_hash TEXT NOT NULL DEFAULT '', phone TEXT, address TEXT, is_admin INTEGER DEFAULT 0, created_at TEXT DEFAULT datetime('now', '+8 hours'), updated_at TEXT DEFAULT datetime('now', '+8 hours'))`,
+    `CREATE TABLE IF NOT EXISTS categories (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT, image_url TEXT, created_at TEXT DEFAULT datetime('now', '+8 hours'))`,
+    `CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT, price REAL NOT NULL, image_url TEXT, category TEXT, stock INTEGER DEFAULT 0, featured INTEGER DEFAULT 0, created_at TEXT DEFAULT datetime('now', '+8 hours'), updated_at TEXT DEFAULT datetime('now', '+8 hours'))`,
+    `CREATE TABLE IF NOT EXISTS orders (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER REFERENCES users(id), total_amount REAL NOT NULL, status TEXT DEFAULT 'pending', shipping_address TEXT, created_at TEXT DEFAULT datetime('now', '+8 hours'), updated_at TEXT DEFAULT datetime('now', '+8 hours'))`,
+    `CREATE TABLE IF NOT EXISTS order_items (id INTEGER PRIMARY KEY AUTOINCREMENT, order_id INTEGER REFERENCES orders(id), product_id INTEGER REFERENCES products(id), quantity INTEGER NOT NULL, price REAL NOT NULL, created_at TEXT DEFAULT datetime('now', '+8 hours'))`,
+    `CREATE TABLE IF NOT EXISTS cart_items (id INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT NOT NULL, user_id INTEGER REFERENCES users(id), product_id INTEGER REFERENCES products(id) NOT NULL, quantity INTEGER NOT NULL DEFAULT 1, created_at TEXT DEFAULT datetime('now', '+8 hours'), updated_at TEXT DEFAULT datetime('now', '+8 hours'))`,
+    `CREATE TABLE IF NOT EXISTS trial_systems (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, desc TEXT NOT NULL DEFAULT '', url TEXT NOT NULL, color TEXT NOT NULL DEFAULT '#3B82F6', bg TEXT NOT NULL DEFAULT 'rgba(59,130,246,0.08)', border TEXT NOT NULL DEFAULT 'rgba(59,130,246,0.2)', emoji TEXT NOT NULL DEFAULT '🌐', tags TEXT NOT NULL DEFAULT '[]', active INTEGER NOT NULL DEFAULT 1, sort_order INTEGER NOT NULL DEFAULT 0, created_at TEXT DEFAULT datetime('now', '+8 hours'))`,
+    `CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY AUTOINCREMENT, anonymous_id TEXT NOT NULL, user_id INTEGER, event TEXT NOT NULL, properties TEXT DEFAULT '{}', created_at TEXT DEFAULT datetime('now', '+8 hours'))`,
+    `CREATE TABLE IF NOT EXISTS audit_logs (id TEXT PRIMARY KEY, user_id TEXT, session_id TEXT NOT NULL, system_name TEXT NOT NULL, operation_type TEXT NOT NULL, operation_detail TEXT, ip_address TEXT, user_agent TEXT, device_type TEXT, location_country TEXT, location_city TEXT, timestamp DATETIME DEFAULT datetime('now', '+8 hours'), response_status INTEGER, response_time INTEGER, error_message TEXT, created_at TEXT DEFAULT datetime('now', '+8 hours'))`,
+    `CREATE TABLE IF NOT EXISTS user_sessions (session_id TEXT PRIMARY KEY, user_id TEXT, system_name TEXT NOT NULL, ip_address TEXT, user_agent TEXT, device_type TEXT, start_time DATETIME DEFAULT datetime('now', '+8 hours'), last_activity DATETIME DEFAULT datetime('now', '+8 hours'), page_count INTEGER DEFAULT 1, is_active BOOLEAN DEFAULT 1)`,
     `CREATE TABLE IF NOT EXISTS operation_types (id TEXT PRIMARY KEY, category TEXT NOT NULL, action TEXT NOT NULL, description TEXT, risk_level INTEGER DEFAULT 1)`,
     `CREATE TABLE IF NOT EXISTS audit_systems (id TEXT PRIMARY KEY, name TEXT NOT NULL, display_name TEXT NOT NULL, url TEXT, color TEXT DEFAULT '#3B82F6', active BOOLEAN DEFAULT 1)`,
+    // Affiliate & traffic tracking
+    `CREATE TABLE IF NOT EXISTS affiliates (id INTEGER PRIMARY KEY AUTOINCREMENT, code TEXT NOT NULL UNIQUE, name TEXT NOT NULL, email TEXT, commission_rate REAL NOT NULL DEFAULT 0.1, total_clicks INTEGER DEFAULT 0, total_conversions INTEGER DEFAULT 0, total_revenue REAL DEFAULT 0, total_commission REAL DEFAULT 0, active INTEGER DEFAULT 1, created_at TEXT DEFAULT datetime('now', '+8 hours'))`,
+    `CREATE TABLE IF NOT EXISTS affiliate_conversions (id INTEGER PRIMARY KEY AUTOINCREMENT, affiliate_code TEXT NOT NULL, user_id INTEGER, event TEXT NOT NULL, revenue REAL DEFAULT 0, commission REAL DEFAULT 0, created_at TEXT DEFAULT datetime('now', '+8 hours'))`,
   ]
   try {
     for (const sql of stmts) {
@@ -292,7 +409,7 @@ app.post('/api/init', async (c) => {
 // Auth 路由
 app.post('/api/auth/register', async (c) => {
   try {
-    const { email, password, name, phone, shopName } = await c.req.json()
+    const { email, password, name, phone, shopName, ref, utm_source, utm_medium, utm_campaign, utm_content, utm_term } = await c.req.json()
     if (!email || !password) return c.json({ error: '請填寫 Email 和密碼' }, 400)
     if (password.length < 6) return c.json({ error: '密碼至少 6 個字元' }, 400)
 
@@ -307,6 +424,29 @@ app.post('/api/auth/register', async (c) => {
       passwordHash,
       phone: phone || null,
     }).returning().get()
+
+    // Migrate: add traffic source columns if not exist
+    await c.env.DB.prepare(`ALTER TABLE users ADD COLUMN ref TEXT`).run().catch(() => {})
+    await c.env.DB.prepare(`ALTER TABLE users ADD COLUMN utm_source TEXT`).run().catch(() => {})
+    await c.env.DB.prepare(`ALTER TABLE users ADD COLUMN utm_medium TEXT`).run().catch(() => {})
+    await c.env.DB.prepare(`ALTER TABLE users ADD COLUMN utm_campaign TEXT`).run().catch(() => {})
+
+    // Save traffic source
+    if (ref || utm_source) {
+      await c.env.DB.prepare(
+        `UPDATE users SET ref=?, utm_source=?, utm_medium=?, utm_campaign=? WHERE id=?`
+      ).bind(ref||null, utm_source||null, utm_medium||null, utm_campaign||null, user.id).run()
+    }
+
+    // Track affiliate conversion
+    if (ref) {
+      await c.env.DB.prepare(`ALTER TABLE affiliates ADD COLUMN code TEXT`).run().catch(() => {})
+      const aff = await c.env.DB.prepare(`SELECT id, commission_rate FROM affiliates WHERE code=? AND active=1`).bind(ref).first<{id:number,commission_rate:number}>()
+      if (aff) {
+        await c.env.DB.prepare(`UPDATE affiliates SET total_clicks=total_clicks+1, total_conversions=total_conversions+1 WHERE code=?`).bind(ref).run()
+        await c.env.DB.prepare(`INSERT INTO affiliate_conversions (affiliate_code, user_id, event, revenue, commission) VALUES (?,?,?,0,0)`).bind(ref, user.id, 'register').run()
+      }
+    }
 
     const token = await signToken({ userId: user.id, email: user.email, isAdmin: user.isAdmin }, c.env.JWT_SECRET)
     return c.json({ token, user: { id: user.id, email: user.email, name: user.name, isAdmin: user.isAdmin } }, 201)
@@ -347,6 +487,136 @@ app.get('/api/auth/me', async (c) => {
   const user = await db.select().from(schema.users).where(eq(schema.users.id, payload.userId)).get()
   if (!user) return c.json({ error: '用戶不存在' }, 404)
   return c.json({ id: user.id, email: user.email, name: user.name, isAdmin: user.isAdmin })
+})
+
+// ── Forgot / Reset Password ───────────────────────────────────────────────────
+app.post('/api/auth/forgot-password', async (c) => {
+  try {
+    const { email } = await c.req.json()
+    if (!email) return c.json({ error: '請輸入 Email' }, 400)
+
+    // Migrate: add reset_token columns if not exist
+    await c.env.DB.prepare(`ALTER TABLE users ADD COLUMN reset_token TEXT`).run().catch(() => {})
+    await c.env.DB.prepare(`ALTER TABLE users ADD COLUMN reset_token_exp INTEGER`).run().catch(() => {})
+
+    const user = await c.env.DB.prepare(`SELECT id, email, name FROM users WHERE email = ?`).bind(email).first<{ id: number; email: string; name: string }>()
+    // Always return success to prevent email enumeration
+    if (!user) return c.json({ ok: true })
+
+    // Generate reset token (random hex)
+    const tokenBytes = crypto.getRandomValues(new Uint8Array(32))
+    const resetToken = Array.from(tokenBytes).map(b => b.toString(16).padStart(2, '0')).join('')
+    const exp = Math.floor(Date.now() / 1000) + 60 * 60 // 1 hour
+
+    await c.env.DB.prepare(`UPDATE users SET reset_token = ?, reset_token_exp = ? WHERE id = ?`).bind(resetToken, exp, user.id).run()
+
+    const resetUrl = `https://shopline-frontend.pages.dev/reset-password?token=${resetToken}`
+    const resendKey = (c.env as any).RESEND_API_KEY
+    const brevoKey = (c.env as any).BREVO_API_KEY
+
+    const emailHtml = `<!DOCTYPE html>
+<html lang="zh-TW">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0f172a;padding:40px 16px">
+    <tr><td align="center">
+      <table width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%">
+        <!-- Logo -->
+        <tr><td align="center" style="padding-bottom:32px">
+          <div style="display:inline-flex;align-items:center;gap:8px">
+            <div style="width:36px;height:36px;background:#3b82f6;border-radius:8px;display:inline-block;text-align:center;line-height:36px;font-size:18px;font-weight:900;color:#fff">S</div>
+            <span style="font-size:22px;font-weight:900;color:#fff;letter-spacing:-0.5px">SHOPLINE</span>
+          </div>
+        </td></tr>
+        <!-- Card -->
+        <tr><td style="background:#1e293b;border-radius:16px;padding:40px 36px;border:1px solid #334155">
+          <!-- Icon -->
+          <div style="text-align:center;margin-bottom:24px">
+            <div style="width:64px;height:64px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);border-radius:16px;display:inline-block;text-align:center;line-height:64px;font-size:28px">🔐</div>
+          </div>
+          <!-- Title -->
+          <h1 style="margin:0 0 8px;font-size:24px;font-weight:700;color:#f1f5f9;text-align:center">重置你的密碼</h1>
+          <p style="margin:0 0 28px;font-size:14px;color:#94a3b8;text-align:center">我們收到了你的密碼重置請求</p>
+          <!-- Greeting -->
+          <p style="margin:0 0 24px;font-size:15px;color:#cbd5e1;line-height:1.6">
+            你好 <strong style="color:#f1f5f9">${user.name}</strong>，<br>
+            請點擊下方按鈕設定新密碼。此連結將在 <strong style="color:#f59e0b">1 小時</strong>後失效。
+          </p>
+          <!-- Button -->
+          <div style="text-align:center;margin:32px 0">
+            <a href="${resetUrl}" style="display:inline-block;padding:14px 40px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;text-decoration:none;border-radius:10px;font-weight:700;font-size:16px;letter-spacing:0.3px;box-shadow:0 4px 15px rgba(59,130,246,0.4)">
+              立即重置密碼 →
+            </a>
+          </div>
+          <!-- Divider -->
+          <div style="border-top:1px solid #334155;margin:28px 0"></div>
+          <!-- Security note -->
+          <div style="background:#0f172a;border-radius:8px;padding:16px;border-left:3px solid #3b82f6">
+            <p style="margin:0;font-size:12px;color:#64748b;line-height:1.6">
+              🛡️ <strong style="color:#94a3b8">安全提示：</strong>如果你沒有發出此請求，請忽略此郵件，你的帳號不會有任何變更。請勿將此連結分享給任何人。
+            </p>
+          </div>
+        </td></tr>
+        <!-- Footer -->
+        <tr><td style="padding:24px 0;text-align:center">
+          <p style="margin:0;font-size:12px;color:#475569">© 2026 SHOPLINE · ARVIX Limited</p>
+          <p style="margin:4px 0 0;font-size:11px;color:#334155">此郵件由系統自動發送，請勿直接回覆</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`
+
+    if (brevoKey) {
+      await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: { 'api-key': brevoKey, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sender: { name: 'SHOPLINE', email: 'wxfaigl@gmail.com' },
+          to: [{ email }],
+          subject: '【SHOPLINE】重置你的密碼',
+          htmlContent: emailHtml,
+        }),
+      })
+    } else if (resendKey) {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: 'SHOPLINE <onboarding@resend.dev>',
+          to: [email],
+          subject: '【SHOPLINE】重置你的密碼',
+          html: emailHtml,
+        }),
+      })
+    }
+
+    return c.json({ ok: true })
+  } catch (e: any) { return c.json({ error: String(e) }, 500) }
+})
+
+app.post('/api/auth/reset-password', async (c) => {
+  try {
+    const { token: resetToken, password } = await c.req.json()
+    if (!resetToken || !password) return c.json({ error: '參數缺失' }, 400)
+    if (password.length < 6) return c.json({ error: '密碼至少 6 個字元' }, 400)
+
+    const now = Math.floor(Date.now() / 1000)
+    const user = await c.env.DB.prepare(
+      `SELECT id FROM users WHERE reset_token = ? AND reset_token_exp > ?`
+    ).bind(resetToken, now).first<{ id: number }>()
+
+    if (!user) return c.json({ error: '連結無效或已過期' }, 400)
+
+    const { hashPassword } = await import('./auth')
+    const hash = await hashPassword(password)
+    await c.env.DB.prepare(
+      `UPDATE users SET password_hash = ?, reset_token = NULL, reset_token_exp = NULL WHERE id = ?`
+    ).bind(hash, user.id).run()
+
+    return c.json({ ok: true })
+  } catch (e: any) { return c.json({ error: String(e) }, 500) }
 })
 
 // 用户相关路由 (admin only)
@@ -656,7 +926,7 @@ app.post('/api/events', async (c) => {
     const { anonymousId, userId, event, properties } = await c.req.json()
     if (!anonymousId || !event) return c.json({ error: 'missing fields' }, 400)
     await c.env.DB.prepare(
-      `INSERT INTO events (anonymous_id, user_id, event, properties, created_at) VALUES (?, ?, ?, ?, datetime('now'))`
+      `INSERT INTO events (anonymous_id, user_id, event, properties, created_at) VALUES (?, ?, ?, ?, datetime('now', '+8 hours'))`
     ).bind(anonymousId, userId ?? null, event, JSON.stringify(properties || {})).run()
     return c.json({ ok: true })
   } catch (e: any) { return c.json({ error: String(e) }, 500) }
@@ -696,19 +966,27 @@ app.get('/api/admin/funnel', requireAdmin, async (c) => {
   } catch (e: any) { return c.json({ error: String(e) }, 500) }
 })
 
-// GET /api/admin/audit-log — full event log with user filter (deprecated, use new audit APIs)
+// GET /api/admin/audit-log — full event log with user filter
 app.get('/api/admin/audit-log', requireAdmin, async (c) => {
   try {
     const userId = c.req.query('userId') || ''
     const event = c.req.query('event') || ''
     const limit = Math.min(parseInt(c.req.query('limit') || '200'), 500)
 
+    // Join with users directly AND also resolve anonymous_id to user via identity events
     let sql = `SELECT e.id, e.anonymous_id, e.user_id, e.event, e.properties, e.created_at,
-                      u.email, u.name
-               FROM events e LEFT JOIN users u ON e.user_id = u.id
+                      COALESCE(u.email, u2.email) as email,
+                      COALESCE(u.name, u2.name) as name
+               FROM events e
+               LEFT JOIN users u ON e.user_id = u.id
+               LEFT JOIN users u2 ON u2.id = (
+                 SELECT ei.user_id FROM events ei
+                 WHERE ei.anonymous_id = e.anonymous_id AND ei.user_id IS NOT NULL
+                 ORDER BY ei.id ASC LIMIT 1
+               )
                WHERE 1=1`
     const binds: any[] = []
-    if (userId) { sql += ` AND e.user_id = ?`; binds.push(userId) }
+    if (userId) { sql += ` AND (e.user_id = ? OR u2.id = ?)`; binds.push(userId, userId) }
     if (event) { sql += ` AND e.event = ?`; binds.push(event) }
     sql += ` ORDER BY e.created_at DESC LIMIT ?`
     binds.push(limit)
@@ -747,7 +1025,7 @@ const auditLogMiddleware = async (c: any, next: any, operationType: string, oper
       INSERT INTO audit_logs (id, user_id, session_id, system_name, operation_type, operation_detail, 
                               ip_address, user_agent, device_type, location_country, location_city, 
                               timestamp, response_status, response_time, created_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', '+8 hours'))
     `).bind(
       crypto.randomUUID(),
       c.get('userId') || null,
@@ -769,7 +1047,7 @@ const auditLogMiddleware = async (c: any, next: any, operationType: string, oper
     await c.env.DB.prepare(`
       INSERT OR REPLACE INTO user_sessions (session_id, user_id, system_name, ip_address, user_agent, 
                                           device_type, last_activity, page_count, is_active)
-      VALUES (?, ?, ?, ?, ?, ?, datetime('now'), 
+      VALUES (?, ?, ?, ?, ?, ?, datetime('now', '+8 hours'), 
               COALESCE((SELECT page_count FROM user_sessions WHERE session_id = ?), 0) + 1, 1)
     `).bind(sessionId, c.get('userId') || null, 'shopline', ipAddress, userAgent, deviceType, sessionId).run()
     
@@ -780,7 +1058,7 @@ const auditLogMiddleware = async (c: any, next: any, operationType: string, oper
       INSERT INTO audit_logs (id, user_id, session_id, system_name, operation_type, operation_detail, 
                               ip_address, user_agent, device_type, location_country, location_city, 
                               timestamp, response_status, response_time, error_message, created_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', '+8 hours'))
     `).bind(
       crypto.randomUUID(),
       c.get('userId') || null,
@@ -1035,6 +1313,70 @@ app.get('/api/admin/customers/search', requireAdmin, async (c) => {
   } catch (e: any) { return c.json({ error: String(e) }, 500) }
 })
 
+// 跨系统审计事件上报接口（供 tinywear/ims 调用）
+app.post('/api/admin/audit-cross-system', async (c) => {
+  try {
+    const systemSourceHeader = c.req.header('X-System-Source') // 'tinywear' | 'ims'
+    
+    const {
+      user_id,
+      session_id,
+      system_name: systemNamePayload,
+      operation_type,
+      operation_detail,
+      ip_address,
+      user_agent,
+      device_type,
+      location_country,
+      location_city,
+      response_status,
+      response_time
+    } = await c.req.json()
+    
+    // 优先使用 payload 中的 system_name，其次使用 Header
+    let finalSystemName = systemNamePayload
+    if (!finalSystemName) {
+      if (systemSourceHeader === 'tinywear') finalSystemName = 'Tiny Wearhouse'
+      else if (systemSourceHeader === 'ims') finalSystemName = 'IMS'
+      else return c.json({ error: 'Invalid system source' }, 400)
+    }
+    
+    if (!user_id || !operation_type) {
+      return c.json({ error: 'Missing required fields' }, 400)
+    }
+    
+    const auditId = `audit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    
+    await c.env.DB.prepare(`
+      INSERT INTO audit_logs (
+        id, user_id, session_id, system_name, operation_type, operation_detail,
+        ip_address, user_agent, device_type, location_country, location_city,
+        timestamp, response_status, response_time
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      auditId,
+      user_id,
+      session_id || `session_${Date.now()}`,
+      finalSystemName,
+      operation_type,
+      operation_detail || '',
+      ip_address || '',
+      user_agent || '',
+      device_type || '',
+      location_country || '',
+      location_city || '',
+      new Date().toISOString(),
+      response_status || 200,
+      response_time || 0
+    ).run()
+    
+    return c.json({ success: true, auditId })
+  } catch (e: any) {
+    console.error('Cross-system audit error:', e)
+    return c.json({ error: String(e) }, 500)
+  }
+})
+
 // Generate SSO token for trial systems (signed with SHOPLINE_JWT_SECRET)
 app.post('/api/auth/sso-token', async (c) => {
   const authHeader = c.req.header('Authorization')
@@ -1046,6 +1388,115 @@ app.post('/api/auth/sso-token', async (c) => {
   const ssoSecret = (c.env as any).SHOPLINE_JWT_SECRET || 'shopline_v2_jwt_secret_2026'
   const ssoToken = await signToken({ userId: payload.userId, email: payload.email }, ssoSecret)
   return c.json({ ssoToken })
+})
+
+// ── Affiliate API ─────────────────────────────────────────────────────────────
+// List affiliates
+app.get('/api/admin/affiliates', requireAdmin, async (c) => {
+  try {
+    const rows = await c.env.DB.prepare(`SELECT * FROM affiliates ORDER BY created_at DESC`).all()
+    return c.json(rows.results)
+  } catch(e:any) { return c.json({error:String(e)},500) }
+})
+
+// Create affiliate
+app.post('/api/admin/affiliates', requireAdmin, async (c) => {
+  try {
+    const { name, email, code, commission_rate } = await c.req.json()
+    if (!name || !code) return c.json({error:'name and code required'},400)
+    await c.env.DB.prepare(
+      `INSERT INTO affiliates (code, name, email, commission_rate) VALUES (?,?,?,?)`
+    ).bind(code, name, email||null, commission_rate||0.1).run()
+    return c.json({ok:true})
+  } catch(e:any) { return c.json({error:String(e)},500) }
+})
+
+// Update affiliate
+app.put('/api/admin/affiliates/:id', requireAdmin, async (c) => {
+  try {
+    const id = c.req.param('id')
+    const { name, email, commission_rate, active } = await c.req.json()
+    await c.env.DB.prepare(
+      `UPDATE affiliates SET name=?, email=?, commission_rate=?, active=? WHERE id=?`
+    ).bind(name, email||null, commission_rate, active, id).run()
+    return c.json({ok:true})
+  } catch(e:any) { return c.json({error:String(e)},500) }
+})
+
+// Delete affiliate
+app.delete('/api/admin/affiliates/:id', requireAdmin, async (c) => {
+  try {
+    await c.env.DB.prepare(`DELETE FROM affiliates WHERE id=?`).bind(c.req.param('id')).run()
+    return c.json({ok:true})
+  } catch(e:any) { return c.json({error:String(e)},500) }
+})
+
+// Traffic source analytics
+app.get('/api/admin/traffic', requireAdmin, async (c) => {
+  try {
+    // UTM source breakdown
+    const sources = await c.env.DB.prepare(
+      `SELECT COALESCE(utm_source,'direct') as source, COUNT(*) as users FROM users WHERE is_admin=0 GROUP BY utm_source ORDER BY users DESC`
+    ).all()
+    // Ref breakdown
+    const refs = await c.env.DB.prepare(
+      `SELECT ref, COUNT(*) as users FROM users WHERE ref IS NOT NULL AND is_admin=0 GROUP BY ref ORDER BY users DESC`
+    ).all()
+    // Campaign breakdown
+    const campaigns = await c.env.DB.prepare(
+      `SELECT utm_campaign, COUNT(*) as users FROM users WHERE utm_campaign IS NOT NULL AND is_admin=0 GROUP BY utm_campaign ORDER BY users DESC`
+    ).all()
+    // Affiliate conversions
+    const affConversions = await c.env.DB.prepare(
+      `SELECT ac.affiliate_code, a.name, COUNT(*) as conversions, COALESCE(SUM(ac.revenue),0) as revenue, COALESCE(SUM(ac.commission),0) as commission
+       FROM affiliate_conversions ac LEFT JOIN affiliates a ON ac.affiliate_code=a.code
+       GROUP BY ac.affiliate_code ORDER BY conversions DESC`
+    ).all()
+    return c.json({ sources: sources.results, refs: refs.results, campaigns: campaigns.results, affConversions: affConversions.results })
+  } catch(e:any) { return c.json({error:String(e)},500) }
+})
+
+// ── Site Settings (SEO & Content) ────────────────────────────────────────────
+app.get('/api/site-settings', async (c) => {
+  try {
+    await c.env.DB.prepare(`CREATE TABLE IF NOT EXISTS site_settings (key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TEXT DEFAULT (datetime('now', '+8 hours')))`).run()
+    const rows = await c.env.DB.prepare(`SELECT key, value FROM site_settings`).all()
+    const settings: Record<string, string> = {}
+    for (const r of rows.results as any[]) settings[r.key] = r.value
+    return c.json(settings)
+  } catch(e:any) { return c.json({error:String(e)},500) }
+})
+
+app.put('/api/site-settings', requireAdmin, async (c) => {
+  try {
+    await c.env.DB.prepare(`CREATE TABLE IF NOT EXISTS site_settings (key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TEXT DEFAULT (datetime('now', '+8 hours')))`).run()
+    const body = await c.req.json()
+    for (const [key, value] of Object.entries(body)) {
+      await c.env.DB.prepare(`INSERT INTO site_settings (key, value, updated_at) VALUES (?,?,datetime('now','+8 hours')) ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_at=excluded.updated_at`).bind(key, String(value)).run()
+    }
+    return c.json({ ok: true })
+  } catch(e:any) { return c.json({error:String(e)},500) }
+})
+
+// Admin: clean test data
+app.post('/api/admin/clean-test-data', requireAdmin, async (c) => {
+  try {
+    // Delete test users and their related data
+    const testEmails = ['john@example.com','mary@example.com','david@example.com','sarah@example.com','mike@example.com']
+    for (const email of testEmails) {
+      const user = await c.env.DB.prepare(`SELECT id FROM users WHERE email=?`).bind(email).first<{id:number}>()
+      if (!user) continue
+      await c.env.DB.prepare(`DELETE FROM order_items WHERE order_id IN (SELECT id FROM orders WHERE user_id=?)`).bind(user.id).run().catch(()=>{})
+      await c.env.DB.prepare(`DELETE FROM orders WHERE user_id=?`).bind(user.id).run().catch(()=>{})
+      await c.env.DB.prepare(`DELETE FROM cart_items WHERE user_id=?`).bind(user.id).run().catch(()=>{})
+      await c.env.DB.prepare(`DELETE FROM events WHERE user_id=?`).bind(user.id).run().catch(()=>{})
+      await c.env.DB.prepare(`DELETE FROM users WHERE id=?`).bind(user.id).run().catch(()=>{})
+    }
+    // Delete test events
+    await c.env.DB.prepare(`DELETE FROM events WHERE event='test_tz'`).run().catch(()=>{})
+    await c.env.DB.prepare(`DELETE FROM events WHERE anonymous_id LIKE 'test_%'`).run().catch(()=>{})
+    return c.json({ ok: true })
+  } catch(e:any) { return c.json({error:String(e)},500) }
 })
 
 export default app

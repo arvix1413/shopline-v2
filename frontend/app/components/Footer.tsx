@@ -4,20 +4,20 @@ import Link from 'next/link'
 import { useI18n } from '../../contexts/I18nContext'
 
 const colHrefs = [
-  // SaaS 電商平台: 功能介紹→/online-store, 方案費用→/online-store/features, 版型主題→/templates, 金流串接→/online-store/shop-builder, 客戶案例→/showcase
-  ['/online-store', '/online-store/features', '/templates', '/online-store/shop-builder', '/showcase'],
-  // APP 開發: iOS→/social-commerce, Android→/social-commerce/features, 跨平台→/social-commerce/instagram-live
-  ['/social-commerce', '/social-commerce/features', '/social-commerce/instagram-live'],
-  // 企業系統: ERP→/pos, CRM→/pos/features, AI會計→/pos/hardware
-  ['/pos', '/pos/features', '/pos/hardware'],
-  // 開始使用: 免費試用→/about/pricing, 方案費用→/seminar, 預約諮詢→/consultation
-  ['/about/pricing', '/seminar', '/consultation'],
-  // 更多資源: 技術部落格→/apps, 開發文件→/faq/overview, 常見問題→/changelog, API文件→/seminar, LINE官方帳號→/line-solution
-  ['/apps', '/faq/overview', '/changelog', '/seminar', '/line-solution'],
-  // 產品支援: 產品更新日誌→/changelog, 常見問題中心→/faq/overview
+  // SaaS 電商平台: 功能介紹, 方案費用, 版型主題, 金流串接, 客戶案例
+  ['/online-store', '/about/pricing', '/templates', '/about/pricing', '/showcase'],
+  // APP 開發: iOS, Android, 跨平台
+  ['/trial-redirect', '/trial-redirect', '/trial-redirect'],
+  // 企業系統: ERP, CRM, AI會計
+  ['/trial-redirect', '/trial-redirect', '/trial-redirect'],
+  // 開始使用: 免費試用, 方案費用, 預約諮詢
+  ['/trial-redirect', '/about/pricing', '/consultation'],
+  // 更多資源: 技術部落格, 開發文件, 常見問題, API文件, LINE官方帳號
+  ['/apps', '/faq/overview', '/faq/overview', '/faq/overview', 'https://line.me'],
+  // 產品支援: 產品更新日誌, 常見問題中心
   ['/changelog', '/faq/overview'],
-  // ARVIX: 加入我們→/cooperate, 合作機會→/cooperate, 關於我們→/selectedpartners, 聯絡我們→/compliance-center
-  ['/cooperate', '/cooperate', '/selectedpartners', '/compliance-center'],
+  // ARVIX: 加入我們, 合作機會, 關於我們, 聯絡我們
+  ['/about', '/about', '/about', '/contact'],
 ]
 
 const socials = [

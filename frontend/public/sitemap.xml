@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://shopline-frontend.pages.dev/</loc><priority>1.0</priority><changefreq>daily</changefreq></url>
+  <url><loc>https://shopline-frontend.pages.dev/about</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://shopline-frontend.pages.dev/about/pricing</loc><priority>0.9</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://shopline-frontend.pages.dev/templates</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://shopline-frontend.pages.dev/apps</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://shopline-frontend.pages.dev/solutions</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://shopline-frontend.pages.dev/online-store</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://shopline-frontend.pages.dev/showcase</loc><priority>0.6</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://shopline-frontend.pages.dev/faq/overview</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://shopline-frontend.pages.dev/changelog</loc><priority>0.5</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://shopline-frontend.pages.dev/contact</loc><priority>0.5</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://shopline-frontend.pages.dev/register</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+</urlset>

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
-import { track, bindUser } from '../../lib/tracker'
+import { track, bindUser, getTrafficSource } from '../../lib/tracker'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://shopline-backend.arvix1413.workers.dev'
 
@@ -29,6 +29,7 @@ export default function RegisterPage() {
           password: form.password,
           phone: form.phone,
           shopName: form.shopName,
+          ...getTrafficSource(),
         }),
       })
       const data = await res.json()

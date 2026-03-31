@@ -3,13 +3,14 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Eye, EyeOff } from 'lucide-react'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://shopline-backend.arvix1413.workers.dev'
 
 export default function LoginPage() {
   const router = useRouter()
   const [form, setForm] = useState({ email: '', password: '' })
+  const [showPw, setShowPw] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -17,33 +18,18 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
-    
     try {
-      console.log('提交登录表单...', { email: form.email, apiBase: API_BASE })
-      
       const res = await fetch(`${API_BASE}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: form.email, password: form.password }),
       })
-      
       const data = await res.json()
-      console.log('登录响应:', { status: res.status, data })
-      
-      if (!res.ok) {
-        setError(data.error || '登入失敗')
-        return
-      }
-      
-      // 直接保存到localStorage
+      if (!res.ok) { setError(data.error || '登入失敗'); return }
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
-      
-      // 跳转到管理后台
-      router.push('/admin')
-      
-    } catch (error) {
-      console.error('登录错误:', error)
+      window.location.href = data.user?.isAdmin ? '/admin' : '/trial'
+    } catch {
       setError('網路錯誤，請重試')
     } finally {
       setLoading(false)
@@ -71,28 +57,38 @@ export default function LoginPage() {
         {error && (
           <div className="mb-3 px-4 py-3 rounded-lg bg-red-500/20 text-red-200 text-sm text-center">{error}</div>
         )}
-        
+
         <form onSubmit={handleSubmit} className="space-y-3">
-          <input 
-            type="email" 
-            placeholder="Email" 
+          <input
+            type="email"
+            placeholder="Email"
             value={form.email}
             onChange={e => setForm({ ...form, email: e.target.value })}
             className="w-full px-5 py-4 rounded-lg bg-white text-gray-700 placeholder-gray-400 text-base outline-none focus:ring-2 focus:ring-blue-400 border-0"
-            required 
-          />
-          
-          <input 
-            type="password" 
-            placeholder="密碼" 
-            value={form.password}
-            onChange={e => setForm({ ...form, password: e.target.value })}
-            className="w-full px-5 py-4 rounded-lg bg-white text-gray-700 placeholder-gray-400 text-base outline-none focus:ring-2 focus:ring-blue-400 border-0"
-            required 
+            required
           />
 
-          <button 
-            type="submit" 
+          <div className="relative">
+            <input
+              type={showPw ? 'text' : 'password'}
+              placeholder="密碼"
+              value={form.password}
+              onChange={e => setForm({ ...form, password: e.target.value })}
+              className="w-full px-5 py-4 pr-14 rounded-lg bg-white text-gray-700 placeholder-gray-400 text-base outline-none focus:ring-2 focus:ring-blue-400 border-0"
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPw(v => !v)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              tabIndex={-1}
+            >
+              {showPw ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
+
+          <button
+            type="submit"
             disabled={loading}
             className="w-full flex items-center justify-center gap-3 py-4 rounded-lg text-white font-bold text-lg transition-all hover:brightness-110 active:scale-[0.99] disabled:opacity-60"
             style={{ background: 'linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)' }}

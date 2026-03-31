@@ -6,6 +6,8 @@ compatibility_date = "2024-01-15"
 R2_DOMAIN = "https://pub-51908639511240656e3a5d46a004f299.r2.dev"
 JWT_SECRET = "shopline_v2_jwt_secret_2026"
 SHOPLINE_JWT_SECRET = "shopline_v2_jwt_secret_2026"
+RESEND_API_KEY = "re_A7ZCKEBK_G7w4r4msGkYskcET6CEESnEV"
+BREVO_API_KEY = "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"
 
 [[d1_databases]]
 binding = "DB"

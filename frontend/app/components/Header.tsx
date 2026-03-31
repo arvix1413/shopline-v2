@@ -83,10 +83,10 @@ export default function Header() {
       dropdown: {
         cols: [
           { title: locale === 'en' ? 'Knowledge' : locale === 'zh-CN' ? '知识库' : '知識庫', links: [
-            { label: locale === 'en' ? 'Commerce Academy' : locale === 'zh-CN' ? '电商成长学院' : '電商成長學苑', href: '#' },
-            { label: locale === 'en' ? 'Commerce Blog' : locale === 'zh-CN' ? '电商教室' : '電商教室', href: '#' },
-            { label: 'ARVIX TRENDS', href: '#' },
-            { label: locale === 'en' ? 'Security Center' : locale === 'zh-CN' ? '信息安全保护专区' : '資訊安全保護專區', href: '#' },
+            { label: locale === 'en' ? 'Commerce Academy' : locale === 'zh-CN' ? '电商成长学院' : '電商成長學苑', href: '/about' },
+            { label: locale === 'en' ? 'Commerce Blog' : locale === 'zh-CN' ? '电商教室' : '電商教室', href: '/about' },
+            { label: 'ARVIX TRENDS', href: '/about' },
+            { label: locale === 'en' ? 'Security Center' : locale === 'zh-CN' ? '信息安全保护专区' : '資訊安全保護專區', href: '/about' },
           ]},
           { title: locale === 'en' ? 'News' : locale === 'zh-CN' ? '最新动态' : '最新動態', links: [
             { label: locale === 'en' ? 'Product Updates' : locale === 'zh-CN' ? '产品最新动态' : '產品最新動態', href: '/changelog' },

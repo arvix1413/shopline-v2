@@ -1,36 +1,45 @@
 'use client'
 import { useState } from 'react'
 
+// Map templates to trial systems (cycle through subsystems)
+const trialSystems = [
+  'https://tinywearhouse-frontend.pages.dev',
+  'https://daf-shoes-frontend.pages.dev',
+  'https://meierq-frontend.pages.dev',
+  'https://molava-frontend.pages.dev',
+  'https://zenlet-frontend.pages.dev',
+]
+
 const templates = [
-  { name: 'Dusk',            src: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1200&q=80',  tags: ['自訂主題顏色', '自訂頁尾顏色', '自訂主題字型顏色'] },
-  { name: 'Philia',          src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&q=80',  tags: ['自訂主題顏色', '自訂主題字型'] },
-  { name: 'Varm',            src: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=1200&q=80',  tags: ['自訂主題顏色', '自訂頁尾顏色'] },
-  { name: 'Skya',            src: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=1200&q=80',  tags: ['自訂主題顏色', '自訂背景顏色', '自訂主題字型顏色'] },
-  { name: 'Sangria',         src: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1200&q=80',  tags: ['自訂主題顏色', '自訂主題字型'] },
-  { name: 'Bianco',          src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&q=80',  tags: ['自訂主題顏色', '自訂主題字型'] },
-  { name: 'Doris Bien',      src: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=1200&q=80',  tags: ['自訂主題顏色'] },
-  { name: 'Kingsman',        src: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=1200&q=80',  tags: ['自訂主題顏色', '自訂主題字型'] },
-  { name: 'Ultra Chic',      src: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1200&q=80',  tags: ['自訂主題顏色', '自訂背景顏色'] },
-  { name: 'Basic',           src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&q=80',  tags: [] },
-  { name: 'Nightfall',       src: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=1200&q=80',  tags: [] },
-  { name: 'Paola',           src: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=1200&q=80',  tags: [] },
-  { name: 'Ell',             src: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1200&q=80',  tags: [] },
-  { name: 'Fresh Urban',     src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&q=80',  tags: [] },
-  { name: 'Hype',            src: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=1200&q=80',  tags: [] },
-  { name: 'Studio',          src: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=1200&q=80',  tags: [] },
-  { name: 'Gentleman',       src: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1200&q=80',  tags: [] },
-  { name: 'Lace',            src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&q=80',  tags: [] },
-  { name: 'Mint',            src: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=1200&q=80',  tags: [] },
-  { name: 'Lux Moss',        src: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=1200&q=80',  tags: [] },
-  { name: 'Simple',          src: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1200&q=80',  tags: [] },
-  { name: 'Simple Patterns', src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&q=80',  tags: [] },
-  { name: 'Boxed Patterns',  src: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=1200&q=80',  tags: [] },
-  { name: 'Rebel',           src: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=1200&q=80',  tags: [] },
-  { name: 'Swanky',          src: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1200&q=80',  tags: [] },
-  { name: 'Slate',           src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&q=80',  tags: [] },
-  { name: 'Chic',            src: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=1200&q=80',  tags: [] },
-  { name: 'King',            src: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=1200&q=80',  tags: [] },
-  { name: 'Streetify',       src: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1200&q=80',  tags: [] },
+  { name: 'Dusk',            src: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1200&q=80',  tags: ['自訂主題顏色', '自訂頁尾顏色', '自訂主題字型顏色'], system: 0 },
+  { name: 'Philia',          src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&q=80',  tags: ['自訂主題顏色', '自訂主題字型'], system: 1 },
+  { name: 'Varm',            src: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=1200&q=80',  tags: ['自訂主題顏色', '自訂頁尾顏色'], system: 2 },
+  { name: 'Skya',            src: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=1200&q=80',  tags: ['自訂主題顏色', '自訂背景顏色', '自訂主題字型顏色'], system: 3 },
+  { name: 'Sangria',         src: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1200&q=80',  tags: ['自訂主題顏色', '自訂主題字型'], system: 4 },
+  { name: 'Bianco',          src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&q=80',  tags: ['自訂主題顏色', '自訂主題字型'], system: 0 },
+  { name: 'Doris Bien',      src: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=1200&q=80',  tags: ['自訂主題顏色'], system: 1 },
+  { name: 'Kingsman',        src: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=1200&q=80',  tags: ['自訂主題顏色', '自訂主題字型'], system: 2 },
+  { name: 'Ultra Chic',      src: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1200&q=80',  tags: ['自訂主題顏色', '自訂背景顏色'], system: 3 },
+  { name: 'Basic',           src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&q=80',  tags: [], system: 4 },
+  { name: 'Nightfall',       src: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=1200&q=80',  tags: [], system: 0 },
+  { name: 'Paola',           src: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=1200&q=80',  tags: [], system: 1 },
+  { name: 'Ell',             src: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1200&q=80',  tags: [], system: 2 },
+  { name: 'Fresh Urban',     src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&q=80',  tags: [], system: 3 },
+  { name: 'Hype',            src: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=1200&q=80',  tags: [], system: 4 },
+  { name: 'Studio',          src: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=1200&q=80',  tags: [], system: 0 },
+  { name: 'Gentleman',       src: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1200&q=80',  tags: [], system: 1 },
+  { name: 'Lace',            src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&q=80',  tags: [], system: 2 },
+  { name: 'Mint',            src: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=1200&q=80',  tags: [], system: 3 },
+  { name: 'Lux Moss',        src: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=1200&q=80',  tags: [], system: 4 },
+  { name: 'Simple',          src: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1200&q=80',  tags: [], system: 0 },
+  { name: 'Simple Patterns', src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&q=80',  tags: [], system: 1 },
+  { name: 'Boxed Patterns',  src: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=1200&q=80',  tags: [], system: 2 },
+  { name: 'Rebel',           src: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=1200&q=80',  tags: [], system: 3 },
+  { name: 'Swanky',          src: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1200&q=80',  tags: [], system: 4 },
+  { name: 'Slate',           src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&q=80',  tags: [], system: 0 },
+  { name: 'Chic',            src: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=1200&q=80',  tags: [], system: 1 },
+  { name: 'King',            src: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=1200&q=80',  tags: [], system: 2 },
+  { name: 'Streetify',       src: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1200&q=80',  tags: [], system: 3 },
 ]
 
 export default function TemplatesPage() {
@@ -55,7 +64,9 @@ export default function TemplatesPage() {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {templates.map((t) => (
+            {templates.map((t) => {
+              const previewUrl = trialSystems[t.system]
+              return (
               <div key={t.name}
                 className="rounded-2xl overflow-hidden border border-gray-100 hover:shadow-xl transition-all cursor-pointer group"
                 onMouseEnter={() => setHovered(t.name)}
@@ -67,9 +78,16 @@ export default function TemplatesPage() {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   {hovered === t.name && (
-                    <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}>
-                      <a href="/trial-redirect" className="text-white font-bold px-6 py-2 rounded-full text-sm" style={{ backgroundColor: '#356DFF' }}>
+                    <div className="absolute inset-0 flex items-center justify-center gap-2" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}>
+                      <a href={previewUrl} target="_blank" rel="noopener noreferrer"
+                        className="text-white font-bold px-4 py-2 rounded-full text-sm hover:opacity-90"
+                        style={{ backgroundColor: '#356DFF' }}>
                         預覽版型
+                      </a>
+                      <a href="/trial-redirect"
+                        className="text-white font-bold px-4 py-2 rounded-full text-sm hover:opacity-90"
+                        style={{ backgroundColor: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.5)' }}>
+                        免費試用
                       </a>
                     </div>
                   )}
@@ -85,7 +103,8 @@ export default function TemplatesPage() {
                   )}
                 </div>
               </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>

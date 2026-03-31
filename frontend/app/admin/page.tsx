@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Header from '../components/Header'
-import { useAuth } from '../../contexts/AuthContext'
 import { Plus, Edit, Trash2, AlertCircle, CheckCircle } from 'lucide-react'
 import EnhancedAuditLog from '../components/EnhancedAuditLog'
 
@@ -12,7 +11,7 @@ const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8787'
 interface UserRow { id: number; email: string; name: string; phone: string | null; isAdmin: number | null; createdAt: string | null }
 interface TrialSystem { id: number; name: string; desc: string; url: string; color: string; bg: string; border: string; emoji: string; tags: string[]; active: number; sortOrder: number }
 
-const TABS = ['用戶管理', '試用系統管理', '行為漏斗', '增強審計日誌', '店鋪報表'] as const
+const TABS = ['用戶管理', '試用系統管理', '行為漏斗', '增強審計日誌', '流量分析', '聯盟行銷', 'SEO 內容', '店鋪報表'] as const
 type Tab = typeof TABS[number]
 
 
@@ -27,27 +26,34 @@ export default function AdminPage() {
 
   // 初始化用户信息
   useEffect(() => {
+    if (typeof window === 'undefined') return
     try {
       const storedToken = localStorage.getItem('token')
       const storedUser = localStorage.getItem('user')
-      
       if (storedToken && storedUser) {
+        const u = JSON.parse(storedUser)
         setToken(storedToken)
-        setUser(JSON.parse(storedUser))
+        setUser(u)
+        if (!u.isAdmin) {
+          window.location.href = '/'
+        }
       } else {
-        // 如果没有token，重定向到登录页
-        router.push('/login')
-        return
+        window.location.href = '/login'
       }
-    } catch (error) {
-      console.error('读取用户信息失败:', error)
-      router.push('/login')
+    } catch {
+      window.location.href = '/login'
     } finally {
       setIsLoading(false)
     }
-  }, [router])
+  }, [])
 
-  // Funnel state
+  // Traffic & affiliate state
+  const [traffic, setTraffic] = useState<any>(null)
+  const [trafficLoading, setTrafficLoading] = useState(false)
+  const [affiliates, setAffiliates] = useState<any[]>([])
+  const [affLoading, setAffLoading] = useState(false)
+  const [showAffForm, setShowAffForm] = useState(false)
+  const [affForm, setAffForm] = useState({ name: '', email: '', code: '', commission_rate: 0.1 })
   const [funnel, setFunnel] = useState<Record<string, number>>({})
   const [userProgress, setUserProgress] = useState<any[]>([])
   const [funnelLoading, setFunnelLoading] = useState(false)
@@ -68,11 +74,6 @@ export default function AdminPage() {
   const [sysForm, setSysForm] = useState({ name: '', desc: '', url: '', color: '#3B82F6', bg: 'rgba(59,130,246,0.08)', border: 'rgba(59,130,246,0.2)', emoji: '🌐', tags: '', active: 1, sortOrder: 0 })
 
   const showMsg = (type: 'success' | 'error', text: string) => { setMsg({ type, text }); setTimeout(() => setMsg(null), 4000) }
-
-  useEffect(() => {
-    if (!isLoading && (!user || user.isAdmin !== 1)) router.push('/login')
-  }, [user, isLoading, router])
-
 
   const fetchUsers = useCallback(async () => {
     setUsersLoading(true)
@@ -101,6 +102,22 @@ export default function AdminPage() {
     } catch { showMsg('error', '獲取漏斗數據失敗') } finally { setFunnelLoading(false) }
   }, [token])
 
+  const fetchTraffic = useCallback(async () => {
+    setTrafficLoading(true)
+    try {
+      const res = await fetch(`${API}/api/admin/traffic`, { headers: { Authorization: `Bearer ${token}` } })
+      if (res.ok) setTraffic(await res.json())
+    } catch {} finally { setTrafficLoading(false) }
+  }, [token])
+
+  const fetchAffiliates = useCallback(async () => {
+    setAffLoading(true)
+    try {
+      const res = await fetch(`${API}/api/admin/affiliates`, { headers: { Authorization: `Bearer ${token}` } })
+      if (res.ok) setAffiliates(await res.json())
+    } catch {} finally { setAffLoading(false) }
+  }, [token])
+
   const SHOP_APIS = [
     { name: 'TinyWearhouse', url: 'https://tinywearhouse-backend.arvix1413.workers.dev', emoji: '👗' },
     { name: 'DAF Shoes', url: 'https://daf-shoes-backend.arvix1413.workers.dev', emoji: '👟' },
@@ -121,18 +138,21 @@ export default function AdminPage() {
   }, [])
 
   useEffect(() => {
-    if (!user || user.isAdmin !== 1) return
+    if (!user || !user.isAdmin) return
     if (tab === '用戶管理') fetchUsers()
     if (tab === '試用系統管理') fetchSystems()
     if (tab === '行為漏斗') fetchFunnel()
-    if (tab === '增強審計日誌') {
-      // 增强审计日志不需要额外的数据获取
-    }
+    if (tab === '增強審計日誌') {}
+    if (tab === '流量分析') fetchTraffic()
+    if (tab === '聯盟行銷') fetchAffiliates()
     if (tab === '店鋪報表') fetchShopStats()
-  }, [tab, user, fetchUsers, fetchSystems, fetchFunnel, fetchShopStats])
+  }, [tab, user, fetchUsers, fetchSystems, fetchFunnel, fetchTraffic, fetchAffiliates, fetchShopStats])
 
   if (isLoading) return <main className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></main>
-  if (!user || user.isAdmin !== 1) return null
+  if (!user || !user.isAdmin) {
+    if (typeof window !== 'undefined') window.location.href = '/'
+    return null
+  }
 
   // ---- User handlers ----
   const handleUserDelete = async (id: number, email: string) => {
@@ -417,6 +437,168 @@ export default function AdminPage() {
           <EnhancedAuditLog token={token!} />
         )}
 
+        {/* ===== TRAFFIC TAB ===== */}
+        {tab === '流量分析' && (
+          <div className="space-y-5">
+            <h2 className="text-lg font-semibold">流量來源分析</h2>
+            {trafficLoading ? <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" /></div> : traffic ? (
+              <>
+                <div className="grid md:grid-cols-3 gap-4">
+                  {/* UTM Source */}
+                  <div className="bg-white rounded-xl border p-4">
+                    <div className="text-sm font-semibold text-gray-700 mb-3">📡 流量來源 (utm_source)</div>
+                    {traffic.sources?.length === 0 ? <div className="text-xs text-gray-400">尚無數據</div> : traffic.sources?.map((s: any) => (
+                      <div key={s.source} className="flex items-center justify-between py-1.5 border-b last:border-0">
+                        <span className="text-sm text-gray-700">{s.source}</span>
+                        <span className="text-sm font-bold text-blue-600">{s.users} 人</span>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Ref */}
+                  <div className="bg-white rounded-xl border p-4">
+                    <div className="text-sm font-semibold text-gray-700 mb-3">🔗 推薦來源 (ref)</div>
+                    {traffic.refs?.length === 0 ? <div className="text-xs text-gray-400">尚無數據</div> : traffic.refs?.map((r: any) => (
+                      <div key={r.ref} className="flex items-center justify-between py-1.5 border-b last:border-0">
+                        <span className="text-sm text-gray-700">{r.ref}</span>
+                        <span className="text-sm font-bold text-purple-600">{r.users} 人</span>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Campaign */}
+                  <div className="bg-white rounded-xl border p-4">
+                    <div className="text-sm font-semibold text-gray-700 mb-3">📣 廣告活動 (utm_campaign)</div>
+                    {traffic.campaigns?.length === 0 ? <div className="text-xs text-gray-400">尚無數據</div> : traffic.campaigns?.map((c: any) => (
+                      <div key={c.utm_campaign} className="flex items-center justify-between py-1.5 border-b last:border-0">
+                        <span className="text-sm text-gray-700">{c.utm_campaign}</span>
+                        <span className="text-sm font-bold text-green-600">{c.users} 人</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Affiliate conversions */}
+                {traffic.affConversions?.length > 0 && (
+                  <div className="bg-white rounded-xl border p-4">
+                    <div className="text-sm font-semibold text-gray-700 mb-3">💰 聯盟行銷轉換</div>
+                    <table className="w-full text-sm">
+                      <thead className="text-xs text-gray-500 uppercase bg-gray-50">
+                        <tr>
+                          <th className="px-3 py-2 text-left">推廣者</th>
+                          <th className="px-3 py-2 text-left">代碼</th>
+                          <th className="px-3 py-2 text-right">轉換數</th>
+                          <th className="px-3 py-2 text-right">營收</th>
+                          <th className="px-3 py-2 text-right">佣金</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y">
+                        {traffic.affConversions.map((a: any) => (
+                          <tr key={a.affiliate_code} className="hover:bg-gray-50">
+                            <td className="px-3 py-2 font-medium">{a.name || '-'}</td>
+                            <td className="px-3 py-2 text-blue-600 font-mono text-xs">{a.affiliate_code}</td>
+                            <td className="px-3 py-2 text-right">{a.conversions}</td>
+                            <td className="px-3 py-2 text-right text-green-600">NT${Math.round(a.revenue).toLocaleString()}</td>
+                            <td className="px-3 py-2 text-right text-orange-600">NT${Math.round(a.commission).toLocaleString()}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-700">
+                  💡 在推廣連結加上參數即可追蹤：<code className="bg-blue-100 px-1 rounded">?utm_source=ig&utm_campaign=春季活動&ref=kol_name</code>
+                </div>
+              </>
+            ) : <div className="text-center py-10 text-gray-400">點擊重新整理載入數據</div>}
+          </div>
+        )}
+
+        {/* ===== AFFILIATE TAB ===== */}
+        {tab === '聯盟行銷' && (
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">聯盟行銷管理</h2>
+              <button onClick={() => setShowAffForm(true)}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm hover:bg-blue-700">
+                <Plus size={16} /> 新增推廣者
+              </button>
+            </div>
+
+            {showAffForm && (
+              <div className="bg-white rounded-xl border p-5 mb-5">
+                <h3 className="font-semibold mb-4">新增推廣者</h3>
+                <form onSubmit={async e => {
+                  e.preventDefault()
+                  const res = await fetch(`${API}/api/admin/affiliates`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                    body: JSON.stringify(affForm)
+                  })
+                  if (res.ok) { showMsg('success', '已新增'); setShowAffForm(false); setAffForm({ name:'',email:'',code:'',commission_rate:0.1 }); fetchAffiliates() }
+                  else showMsg('error', '新增失敗')
+                }} className="grid md:grid-cols-2 gap-3">
+                  <div><label className="block text-xs font-medium mb-1">推廣者名稱 *</label><input className={inp} value={affForm.name} onChange={e=>setAffForm(p=>({...p,name:e.target.value}))} required /></div>
+                  <div><label className="block text-xs font-medium mb-1">Email</label><input type="email" className={inp} value={affForm.email} onChange={e=>setAffForm(p=>({...p,email:e.target.value}))} /></div>
+                  <div><label className="block text-xs font-medium mb-1">推廣代碼 * (用於 ?ref=xxx)</label><input className={inp} value={affForm.code} onChange={e=>setAffForm(p=>({...p,code:e.target.value}))} required placeholder="kol_name" /></div>
+                  <div><label className="block text-xs font-medium mb-1">佣金比例 (0~1)</label><input type="number" step="0.01" min="0" max="1" className={inp} value={affForm.commission_rate} onChange={e=>setAffForm(p=>({...p,commission_rate:Number(e.target.value)}))} /></div>
+                  <div className="md:col-span-2 flex gap-3">
+                    <button type="submit" className="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm hover:bg-blue-700">新增</button>
+                    <button type="button" onClick={()=>setShowAffForm(false)} className="bg-gray-500 text-white px-5 py-2 rounded-lg text-sm hover:bg-gray-600">取消</button>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            <div className="bg-white rounded-xl border overflow-hidden">
+              {affLoading ? <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" /></div> : (
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 text-xs text-gray-500 uppercase">
+                    <tr>
+                      <th className="px-4 py-3 text-left">推廣者</th>
+                      <th className="px-4 py-3 text-left">代碼</th>
+                      <th className="px-4 py-3 text-right">佣金率</th>
+                      <th className="px-4 py-3 text-right">點擊</th>
+                      <th className="px-4 py-3 text-right">轉換</th>
+                      <th className="px-4 py-3 text-right">累積佣金</th>
+                      <th className="px-4 py-3 text-left">狀態</th>
+                      <th className="px-4 py-3 text-left">推廣連結</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {affiliates.map((a: any) => (
+                      <tr key={a.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-3">
+                          <div className="font-medium">{a.name}</div>
+                          {a.email && <div className="text-xs text-gray-400">{a.email}</div>}
+                        </td>
+                        <td className="px-4 py-3 font-mono text-blue-600 text-xs">{a.code}</td>
+                        <td className="px-4 py-3 text-right">{Math.round(a.commission_rate * 100)}%</td>
+                        <td className="px-4 py-3 text-right">{a.total_clicks}</td>
+                        <td className="px-4 py-3 text-right">{a.total_conversions}</td>
+                        <td className="px-4 py-3 text-right text-orange-600 font-medium">NT${Math.round(a.total_commission).toLocaleString()}</td>
+                        <td className="px-4 py-3">
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${a.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-500'}`}>
+                            {a.active ? '啟用' : '停用'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-xs text-gray-500 max-w-[200px] truncate">
+                          <a href={`https://shopline-frontend.pages.dev/register?ref=${a.code}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                            ?ref={a.code}
+                          </a>
+                        </td>
+                      </tr>
+                    ))}
+                    {affiliates.length === 0 && <tr><td colSpan={8} className="px-4 py-8 text-center text-gray-400">尚無推廣者，點擊「新增推廣者」開始</td></tr>}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+        )}
+
+
+        {/* ===== SEO TAB ===== */}
+        {tab === 'SEO 內容' && (
+          <SEOTab settings={seoSettings} loading={seoLoading} saving={seoSaving} onSave={saveSEO} inp={inp} />
+        )}
+
         {/* ===== SHOP STATS TAB ===== */}
         {tab === '店鋪報表' && (
           <div>
@@ -488,3 +670,96 @@ export default function AdminPage() {
     </main>
   )
 }
+
+// ── SEO Tab ───────────────────────────────────────────────────────────────────
+const SEO_FIELDS = [
+  { section: '首頁 SEO', fields: [
+    { key: 'home_title', label: 'Title', placeholder: 'ARVIX 全方位零售整合專家 | 電商平台', hint: '建議 50-60 字元' },
+    { key: 'home_description', label: 'Meta Description', placeholder: 'ARVIX 提供全方位的零售解決方案...', hint: '建議 120-160 字元', textarea: true },
+    { key: 'home_keywords', label: '關鍵字', placeholder: '電商平台,網路開店,SaaS電商,ARVIX', hint: '逗號分隔' },
+    { key: 'home_og_title', label: 'OG Title（社群分享）', placeholder: 'ARVIX - 台灣最強電商平台' },
+    { key: 'home_og_description', label: 'OG Description', placeholder: '超過 60 萬商家信賴的電商解決方案', textarea: true },
+  ]},
+  { section: '品牌資訊', fields: [
+    { key: 'brand_name', label: '品牌名稱', placeholder: 'ARVIX' },
+    { key: 'brand_tagline', label: '品牌標語', placeholder: '全方位零售整合專家' },
+    { key: 'brand_description', label: '品牌描述', placeholder: 'ARVIX 提供全方位的零售解決方案...', textarea: true },
+    { key: 'contact_email', label: '聯絡 Email', placeholder: 'contact@arvix.com' },
+    { key: 'contact_phone', label: '聯絡電話', placeholder: '+886-2-1234-5678' },
+  ]},
+  { section: '各頁面 SEO', fields: [
+    { key: 'pricing_title', label: '方案費用頁 Title', placeholder: 'ARVIX 方案費用 | 免費試用 14 天' },
+    { key: 'pricing_description', label: '方案費用頁 Description', placeholder: '查看 ARVIX 各方案費用...', textarea: true },
+    { key: 'templates_title', label: '版型主題頁 Title', placeholder: 'ARVIX 版型主題 | 多款精美設計' },
+    { key: 'templates_description', label: '版型主題頁 Description', placeholder: '超過 30 款精美版型，一鍵套用...', textarea: true },
+    { key: 'apps_title', label: '擴充功能頁 Title', placeholder: 'ARVIX 擴充功能商店' },
+    { key: 'apps_description', label: '擴充功能頁 Description', placeholder: '豐富的試用系統，讓你體驗各種電商解決方案...', textarea: true },
+  ]},
+]
+
+function SEOTab({ settings, loading, saving, onSave, inp }: {
+  settings: Record<string,string>; loading: boolean; saving: boolean
+  onSave: (u: Record<string,string>) => void; inp: string
+}) {
+  const [form, setForm] = useState<Record<string,string>>({})
+  const [activeSection, setActiveSection] = useState(0)
+  useEffect(() => { setForm(settings) }, [settings])
+
+  const handleSave = () => {
+    const changed: Record<string,string> = {}
+    for (const [k, v] of Object.entries(form)) if (v !== settings[k]) changed[k] = v
+    if (Object.keys(changed).length > 0) onSave(changed)
+  }
+
+  if (loading) return <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" /></div>
+
+  const section = SEO_FIELDS[activeSection]
+  return (
+    <div className="space-y-5">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">SEO 內容管理</h2>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-400">儲存後重新 build 前端才會生效</span>
+          <button onClick={handleSave} disabled={saving}
+            className="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-60">
+            {saving ? '儲存中...' : '儲存變更'}
+          </button>
+        </div>
+      </div>
+      <div className="flex gap-1 bg-gray-100 rounded-lg p-1 w-fit">
+        {SEO_FIELDS.map((s, i) => (
+          <button key={i} onClick={() => setActiveSection(i)}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeSection === i ? 'bg-white shadow text-gray-800' : 'text-gray-500 hover:text-gray-700'}`}>
+            {s.section}
+          </button>
+        ))}
+      </div>
+      <div className="bg-white rounded-xl border p-6 space-y-5">
+        <h3 className="font-semibold text-gray-800 border-b pb-3">{section.section}</h3>
+        {section.fields.map((f: any) => (
+          <div key={f.key}>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {f.label}
+              {f.hint && <span className="ml-2 text-xs text-gray-400 font-normal">{f.hint}</span>}
+            </label>
+            {f.textarea ? (
+              <textarea className={`${inp} h-20 resize-none`} value={form[f.key] || ''} placeholder={f.placeholder}
+                onChange={e => setForm(p => ({...p, [f.key]: e.target.value}))} />
+            ) : (
+              <input className={inp} value={form[f.key] || ''} placeholder={f.placeholder}
+                onChange={e => setForm(p => ({...p, [f.key]: e.target.value}))} />
+            )}
+            {form[f.key] && <div className="text-xs text-gray-400 mt-1">{form[f.key].length} 字元</div>}
+          </div>
+        ))}
+      </div>
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-700 space-y-1">
+        <div className="font-semibold mb-1">📈 SEO 優化建議</div>
+        <div>• Title 包含主要關鍵字，建議 50-60 字元</div>
+        <div>• Description 自然描述頁面內容，建議 120-160 字元</div>
+        <div>• 每個頁面的 Title 和 Description 應該唯一</div>
+      </div>
+    </div>
+  )
+}
+
