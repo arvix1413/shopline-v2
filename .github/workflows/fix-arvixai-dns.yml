@@ -1,0 +1,27 @@
+name: Fix arvixai.com DNS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  fix-dns:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fix DNS and Pages domains
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          chmod +x scripts/fix-arvixai-dns.sh
+          export ACCOUNT_ID="${CLOUDFLARE_ACCOUNT_ID:-51908639511240656e3a5d46a004f299}"
+          ./scripts/fix-arvixai-dns.sh
+
+      - name: Verify HTTP
+        run: |
+          sleep 5
+          for url in https://shopline-frontend.pages.dev/ https://arvixai.com/ https://www.arvixai.com/; do
+            echo "--- $url ---"
+            curl -sI -m 20 -L "$url" | grep -E '^(HTTP/|location:|server:)' || true
+          done

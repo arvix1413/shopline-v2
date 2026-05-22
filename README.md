@@ -22,10 +22,23 @@
 
 ### DNS 配置（arvixai.com）
 
+域名在 Cloudflare Registrar，Zone 激活前需将注册商 NS 改为 Cloudflare 分配的：
+
+- `carmelo.ns.cloudflare.com`
+- `melody.ns.cloudflare.com`
+
+（公网若仍显示 `cesar` / `priscilla`，自定义域名不会生效。）
+
 | Type | Name | Content | Proxy |
 |------|------|---------|-------|
 | CNAME | `@` | `shopline-frontend.pages.dev` | Proxied |
 | CNAME | `www` | `shopline-frontend.pages.dev` | Proxied |
+
+一键修复（需 GitHub Secret `CLOUDFLARE_API_TOKEN` 含 Zone DNS Edit）：
+
+```bash
+gh workflow run fix-arvixai-dns.yml -R arvix1413/shopline-v2
+```
 
 ## ✨ 核心功能
 
