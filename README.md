@@ -2,6 +2,64 @@
 
 基于 Next.js 14 + Cloudflare 技术栈构建的现代化电商平台，完整复刻 SHOPLINE 官网设计和功能。
 
+---
+
+## 项目信息
+
+| 项目 | 说明 |
+|------|------|
+| **名称** | SHOPLINE 克隆 / 演示电商 |
+| **类型** | 官网展示 + 商品站 + 管理后台 |
+| **代码仓库** | https://github.com/arvix1413/shopline-v2.git |
+| **默认分支** | `main`（推送即生产部署） |
+| **本地路径** | `ern-projects/shopline-v2` |
+
+### 技术栈
+
+| 层级 | 技术 |
+|------|------|
+| 前端 | Next.js 15 + `@cloudflare/next-on-pages` |
+| 构建产物 | `frontend/.vercel/output/static` |
+| 托管 | **Cloudflare Pages**（项目名 `shopline-frontend`） |
+| API | **Cloudflare Worker**（脚本名 `shopline-backend`） |
+| 数据库 | **Cloudflare D1**（`shopline-v2-db`） |
+| 存储 | **R2**（`shopline-v2`） |
+
+---
+
+## 部署与线上环境
+
+### GitHub Actions 自动部署
+
+**Workflow：** `.github/workflows/deploy.yml`（触发：`push` → `main`，或 `workflow_dispatch`）
+
+| Job | 步骤 |
+|-----|------|
+| `deploy-pages` | `frontend/`：`npm ci --legacy-peer-deps` → `npm run pages:build`（`NEXT_PUBLIC_API_URL`）→ `wrangler pages deploy .vercel/output/static --project-name shopline-frontend` |
+| `deploy-worker` | `backend/`：`wrangler deploy` |
+| `notify` | Telegram 部署通知 |
+
+### GitHub Secrets（必需）
+
+| Secret | 说明 |
+|--------|------|
+| `CLOUDFLARE_API_TOKEN` | Pages + Workers + D1 + DNS |
+| `CLOUDFLARE_ACCOUNT_ID` | `51908639511240656e3a5d46a004f299` |
+| `TELEGRAM_BOT_TOKEN` | 部署通知 |
+| `TELEGRAM_CHAT_ID` | 部署通知 |
+
+批量写入：`ern-projects/scripts/set-cf-deploy-secrets.sh`
+
+### 健康检查
+
+```bash
+curl -I https://arvixai.com/
+curl -I https://shopline-frontend.pages.dev/
+curl -s https://shopline-backend.arvix1413.workers.dev/api/products
+```
+
+---
+
 ## 🌐 在线演示
 
 - **前端网站（主域名）**: https://arvixai.com
@@ -11,14 +69,26 @@
 - **购物车**: https://arvixai.com/cart
 - **管理后台**: https://arvixai.com/admin
 
+### 线上 URL 汇总
+
+| 用途 | URL |
+|------|-----|
+| **主域名** | https://arvixai.com |
+| **WWW** | https://www.arvixai.com |
+| **Pages 默认域名** | https://shopline-frontend.pages.dev |
+| **Worker API** | https://shopline-backend.arvix1413.workers.dev |
+
 ### Cloudflare 资源
 
 | 资源 | 值 |
 |------|-----|
 | Account ID | `51908639511240656e3a5d46a004f299` |
 | Pages 项目 | `shopline-frontend` |
+| Worker 脚本 | `shopline-backend` |
+| D1 数据库 | `shopline-v2-db`（`dcd227af-5f80-4c1e-941c-7b58bb0aed01`） |
+| R2 存储桶 | `shopline-v2` |
 | Zone ID (arvixai.com) | `ba218f75c4d0326588d0091c4a925046` |
-| API Token | 存放于 GitHub Secrets `CLOUDFLARE_API_TOKEN` |
+| API Token | GitHub Secrets `CLOUDFLARE_API_TOKEN` |
 
 ### DNS 配置（arvixai.com）
 
@@ -95,6 +165,9 @@ gh workflow run fix-arvixai-dns.yml -R arvix1413/shopline-v2
 
 ```
 shopline-v2/
+├── .github/workflows/
+│   ├── deploy.yml            # push main → Pages + Worker + Telegram
+│   └── fix-arvixai-dns.yml   # 手动：arvixai.com DNS
 ├── frontend/                 # Next.js 前端应用
 │   ├── app/                 # App Router 页面
 │   │   ├── components/      # React 组件
@@ -165,13 +238,16 @@ npm run dev
 ```
 
 ### 5. 部署到生产环境
-```bash
-# 使用自动部署脚本
-./deploy.sh
 
-# 或手动部署
-cd frontend && npm run build && npx wrangler pages deploy out --project-name shopline-frontend
-cd backend && npx wrangler deploy
+推送 `main` 会触发 GitHub Actions（见「部署与线上环境」）。手动部署：
+
+```bash
+cd frontend
+NEXT_PUBLIC_API_URL=https://shopline-backend.arvix1413.workers.dev npm run pages:build
+npx wrangler pages deploy .vercel/output/static --project-name shopline-frontend
+
+cd ../backend
+npx wrangler deploy
 ```
 
 ## 📊 数据库结构
@@ -186,8 +262,8 @@ cd backend && npx wrangler deploy
 ### 数据库初始化
 ```bash
 cd backend
-npx wrangler d1 execute shopline-db --file=schema.sql --remote
-npx wrangler d1 execute shopline-db --file=seed.sql --remote
+npx wrangler d1 execute shopline-v2-db --file=schema.sql --remote
+npx wrangler d1 execute shopline-v2-db --file=seed.sql --remote
 ```
 
 ## 🧪 测试
@@ -210,7 +286,7 @@ curl -X POST -F "file=@image.jpg" https://shopline-backend.arvix1413.workers.dev
 ## 🔧 配置说明
 
 ### Cloudflare 配置
-1. **D1 数据库**: `shopline-db`
+1. **D1 数据库**: `shopline-v2-db`
 2. **R2 存储桶**: `shopline-v2`
 3. **Pages 项目**: `shopline-frontend`
 4. **Workers 项目**: `shopline-backend`
