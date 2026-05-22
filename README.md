@@ -4,10 +4,28 @@
 
 ## 🌐 在线演示
 
-- **前端网站**: https://shopline-frontend.pages.dev
-- **商品展示**: https://shopline-frontend.pages.dev/products
-- **购物车**: https://shopline-frontend.pages.dev/cart
-- **管理后台**: https://shopline-frontend.pages.dev/admin
+- **前端网站（主域名）**: https://arvixai.com
+- **前端网站（WWW）**: https://www.arvixai.com
+- **前端网站（Pages 默认域名）**: https://shopline-frontend.pages.dev
+- **商品展示**: https://arvixai.com/products
+- **购物车**: https://arvixai.com/cart
+- **管理后台**: https://arvixai.com/admin
+
+### Cloudflare 资源
+
+| 资源 | 值 |
+|------|-----|
+| Account ID | `51908639511240656e3a5d46a004f299` |
+| Pages 项目 | `shopline-frontend` |
+| Zone ID (arvixai.com) | `ba218f75c4d0326588d0091c4a925046` |
+| API Token | 存放于 GitHub Secrets `CLOUDFLARE_API_TOKEN` |
+
+### DNS 配置（arvixai.com）
+
+| Type | Name | Content | Proxy |
+|------|------|---------|-------|
+| CNAME | `@` | `shopline-frontend.pages.dev` | Proxied |
+| CNAME | `www` | `shopline-frontend.pages.dev` | Proxied |
 
 ## ✨ 核心功能
 
@@ -179,7 +197,7 @@ curl -X POST -F "file=@image.jpg" https://shopline-backend.arvix1413.workers.dev
 4. **Workers 项目**: `shopline-backend`
 
 ### 域名配置
-- 前端: `https://shopline-frontend.pages.dev`
+- 前端: `https://arvixai.com`（主域名）/ `https://www.arvixai.com` / `https://shopline-frontend.pages.dev`
 - 后端: `https://shopline-backend.arvix1413.workers.dev`
 
 ## 📈 性能优化
