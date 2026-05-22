@@ -90,9 +90,11 @@ for r in data['result']:
     elif r['type'] == 'A' and r['content'] == '76.76.21.21':
         to_delete.append(r['id'])
         print(f'DEL {name} A {r[\"content\"]} (Vercel)')
-    else:
+    elif r['type'] == 'CNAME':
         to_delete.append(r['id'])
-        print(f'DEL {name} {r[\"type\"]} {r.get(\"content\")}')
+        print(f'DEL {name} CNAME {r.get(\"content\")}')
+    else:
+        print(f'SKIP {name} {r[\"type\"]} {r.get(\"content\")}')
 
 open('/tmp/cf_delete_ids.txt', 'w').write('\n'.join(to_delete))
 open('/tmp/cf_missing.txt', 'w').write('\n'.join(n for n, _ in want if n not in have_cname))

@@ -34,7 +34,13 @@
 | CNAME | `@` | `shopline-frontend.pages.dev` | Proxied |
 | CNAME | `www` | `shopline-frontend.pages.dev` | Proxied |
 
-一键修复（需 GitHub Secret `CLOUDFLARE_API_TOKEN` 含 Zone DNS Edit）：
+一键修复 DNS（使用 tmt 仓库里已配置的 `CLOUDFLARE_API_TOKEN`）：
+
+```bash
+gh workflow run cf-dns-setup-arvixai.yml -R arvix1413/tmt
+```
+
+`shopline-v2` 仓库需自行配置同名 GitHub Secret 后，也可运行：
 
 ```bash
 gh workflow run fix-arvixai-dns.yml -R arvix1413/shopline-v2
