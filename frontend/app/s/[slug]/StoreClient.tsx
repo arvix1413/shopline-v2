@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { RESERVED_STORE_SLUGS } from '../../lib/storeSlug'
+import { RESERVED_STORE_SLUGS } from '../../../lib/storeSlug'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://shopline-backend.arvix1413.workers.dev'
 
@@ -16,9 +16,18 @@ type Store = {
   urlPath: string
 }
 
-export default function BrandStorePage() {
+export default function BrandStoreClient() {
   const params = useParams<{ slug: string }>()
-  const slug = (params?.slug || '').toLowerCase()
+  const slug = useMemo(() => {
+    if (typeof window !== 'undefined') {
+      const parts = window.location.pathname.split('/').filter(Boolean)
+      const fromPath = parts[0] === 's' ? parts[1] : parts[0]
+      if (fromPath && fromPath !== '_') return fromPath.toLowerCase()
+    }
+    const p = (params?.slug || '').toLowerCase()
+    return p === '_' ? '' : p
+  }, [params])
+
   const [store, setStore] = useState<Store | null>(null)
   const [loading, setLoading] = useState(true)
   const [missing, setMissing] = useState(false)
@@ -61,7 +70,9 @@ export default function BrandStorePage() {
       <main className="min-h-screen flex flex-col items-center justify-center px-6" style={{ background: '#FFFFFF' }}>
         <p className="font-brand text-2xl font-extrabold brand-text mb-4">ARVIX</p>
         <h1 className="text-2xl font-black mb-2" style={{ color: '#12131F' }}>找不到這間店</h1>
-        <p className="text-sm mb-8" style={{ color: '#5C5F7A' }}>網址 /{slug} 尚未開通，或品牌名稱有誤。</p>
+        <p className="text-sm mb-8" style={{ color: '#5C5F7A' }}>
+          網址 /{slug || '...'} 尚未開通，或品牌名稱有誤。
+        </p>
         <Link href="/register" className="btn-brand btn-glow px-6 py-3 rounded-full text-sm font-bold">
           免費開一間自己的店
         </Link>
@@ -121,7 +132,7 @@ export default function BrandStorePage() {
             </p>
             <div className="grid sm:grid-cols-3 gap-4 text-left">
               {[
-                { t: '品牌網址', d: `arvix 前綴網域 + /${store.slug}` },
+                { t: '品牌網址', d: `arvixai.com/${store.slug}` },
                 { t: '開店狀態', d: store.status === 'active' ? '已啟用' : store.status },
                 { t: '下一步', d: '上架第一件商品，開始接單' },
               ].map((item) => (

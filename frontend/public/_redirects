@@ -1,0 +1,3 @@
+# Brand storefront SPA fallback (static files take precedence over these rules)
+/s/*    /s/_.html   200
+/:slug  /s/_.html   200
