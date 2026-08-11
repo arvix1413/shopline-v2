@@ -1,3 +1,3 @@
-# Pretty brand URLs: arvixai.com/{slug} → storefront shell
-# Static files ( /about, /login, ... ) take precedence over this rule.
-/:slug  /s/shop.html  200
+# Brand stores use /s/shop?slug={brand} — do NOT add a /:slug catch-all.
+# That rule hijacked every marketing route (/pos, /about, /login, …)
+# into the storefront shell under @cloudflare/next-on-pages.

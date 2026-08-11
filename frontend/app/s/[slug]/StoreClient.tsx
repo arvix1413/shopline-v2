@@ -30,17 +30,22 @@ export default function BrandStoreClient() {
       return
     }
     const parts = window.location.pathname.split('/').filter(Boolean)
+    // /s/shop is only a shell — brand id must be ?slug= or /s/{brand}
     const fromPath = parts[0] === 's' ? parts[1] : parts[0]
     const resolved = (fromPath && fromPath !== '_' && fromPath !== 'shop'
       ? fromPath
-      : (params?.slug || '')
+      : ''
     ).toLowerCase()
-    setSlug(resolved === '_' || resolved === 'shop' ? '' : resolved)
+    if (!resolved) {
+      // Bare /s/shop (no ?slug=) — send people back to marketing home
+      window.location.replace('/')
+      return
+    }
+    setSlug(resolved)
   }, [params])
 
   useEffect(() => {
     if (!slug) {
-      // still resolving pathname on first tick
       return
     }
     if (RESERVED_STORE_SLUGS.has(slug)) {

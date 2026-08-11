@@ -1,6 +1,6 @@
 import BrandStoreClient from './StoreClient'
 
-/** Placeholder for static export; Cloudflare rewrites /{slug} here */
+/** Storefront shell at /s/shop?slug={brand} (and /s/{slug} if linked that way) */
 export function generateStaticParams() {
   return [{ slug: 'shop' }]
 }

@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useI18n } from '../../contexts/I18nContext'
 
-const hrefs = ['/online-store/shop-builder', '/payments', '/group-buying', '/targeted-marketing', '/compliance-center']
+const hrefs = ['/online-store/shop-builder', '/payments', '/pos', '/targeted-marketing', '/compliance-center']
 const imgs = [
   'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800&q=80',
   'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
