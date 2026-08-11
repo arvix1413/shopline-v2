@@ -8,10 +8,10 @@ export default function Integration() {
   return (
     <section className="py-24 relative" style={{ backgroundColor: '#F6F7FB', color: '#12131F' }}>
       <div className="absolute pointer-events-none" style={{ width: 800, height: 400, borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(91,95,240,0.08) 0%, transparent 70%)', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', zIndex: 0 }} />
-      <div className="relative z-10 max-w-7xl mx-auto px-6">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-16">
           <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#5B5FF0' }}>{t.integration.eyebrow}</p>
-          <h2 className="font-black mb-4" style={{ color: '#12131F', fontSize: 40 }}>{t.integration.title}</h2>
+          <h2 className="font-black mb-4 text-3xl md:text-4xl" style={{ color: '#12131F' }}>{t.integration.title}</h2>
           <p style={{ color: '#5C5F7A' }} className="max-w-2xl mx-auto text-sm">{t.integration.subtitle}</p>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">

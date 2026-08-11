@@ -8,6 +8,12 @@ export const users = sqliteTable('users', {
   phone: text('phone'),
   address: text('address'),
   isAdmin: integer('is_admin').default(0),
+  trialStartedAt: text('trial_started_at'),
+  trialEndsAt: text('trial_ends_at'),
+  planStatus: text('plan_status').default('trialing'), // trialing | expired | paid
+  followUpStatus: text('follow_up_status').default('new'), // new | contacted | nurturing | won | lost
+  followUpNote: text('follow_up_note').default(''),
+  followUpUpdatedAt: text('follow_up_updated_at'),
   createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
   updatedAt: text('updated_at').default('CURRENT_TIMESTAMP')
 })
@@ -94,6 +100,11 @@ export const stores = sqliteTable('stores', {
   name: text('name').notNull(),
   tagline: text('tagline').default(''),
   status: text('status').notNull().default('active'),
+  onboardingStage: text('onboarding_stage').default('store_created'),
+  paymentsEnabled: integer('payments_enabled').default(0),
+  isLive: integer('is_live').default(0),
+  productCount: integer('product_count').default(0),
+  lastActiveAt: text('last_active_at'),
   createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
   updatedAt: text('updated_at').default('CURRENT_TIMESTAMP'),
 })

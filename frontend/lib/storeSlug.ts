@@ -6,7 +6,7 @@ export const RESERVED_STORE_SLUGS = new Set([
   'payments', 'pos', 'products', 'profile', 'register', 'reset-password',
   'selectedpartners', 'seminar', 'settings', 'shoplytics', 'shopper-app',
   'showcase', 'smart-omo', 'social-commerce', 'solutions', 'targeted-marketing',
-  'templates', 'trial', 'trial-redirect', 's', 'store', 'stores', 'www', 'shop',
+  'templates', 'trial', 'trial-redirect', 'billing', 's', 'store', 'stores', 'www', 'shop',
   'static', 'assets', 'favicon.ico', 'robots.txt', 'sitemap.xml', '_next',
 ])
 

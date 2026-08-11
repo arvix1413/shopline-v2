@@ -3,6 +3,8 @@ import './globals.css'
 import { I18nProvider } from '../contexts/I18nContext'
 import { AuthProvider } from '../contexts/AuthContext'
 import TrafficCapture from './components/TrafficCapture'
+import LineChatBubble from './components/LineChatBubble'
+import TrialBanner from './components/TrialBanner'
 
 export const metadata: Metadata = {
   title: 'ARVIX 全方位零售整合專家 | 電商平台 SaaS 開店系統',
@@ -31,12 +33,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
       </head>
       <body>
         <I18nProvider>
           <AuthProvider>
             <TrafficCapture />
+            <TrialBanner />
             {children}
+            <LineChatBubble />
           </AuthProvider>
         </I18nProvider>
       </body>

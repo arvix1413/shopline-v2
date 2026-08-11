@@ -13,10 +13,10 @@ export default function Features() {
 
   return (
     <section className="py-24" style={{ backgroundColor: '#F6F7FB', color: '#12131F' }}>
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-16">
           <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#5B5FF0' }}>{t.features.eyebrow}</p>
-          <h2 className="font-black mb-3" style={{ color: '#12131F', fontSize: 40 }}>{t.features.title}</h2>
+          <h2 className="font-black mb-3 text-3xl md:text-4xl" style={{ color: '#12131F' }}>{t.features.title}</h2>
           <p className="mt-4 max-w-2xl mx-auto leading-relaxed text-sm" style={{ color: '#5C5F7A' }}>{t.features.subtitle}</p>
         </div>
 

@@ -4,12 +4,14 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowRight, Eye, EyeOff, CheckCircle } from 'lucide-react'
+import { useI18n } from '../../contexts/I18nContext'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://shopline-backend.arvix1413.workers.dev'
 
 function ResetForm() {
   const router = useRouter()
   const params = useSearchParams()
+  const { t } = useI18n()
   const token = params.get('token') || ''
 
   const [form, setForm] = useState({ password: '', confirm: '' })
@@ -19,13 +21,13 @@ function ResetForm() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    if (!token) setError('連結無效或已過期')
-  }, [token])
+    if (!token) setError(t.auth.resetTitle)
+  }, [token, t.auth.resetTitle])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (form.password !== form.confirm) { setError('兩次密碼不一致'); return }
-    if (form.password.length < 6) { setError('密碼至少 6 個字元'); return }
+    if (form.password !== form.confirm) { setError(t.auth.password); return }
+    if (form.password.length < 6) { setError(t.auth.password); return }
     setError(''); setLoading(true)
     try {
       const res = await fetch(`${API_BASE}/api/auth/reset-password`, {
@@ -34,11 +36,11 @@ function ResetForm() {
         body: JSON.stringify({ token, password: form.password }),
       })
       const data = await res.json()
-      if (!res.ok) { setError(data.error || '重置失敗'); return }
+      if (!res.ok) { setError(data.error || t.auth.resetTitle); return }
       setDone(true)
       setTimeout(() => router.push('/login'), 3000)
     } catch {
-      setError('網路錯誤，請重試')
+      setError('Network error')
     } finally {
       setLoading(false)
     }
@@ -48,29 +50,29 @@ function ResetForm() {
     <div className="w-full max-w-md">
       {done ? (
         <div className="text-center">
-          <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
-            <CheckCircle size={32} className="text-green-400" />
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: '#EEF0FF' }}>
+            <CheckCircle size={32} style={{ color: '#5B5FF0' }} />
           </div>
-          <h2 className="text-white text-xl font-bold mb-2">密碼已重置</h2>
-          <p className="text-white/60 text-sm">3 秒後自動跳轉到登入頁...</p>
+          <h2 className="text-xl font-bold mb-2" style={{ color: '#00142D' }}>{t.auth.resetTitle}</h2>
+          <p className="text-sm" style={{ color: '#687280' }}>{t.auth.backToLogin}</p>
         </div>
       ) : (
         <>
-          <h2 className="text-white text-xl font-bold mb-1 text-center">設定新密碼</h2>
-          <p className="text-white/50 text-sm text-center mb-6">請輸入你的新密碼</p>
+          <h2 className="text-xl font-bold mb-1 text-center" style={{ color: '#00142D' }}>{t.auth.resetTitle}</h2>
+          <p className="text-sm text-center mb-6" style={{ color: '#687280' }}>{t.auth.password}</p>
 
           {error && (
-            <div className="mb-3 px-4 py-3 rounded-lg bg-red-500/20 text-red-200 text-sm text-center">{error}</div>
+            <div className="mb-3 px-4 py-3 rounded-lg bg-red-50 text-red-600 text-sm text-center border border-red-100">{error}</div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-3">
             <div className="relative">
               <input
                 type={showPw ? 'text' : 'password'}
-                placeholder="新密碼（至少 6 個字元）"
+                placeholder={t.auth.password}
                 value={form.password}
                 onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
-                className="w-full px-5 py-4 pr-14 rounded-lg bg-white text-gray-700 placeholder-gray-400 text-base outline-none focus:ring-2 focus:ring-blue-400 border-0"
+                className="w-full px-5 py-4 pr-14 rounded-xl bg-white text-gray-700 placeholder-gray-400 text-base outline-none focus:ring-2 focus:ring-[#5B5FF0] border border-black/5"
                 required
               />
               <button type="button" onClick={() => setShowPw(v => !v)}
@@ -80,25 +82,25 @@ function ResetForm() {
             </div>
             <input
               type={showPw ? 'text' : 'password'}
-              placeholder="確認新密碼"
+              placeholder={t.auth.password}
               value={form.confirm}
               onChange={e => setForm(p => ({ ...p, confirm: e.target.value }))}
-              className="w-full px-5 py-4 rounded-lg bg-white text-gray-700 placeholder-gray-400 text-base outline-none focus:ring-2 focus:ring-blue-400 border-0"
+              className="w-full px-5 py-4 rounded-xl bg-white text-gray-700 placeholder-gray-400 text-base outline-none focus:ring-2 focus:ring-[#5B5FF0] border border-black/5"
               required
             />
             <button
               type="submit"
               disabled={loading || !token}
-              className="w-full flex items-center justify-center gap-3 py-4 rounded-lg text-white font-bold text-lg transition-all hover:brightness-110 disabled:opacity-60"
-              style={{ background: 'linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)' }}
+              className="w-full flex items-center justify-center gap-3 py-4 rounded-xl text-white font-bold text-lg transition-all hover:brightness-110 disabled:opacity-60 btn-glow"
+              style={{ background: 'linear-gradient(90deg, #5B5FF0 0%, #484CE8 100%)' }}
             >
-              {loading ? '處理中...' : '確認重置'}
+              {loading ? t.common.loading : t.common.submit}
               {!loading && <ArrowRight size={22} />}
             </button>
           </form>
 
           <div className="mt-6 text-center">
-            <Link href="/login" className="text-white/60 hover:text-white text-sm">返回登入</Link>
+            <Link href="/login" className="text-sm hover:opacity-80" style={{ color: '#5C5F7A' }}>{t.auth.backToLogin}</Link>
           </div>
         </>
       )}
@@ -107,20 +109,15 @@ function ResetForm() {
 }
 
 export default function ResetPasswordPage() {
+  const { t } = useI18n()
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4"
-      style={{ background: 'linear-gradient(160deg, #2c3e50 0%, #3d5166 40%, #2c4a6e 70%, #1a3a5c 100%)' }}>
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6"
+      style={{ background: 'linear-gradient(160deg, #F6F7FB 0%, #EEF0FF 45%, #FFFFFF 100%)' }}>
       <div className="mb-10">
-        <span className="text-4xl font-black tracking-tight text-white">
-          SH<span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white mx-0.5 relative" style={{ verticalAlign: 'middle' }}>
-            <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
-              <circle cx="12" cy="10" r="4" fill="#3b82f6" />
-              <path d="M8 10 Q12 16 16 10" stroke="#3b82f6" strokeWidth="1.5" fill="none" />
-            </svg>
-          </span>PLINE
-        </span>
+        <Link href="/" className="font-brand text-4xl font-extrabold brand-text tracking-tight">ARVIX</Link>
       </div>
-      <Suspense fallback={<div className="text-white/40">載入中...</div>}>
+      <Suspense fallback={<div style={{ color: '#8A8DA8' }}>{t.common.loading}</div>}>
         <ResetForm />
       </Suspense>
     </div>

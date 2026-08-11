@@ -7,7 +7,7 @@ export const RESERVED_STORE_SLUGS = new Set([
   'payments', 'pos', 'products', 'profile', 'register', 'reset-password',
   'selectedpartners', 'seminar', 'settings', 'shoplytics', 'shopper-app',
   'showcase', 'smart-omo', 'social-commerce', 'solutions', 'targeted-marketing',
-  'templates', 'trial', 'trial-redirect', 's', 'store', 'stores', 'www', 'shop',
+  'templates', 'trial', 'trial-redirect', 'billing', 's', 'store', 'stores', 'www', 'shop',
   'static', 'assets', 'favicon.ico', 'robots.txt', 'sitemap.xml', '_next',
 ])
 
@@ -32,11 +32,26 @@ export async function ensureStoresTable(db: D1Database) {
       name TEXT NOT NULL,
       tagline TEXT DEFAULT '',
       status TEXT NOT NULL DEFAULT 'active',
+      onboarding_stage TEXT DEFAULT 'store_created',
+      payments_enabled INTEGER DEFAULT 0,
+      is_live INTEGER DEFAULT 0,
+      product_count INTEGER DEFAULT 0,
+      last_active_at TEXT,
       created_at TEXT DEFAULT (datetime('now', '+8 hours')),
       updated_at TEXT DEFAULT (datetime('now', '+8 hours'))
     )
   `).run()
   await db.prepare(`CREATE INDEX IF NOT EXISTS idx_stores_user_id ON stores(user_id)`).run().catch(() => {})
+  const extras = [
+    `ALTER TABLE stores ADD COLUMN onboarding_stage TEXT DEFAULT 'store_created'`,
+    `ALTER TABLE stores ADD COLUMN payments_enabled INTEGER DEFAULT 0`,
+    `ALTER TABLE stores ADD COLUMN is_live INTEGER DEFAULT 0`,
+    `ALTER TABLE stores ADD COLUMN product_count INTEGER DEFAULT 0`,
+    `ALTER TABLE stores ADD COLUMN last_active_at TEXT`,
+  ]
+  for (const sql of extras) {
+    await db.prepare(sql).run().catch(() => {})
+  }
 }
 
 export async function allocateUniqueSlug(db: D1Database, preferred: string, fallbackSeed: string): Promise<string> {

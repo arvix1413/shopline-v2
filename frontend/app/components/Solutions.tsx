@@ -18,20 +18,20 @@ export default function Solutions() {
 
   return (
     <section className="py-24" style={{ backgroundColor: '#FFFFFF', color: '#12131F' }}>
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-16">
           <p className="font-bold text-xs uppercase tracking-widest mb-3" style={{ color: '#5B5FF0' }}>{t.solutions.eyebrow}</p>
-          <h2 className="font-black mb-4" style={{ color: '#12131F', fontSize: 40 }}>{t.solutions.title}</h2>
+          <h2 className="font-black mb-4 text-3xl md:text-4xl" style={{ color: '#12131F' }}>{t.solutions.title}</h2>
           <p className="max-w-3xl mx-auto leading-relaxed text-sm" style={{ color: '#5C5F7A' }}>{t.solutions.subtitle}</p>
         </div>
 
         <div className="rounded-2xl overflow-hidden max-w-4xl mx-auto mb-8"
           style={{ background: '#F6F7FB', border: '1px solid rgba(91,95,240,0.14)' }}>
-          <img src={imgs[active]} alt={t.solutions.items[active].title} className="w-full h-64 object-cover" />
-          <div className="p-8 flex flex-col md:flex-row gap-6 items-start">
+          <img src={imgs[active]} alt={t.solutions.items[active].title} className="w-full h-48 sm:h-64 object-cover" />
+          <div className="p-5 sm:p-8 flex flex-col md:flex-row gap-6 items-start">
             <div className="text-5xl flex-shrink-0">{t.solutions.items[active].icon}</div>
             <div>
-              <h3 className="text-2xl font-black mb-3" style={{ color: '#12131F' }}>{t.solutions.items[active].title}</h3>
+              <h3 className="text-xl sm:text-2xl font-black mb-3" style={{ color: '#12131F' }}>{t.solutions.items[active].title}</h3>
               <p className="leading-relaxed text-sm" style={{ color: '#5C5F7A' }}>{t.solutions.items[active].desc}</p>
               <a href={hrefs[active]} className="inline-block mt-5 font-bold text-sm hover:underline" style={{ color: '#5B5FF0' }}>
                 {t.solutions.learnMore} →
@@ -40,9 +40,9 @@ export default function Solutions() {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
           {t.solutions.items.map((s, i) => (
-            <div key={i} onClick={() => setActive(i)} className="rounded-xl p-5 cursor-pointer transition-all"
+            <div key={i} onClick={() => setActive(i)} className="rounded-xl p-3 sm:p-5 cursor-pointer transition-all"
               style={active === i
                 ? { border: '1px solid rgba(91,95,240,0.55)', background: '#F0F1FE' }
                 : { border: '1px solid rgba(18,19,31,0.08)', background: '#fff' }}>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useI18n } from '../../contexts/I18nContext'
+import SocialIcons from './SocialIcons'
 
 const growthImgs = [
   'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80',
@@ -16,10 +17,10 @@ export default function Growth() {
   return (
     <>
       <section className="py-24" style={{ backgroundColor: '#F6F7FB', color: '#12131F' }}>
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
             <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#5B5FF0' }}>{t.growth.eyebrow}</p>
-            <h2 className="font-black mb-4" style={{ color: '#12131F', fontSize: 40 }}>{t.growth.title}</h2>
+            <h2 className="font-black mb-4 text-3xl md:text-4xl" style={{ color: '#12131F' }}>{t.growth.title}</h2>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6 mb-6">
@@ -56,15 +57,15 @@ export default function Growth() {
       </section>
 
       <section className="py-24" style={{ backgroundColor: '#FFFFFF', color: '#12131F' }}>
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#5B5FF0' }}>{t.growth.testimonialsEyebrow}</p>
-            <h2 className="font-black" style={{ color: '#12131F', fontSize: 36 }}>{t.growth.testimonialsTitle}</h2>
+            <h2 className="font-black text-3xl md:text-4xl" style={{ color: '#12131F' }}>{t.growth.testimonialsTitle}</h2>
           </div>
           <div className="max-w-3xl mx-auto">
-            <div className="rounded-2xl p-10 mb-8 min-h-[160px]"
+            <div className="rounded-2xl p-6 sm:p-10 mb-8 min-h-[160px]"
               style={{ background: '#F0F1FE', border: '1px solid rgba(91,95,240,0.16)' }}>
-              <p className="text-lg leading-relaxed mb-6 italic" style={{ color: '#3A3D55' }}>
+              <p className="text-base sm:text-lg leading-relaxed mb-6 italic" style={{ color: '#3A3D55' }}>
                 "{t.growth.testimonials[activeTestimonial].quote}"
               </p>
               <div className="font-bold text-sm" style={{ color: '#5B5FF0' }}>
@@ -85,14 +86,20 @@ export default function Growth() {
 
       <section className="py-24 text-center relative overflow-hidden" style={{ backgroundColor: '#15162A' }}>
         <div className="absolute pointer-events-none animate-aurora" style={{ width: 600, height: 300, borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(91,95,240,0.32) 0%, transparent 70%)', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', zIndex: 0 }} />
-        <div className="relative z-10 max-w-4xl mx-auto px-6">
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6">
           <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: '#9B9EF8' }}>{t.growth.ctaEyebrow}</p>
-          <h2 className="font-black mb-8" style={{ color: '#fff', fontSize: 40 }}>{t.growth.ctaTitle}</h2>
+          <h2 className="font-black mb-8 text-3xl md:text-4xl" style={{ color: '#fff' }}>{t.growth.ctaTitle}</h2>
           <a href="/trial-redirect"
             className="inline-block font-bold transition-all btn-glow btn-brand"
             style={{ borderRadius: 30, fontSize: 17, fontWeight: 700, padding: '14px 52px' }}>
             {t.growth.ctaCta}
           </a>
+          <div className="mt-10 flex flex-col items-center gap-3">
+            <p className="text-xs font-semibold tracking-wide" style={{ color: 'rgba(255,255,255,0.45)' }}>
+              Follow ARVIX
+            </p>
+            <SocialIcons />
+          </div>
         </div>
       </section>
     </>

@@ -1,14 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowRight, Eye, EyeOff } from 'lucide-react'
+import { useI18n } from '../../contexts/I18nContext'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://shopline-backend.arvix1413.workers.dev'
 
 export default function LoginPage() {
-  const router = useRouter()
+  const { t } = useI18n()
   const [form, setForm] = useState({ email: '', password: '' })
   const [showPw, setShowPw] = useState(false)
   const [error, setError] = useState('')
@@ -25,56 +25,49 @@ export default function LoginPage() {
         body: JSON.stringify({ email: form.email, password: form.password }),
       })
       const data = await res.json()
-      if (!res.ok) { setError(data.error || '登入失敗'); return }
+      if (!res.ok) { setError(data.error || t.auth.loginCta); return }
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
       window.location.href = data.user?.isAdmin ? '/admin' : '/trial'
     } catch {
-      setError('網路錯誤，請重試')
+      setError('Network error')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4"
-      style={{ background: 'linear-gradient(160deg, #2c3e50 0%, #3d5166 40%, #2c4a6e 70%, #1a3a5c 100%)' }}>
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6"
+      style={{ background: 'linear-gradient(160deg, #F6F7FB 0%, #EEF0FF 45%, #FFFFFF 100%)' }}>
 
-      <div className="mb-10 flex items-center gap-2">
-        <span className="text-4xl font-black tracking-tight text-white">
-          SH
-          <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white mx-0.5 relative" style={{ verticalAlign: 'middle' }}>
-            <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
-              <circle cx="12" cy="10" r="4" fill="#3b82f6" />
-              <path d="M8 10 Q12 16 16 10" stroke="#3b82f6" strokeWidth="1.5" fill="none" />
-            </svg>
-          </span>
-          PLINE
-        </span>
+      <div className="mb-10">
+        <Link href="/" className="font-brand text-4xl font-extrabold brand-text tracking-tight">ARVIX</Link>
       </div>
 
       <div className="w-full max-w-md">
+        <h1 className="text-2xl font-bold text-center mb-6" style={{ color: '#00142D' }}>{t.auth.loginTitle}</h1>
+
         {error && (
-          <div className="mb-3 px-4 py-3 rounded-lg bg-red-500/20 text-red-200 text-sm text-center">{error}</div>
+          <div className="mb-3 px-4 py-3 rounded-lg bg-red-50 text-red-600 text-sm text-center border border-red-100">{error}</div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <input
             type="email"
-            placeholder="Email"
+            placeholder={t.auth.email}
             value={form.email}
             onChange={e => setForm({ ...form, email: e.target.value })}
-            className="w-full px-5 py-4 rounded-lg bg-white text-gray-700 placeholder-gray-400 text-base outline-none focus:ring-2 focus:ring-blue-400 border-0"
+            className="w-full px-5 py-4 rounded-xl bg-white text-gray-700 placeholder-gray-400 text-base outline-none focus:ring-2 focus:ring-[#5B5FF0] border border-black/5"
             required
           />
 
           <div className="relative">
             <input
               type={showPw ? 'text' : 'password'}
-              placeholder="密碼"
+              placeholder={t.auth.password}
               value={form.password}
               onChange={e => setForm({ ...form, password: e.target.value })}
-              className="w-full px-5 py-4 pr-14 rounded-lg bg-white text-gray-700 placeholder-gray-400 text-base outline-none focus:ring-2 focus:ring-blue-400 border-0"
+              className="w-full px-5 py-4 pr-14 rounded-xl bg-white text-gray-700 placeholder-gray-400 text-base outline-none focus:ring-2 focus:ring-[#5B5FF0] border border-black/5"
               required
             />
             <button
@@ -90,21 +83,25 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 py-4 rounded-lg text-white font-bold text-lg transition-all hover:brightness-110 active:scale-[0.99] disabled:opacity-60"
-            style={{ background: 'linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)' }}
+            className="w-full flex items-center justify-center gap-3 py-4 rounded-xl text-white font-bold text-lg transition-all hover:brightness-110 active:scale-[0.99] disabled:opacity-60 btn-glow"
+            style={{ background: 'linear-gradient(90deg, #5B5FF0 0%, #484CE8 100%)' }}
           >
-            {loading ? '處理中...' : '登入'}
+            {loading ? t.common.loading : t.auth.loginCta}
             {!loading && <ArrowRight size={22} />}
           </button>
         </form>
 
-        <div className="mt-6 flex items-center justify-center gap-4 text-white/80 text-sm">
-          <Link href="/register" className="hover:text-white transition-colors">免費註冊</Link>
-          <span className="text-white/30">|</span>
-          <Link href="/forgot-password" className="hover:text-white transition-colors">忘記密碼</Link>
+        <div className="mt-6 flex items-center justify-center gap-4 text-sm" style={{ color: '#5C5F7A' }}>
+          <Link href="/register" className="hover:text-[#5B5FF0] transition-colors">
+            {t.auth.noAccount} {t.auth.createAccount}
+          </Link>
+          <span style={{ color: '#C5C7D6' }}>|</span>
+          <Link href="/forgot-password" className="hover:text-[#5B5FF0] transition-colors">
+            {t.auth.forgotPassword}
+          </Link>
         </div>
 
-        <p className="mt-6 text-center text-white/40 text-xs">© 2013–2026 ARVIX Limited</p>
+        <p className="mt-6 text-center text-xs" style={{ color: '#8A8DA8' }}>{t.footer.copyright}</p>
       </div>
     </div>
   )

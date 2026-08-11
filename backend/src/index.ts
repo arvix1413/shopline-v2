@@ -5,6 +5,19 @@ import { eq } from 'drizzle-orm'
 import * as schema from './schema'
 import { hashPassword, verifyPassword, signToken, verifyToken } from './auth'
 import { allocateUniqueSlug, ensureStoresTable } from './stores'
+import {
+  TRIAL_DAYS,
+  ONBOARDING_STAGES,
+  FOLLOW_UP_STATUSES,
+  STAGE_LABELS,
+  addDaysIso,
+  nowIso,
+  computeTrial,
+  ensureTrialSchema,
+  maxStage,
+  type OnboardingStage,
+  type FollowUpStatus,
+} from './trial'
 
 type Bindings = {
   DB: D1Database
@@ -14,7 +27,12 @@ type Bindings = {
   SHOPLINE_JWT_SECRET: string
 }
 
-const app = new Hono<{ Bindings: Bindings }>()
+type Variables = {
+  adminPayload: { userId: number; email: string; isAdmin?: number }
+  userPayload: { userId: number; email: string; isAdmin?: number }
+}
+
+const app = new Hono<{ Bindings: Bindings; Variables: Variables }>()
 
 // CORS 配置 - 支持跨系统审计上报
 app.use('*', cors({
@@ -154,6 +172,21 @@ const requireAdmin = async (c: any, next: any) => {
   if (!payload.isAdmin) return c.json({ error: '需要管理員權限' }, 403)
   c.set('adminPayload', payload)
   await next()
+}
+
+const requireUser = async (c: any, next: any) => {
+  const authHeader = c.req.header('Authorization')
+  if (!authHeader?.startsWith('Bearer ')) return c.json({ error: '未授權' }, 401)
+  const payload = await verifyToken(authHeader.slice(7), c.env.JWT_SECRET)
+  if (!payload) return c.json({ error: 'Token 無效或已過期' }, 401)
+  c.set('userPayload', payload as any)
+  await next()
+}
+
+async function getAuthUser(c: any) {
+  const authHeader = c.req.header('Authorization')
+  if (!authHeader?.startsWith('Bearer ')) return null
+  return verifyToken(authHeader.slice(7), c.env.JWT_SECRET)
 }
 
 // Init admin account
@@ -402,6 +435,8 @@ app.post('/api/init', async (c) => {
     // migration: add columns if missing
     try { await c.env.DB.prepare(`ALTER TABLE users ADD COLUMN password_hash TEXT NOT NULL DEFAULT ''`).run() } catch {}
     try { await c.env.DB.prepare(`ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0`).run() } catch {}
+    await ensureStoresTable(c.env.DB)
+    await ensureTrialSchema(c.env.DB)
     return c.json({ message: 'DB initialized' })
   } catch (error) {
     console.error('Init error:', error)
@@ -454,18 +489,30 @@ app.post('/api/auth/register', async (c) => {
 
     // Provision brand store: public URL /{slug}
     await ensureStoresTable(c.env.DB)
+    await ensureTrialSchema(c.env.DB)
     const preferred = requestedSlug || shopName || displayName
     const slug = await allocateUniqueSlug(c.env.DB, preferred, email.split('@')[0] || `shop${user.id}`)
     const storeName = (shopName || displayName || slug).trim()
+    const trialStart = nowIso()
+    const trialEnd = addDaysIso(TRIAL_DAYS)
     await c.env.DB.prepare(
-      `INSERT INTO stores (user_id, slug, name, tagline, status) VALUES (?, ?, ?, ?, 'active')`
-    ).bind(user.id, slug, storeName, '用 ARVIX 架起來的品牌電商').run()
+      `UPDATE users SET trial_started_at=?, trial_ends_at=?, plan_status='trialing', follow_up_status='new' WHERE id=?`
+    ).bind(trialStart, trialEnd, user.id).run()
+    await c.env.DB.prepare(
+      `INSERT INTO stores (user_id, slug, name, tagline, status, onboarding_stage, last_active_at) VALUES (?, ?, ?, ?, 'active', 'store_created', ?)`
+    ).bind(user.id, slug, storeName, '用 ARVIX 架起來的品牌電商', trialStart).run()
+
+    // Funnel event
+    await c.env.DB.prepare(
+      `INSERT INTO events (anonymous_id, user_id, event, properties, created_at) VALUES (?, ?, 'sign_up_complete', ?, datetime('now', '+8 hours'))`
+    ).bind(`user_${user.id}`, user.id, JSON.stringify({ slug, trialEndsAt: trialEnd })).run().catch(() => {})
 
     const token = await signToken({ userId: user.id, email: user.email, isAdmin: user.isAdmin }, c.env.JWT_SECRET)
     return c.json({
       token,
       user: { id: user.id, email: user.email, name: user.name, isAdmin: user.isAdmin },
       store: { slug, name: storeName, urlPath: `/s/shop?slug=${slug}` },
+      trial: { planStatus: 'trialing', trialStartedAt: trialStart, trialEndsAt: trialEnd, daysLeft: TRIAL_DAYS },
     }, 201)
   } catch (error) {
     console.error('Register error:', error)
@@ -1541,8 +1588,13 @@ app.get('/api/stores/me', async (c) => {
     const payload = await verifyToken(authHeader.slice(7), c.env.JWT_SECRET)
     if (!payload) return c.json({ error: 'Token 無效或已過期' }, 401)
     await ensureStoresTable(c.env.DB)
+    await ensureTrialSchema(c.env.DB)
     const store = await c.env.DB.prepare(
-      `SELECT id, user_id as userId, slug, name, tagline, status, created_at as createdAt FROM stores WHERE user_id = ? ORDER BY id ASC LIMIT 1`
+      `SELECT id, user_id as userId, slug, name, tagline, status,
+              onboarding_stage as onboardingStage, payments_enabled as paymentsEnabled,
+              is_live as isLive, product_count as productCount,
+              created_at as createdAt
+       FROM stores WHERE user_id = ? ORDER BY id ASC LIMIT 1`
     ).bind(payload.userId).first()
     if (!store) return c.json({ error: '尚未建立商店' }, 404)
     return c.json({ ...store, urlPath: `/s/shop?slug=${(store as any).slug}` })
@@ -1562,6 +1614,258 @@ app.get('/api/stores/:slug', async (c) => {
     ).bind(slug).first()
     if (!store) return c.json({ error: '商店不存在' }, 404)
     return c.json({ ...store, urlPath: `/s/shop?slug=${slug}` })
+  } catch (e: any) {
+    return c.json({ error: String(e) }, 500)
+  }
+})
+
+// ── Trial + onboarding + merchant CRM ─────────────────────────────────────────
+
+app.get('/api/me/trial', requireUser, async (c) => {
+  try {
+    await ensureTrialSchema(c.env.DB)
+    const payload = await getAuthUser(c)
+    if (!payload) return c.json({ error: '未授權' }, 401)
+    const row = await c.env.DB.prepare(
+      `SELECT id, is_admin, trial_started_at, trial_ends_at, plan_status FROM users WHERE id = ?`
+    ).bind(payload.userId).first<any>()
+    if (!row) return c.json({ error: '用戶不存在' }, 404)
+
+    // Auto-expire if needed
+    const trial = computeTrial(row)
+    if (trial.expired && row.plan_status === 'trialing') {
+      await c.env.DB.prepare(`UPDATE users SET plan_status='expired' WHERE id=?`).bind(payload.userId).run()
+    }
+
+    const store = await c.env.DB.prepare(
+      `SELECT slug, name, onboarding_stage as onboardingStage, payments_enabled as paymentsEnabled, is_live as isLive, product_count as productCount
+       FROM stores WHERE user_id = ? ORDER BY id ASC LIMIT 1`
+    ).bind(payload.userId).first()
+
+    return c.json({
+      ...trial,
+      planStatus: trial.planStatus,
+      stage: (store as any)?.onboardingStage || 'registered',
+      stageLabel: STAGE_LABELS[((store as any)?.onboardingStage || 'registered') as OnboardingStage] || '已註冊',
+      store: store || null,
+      stages: ONBOARDING_STAGES.map((s) => ({ id: s, label: STAGE_LABELS[s] })),
+    })
+  } catch (e: any) {
+    return c.json({ error: String(e) }, 500)
+  }
+})
+
+app.post('/api/me/onboarding', requireUser, async (c) => {
+  try {
+    await ensureStoresTable(c.env.DB)
+    await ensureTrialSchema(c.env.DB)
+    const payload = await getAuthUser(c)
+    if (!payload) return c.json({ error: '未授權' }, 401)
+    const body = await c.req.json().catch(() => ({}))
+    const stage = body.stage as string
+    if (!ONBOARDING_STAGES.includes(stage as OnboardingStage)) {
+      return c.json({ error: '無效的階段', allowed: ONBOARDING_STAGES }, 400)
+    }
+    if (stage === 'paid') {
+      return c.json({ error: '請使用付款開通 API' }, 400)
+    }
+
+    const store = await c.env.DB.prepare(
+      `SELECT id, onboarding_stage FROM stores WHERE user_id = ? ORDER BY id ASC LIMIT 1`
+    ).bind(payload.userId).first<{ id: number; onboarding_stage: string }>()
+    if (!store) return c.json({ error: '尚未建立商店' }, 404)
+
+    const next = maxStage(store.onboarding_stage, stage)
+    await c.env.DB.prepare(
+      `UPDATE stores SET onboarding_stage=?, last_active_at=?, updated_at=? WHERE id=?`
+    ).bind(next, nowIso(), nowIso(), store.id).run()
+
+    if (stage === 'payments_setup' || stage === 'live') {
+      await c.env.DB.prepare(`UPDATE stores SET payments_enabled=1 WHERE id=?`).bind(store.id).run()
+    }
+    if (stage === 'live') {
+      await c.env.DB.prepare(`UPDATE stores SET is_live=1 WHERE id=?`).bind(store.id).run()
+    }
+    if (stage === 'products_added') {
+      await c.env.DB.prepare(
+        `UPDATE stores SET product_count = CASE WHEN COALESCE(product_count,0) < 1 THEN 1 ELSE product_count END WHERE id=?`
+      ).bind(store.id).run()
+    }
+
+    await c.env.DB.prepare(
+      `INSERT INTO events (anonymous_id, user_id, event, properties, created_at) VALUES (?, ?, ?, ?, datetime('now', '+8 hours'))`
+    ).bind(`user_${payload.userId}`, payload.userId, 'onboarding_stage', JSON.stringify({ stage: next })).run().catch(() => {})
+
+    if (stage === 'products_added') {
+      await c.env.DB.prepare(
+        `INSERT INTO events (anonymous_id, user_id, event, properties, created_at) VALUES (?, ?, 'create_product', '{}', datetime('now', '+8 hours'))`
+      ).bind(`user_${payload.userId}`, payload.userId).run().catch(() => {})
+    }
+
+    return c.json({ ok: true, stage: next, stageLabel: STAGE_LABELS[next] })
+  } catch (e: any) {
+    return c.json({ error: String(e) }, 500)
+  }
+})
+
+/** Activate paid plan (manual / placeholder checkout). Wire payment provider later. */
+app.post('/api/me/activate', requireUser, async (c) => {
+  try {
+    await ensureTrialSchema(c.env.DB)
+    await ensureStoresTable(c.env.DB)
+    const payload = await getAuthUser(c)
+    if (!payload) return c.json({ error: '未授權' }, 401)
+    const body = await c.req.json().catch(() => ({}))
+    const plan = (body.plan || 'standard').toString()
+
+    await c.env.DB.prepare(
+      `UPDATE users SET plan_status='paid', follow_up_status='won', follow_up_updated_at=?, updated_at=? WHERE id=?`
+    ).bind(nowIso(), nowIso(), payload.userId).run()
+
+    await c.env.DB.prepare(
+      `UPDATE stores SET onboarding_stage='paid', updated_at=?, last_active_at=? WHERE user_id=?`
+    ).bind(nowIso(), nowIso(), payload.userId).run()
+
+    await c.env.DB.prepare(
+      `INSERT INTO events (anonymous_id, user_id, event, properties, created_at) VALUES (?, ?, 'plan_purchased', ?, datetime('now', '+8 hours'))`
+    ).bind(`user_${payload.userId}`, payload.userId, JSON.stringify({ plan })).run().catch(() => {})
+
+    return c.json({ ok: true, planStatus: 'paid', plan })
+  } catch (e: any) {
+    return c.json({ error: String(e) }, 500)
+  }
+})
+
+app.get('/api/admin/merchants', requireAdmin, async (c) => {
+  try {
+    await ensureTrialSchema(c.env.DB)
+    await ensureStoresTable(c.env.DB)
+    const stage = c.req.query('stage') || ''
+    const plan = c.req.query('plan') || ''
+    const follow = c.req.query('follow') || ''
+    const q = (c.req.query('q') || '').trim()
+
+    let sql = `
+      SELECT u.id, u.email, u.name, u.phone, u.created_at as createdAt,
+             u.trial_started_at as trialStartedAt, u.trial_ends_at as trialEndsAt,
+             u.plan_status as planStatus, u.follow_up_status as followUpStatus,
+             u.follow_up_note as followUpNote, u.follow_up_updated_at as followUpUpdatedAt,
+             u.ref, u.utm_source as utmSource, u.utm_campaign as utmCampaign,
+             s.slug, s.name as storeName, s.onboarding_stage as onboardingStage,
+             s.payments_enabled as paymentsEnabled, s.is_live as isLive,
+             s.product_count as productCount, s.last_active_at as lastActiveAt
+      FROM users u
+      LEFT JOIN stores s ON s.user_id = u.id
+      WHERE COALESCE(u.is_admin, 0) = 0
+    `
+    const binds: any[] = []
+    if (stage) { sql += ` AND s.onboarding_stage = ?`; binds.push(stage) }
+    if (plan) { sql += ` AND COALESCE(u.plan_status, 'trialing') = ?`; binds.push(plan) }
+    if (follow) { sql += ` AND COALESCE(u.follow_up_status, 'new') = ?`; binds.push(follow) }
+    if (q) {
+      sql += ` AND (u.email LIKE ? OR u.name LIKE ? OR u.phone LIKE ? OR s.slug LIKE ? OR s.name LIKE ?)`
+      const like = `%${q}%`
+      binds.push(like, like, like, like, like)
+    }
+    sql += ` ORDER BY u.created_at DESC LIMIT 300`
+
+    const stmt = c.env.DB.prepare(sql)
+    const rows = binds.length ? await stmt.bind(...binds).all() : await stmt.all()
+    const merchants = (rows.results || []).map((r: any) => {
+      const trial = computeTrial({
+        plan_status: r.planStatus,
+        trial_started_at: r.trialStartedAt,
+        trial_ends_at: r.trialEndsAt,
+        is_admin: 0,
+      })
+      return {
+        ...r,
+        daysLeft: trial.daysLeft,
+        expired: trial.expired,
+        stageLabel: STAGE_LABELS[(r.onboardingStage || 'registered') as OnboardingStage] || r.onboardingStage,
+        storeUrl: r.slug ? `/s/shop?slug=${r.slug}` : null,
+      }
+    })
+
+    // Summary counts
+    const summary = {
+      total: merchants.length,
+      trialing: merchants.filter((m: any) => m.planStatus === 'trialing' && !m.expired).length,
+      expiringSoon: merchants.filter((m: any) => m.planStatus === 'trialing' && !m.expired && (m.daysLeft ?? 99) <= 3).length,
+      expired: merchants.filter((m: any) => m.planStatus === 'expired' || m.expired).length,
+      paid: merchants.filter((m: any) => m.planStatus === 'paid').length,
+      byStage: ONBOARDING_STAGES.reduce((acc, s) => {
+        acc[s] = merchants.filter((m: any) => (m.onboardingStage || 'registered') === s).length
+        return acc
+      }, {} as Record<string, number>),
+    }
+
+    return c.json({
+      merchants,
+      summary,
+      stages: ONBOARDING_STAGES.map((s) => ({ id: s, label: STAGE_LABELS[s] })),
+      followUpStatuses: FOLLOW_UP_STATUSES,
+    })
+  } catch (e: any) {
+    return c.json({ error: String(e) }, 500)
+  }
+})
+
+app.patch('/api/admin/merchants/:id', requireAdmin, async (c) => {
+  try {
+    await ensureTrialSchema(c.env.DB)
+    await ensureStoresTable(c.env.DB)
+    const id = parseInt(c.req.param('id'))
+    const body = await c.req.json()
+
+    if (body.followUpStatus) {
+      if (!FOLLOW_UP_STATUSES.includes(body.followUpStatus as FollowUpStatus)) {
+        return c.json({ error: '無效的跟進狀態' }, 400)
+      }
+      await c.env.DB.prepare(
+        `UPDATE users SET follow_up_status=?, follow_up_updated_at=? WHERE id=?`
+      ).bind(body.followUpStatus, nowIso(), id).run()
+    }
+    if (typeof body.followUpNote === 'string') {
+      await c.env.DB.prepare(
+        `UPDATE users SET follow_up_note=?, follow_up_updated_at=? WHERE id=?`
+      ).bind(body.followUpNote, nowIso(), id).run()
+    }
+    if (body.planStatus) {
+      if (!['trialing', 'expired', 'paid'].includes(body.planStatus)) {
+        return c.json({ error: '無效的方案狀態' }, 400)
+      }
+      await c.env.DB.prepare(`UPDATE users SET plan_status=?, updated_at=? WHERE id=?`)
+        .bind(body.planStatus, nowIso(), id).run()
+      if (body.planStatus === 'paid') {
+        await c.env.DB.prepare(
+          `UPDATE stores SET onboarding_stage='paid', updated_at=? WHERE user_id=?`
+        ).bind(nowIso(), id).run()
+        await c.env.DB.prepare(
+          `UPDATE users SET follow_up_status='won', follow_up_updated_at=? WHERE id=?`
+        ).bind(nowIso(), id).run()
+      }
+    }
+    if (body.onboardingStage) {
+      if (!ONBOARDING_STAGES.includes(body.onboardingStage as OnboardingStage)) {
+        return c.json({ error: '無效的開店階段' }, 400)
+      }
+      await c.env.DB.prepare(
+        `UPDATE stores SET onboarding_stage=?, updated_at=? WHERE user_id=?`
+      ).bind(body.onboardingStage, nowIso(), id).run()
+    }
+    if (body.extendTrialDays && Number(body.extendTrialDays) > 0) {
+      const days = Math.min(Number(body.extendTrialDays), 90)
+      await c.env.DB.prepare(
+        `UPDATE users SET
+           trial_ends_at = datetime(COALESCE(trial_ends_at, datetime('now')), '+' || ? || ' days'),
+           plan_status = 'trialing',
+           updated_at = ?
+         WHERE id = ?`
+      ).bind(String(days), nowIso(), id).run()
+    }
+
+    return c.json({ ok: true })
   } catch (e: any) {
     return c.json({ error: String(e) }, 500)
   }

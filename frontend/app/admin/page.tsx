@@ -5,13 +5,14 @@ import { useRouter } from 'next/navigation'
 import Header from '../components/Header'
 import { Plus, Edit, Trash2, AlertCircle, CheckCircle } from 'lucide-react'
 import EnhancedAuditLog from '../components/EnhancedAuditLog'
+import MerchantCRM from '../components/MerchantCRM'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8787'
 
 interface UserRow { id: number; email: string; name: string; phone: string | null; isAdmin: number | null; createdAt: string | null }
 interface TrialSystem { id: number; name: string; desc: string; url: string; color: string; bg: string; border: string; emoji: string; tags: string[]; active: number; sortOrder: number }
 
-const TABS = ['用戶管理', '試用系統管理', '行為漏斗', '增強審計日誌', '流量分析', '聯盟行銷', 'SEO 內容', '店鋪報表'] as const
+const TABS = ['商家跟進', '用戶管理', '試用系統管理', '行為漏斗', '增強審計日誌', '流量分析', '聯盟行銷', 'SEO 內容', '店鋪報表'] as const
 type Tab = typeof TABS[number]
 
 
@@ -21,7 +22,7 @@ export default function AdminPage() {
   const [token, setToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
-  const [tab, setTab] = useState<Tab>('用戶管理')
+  const [tab, setTab] = useState<Tab>('商家跟進')
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   // 初始化用户信息
@@ -240,14 +241,19 @@ export default function AdminPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-6 bg-white rounded-lg p-1 shadow-sm border w-fit">
+        <div className="flex flex-wrap gap-1 mb-6 bg-white rounded-lg p-1 shadow-sm border">
           {TABS.map(t => (
             <button key={t} onClick={() => setTab(t)}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${tab === t ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
+              className={`px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors ${tab === t ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
               {t}
             </button>
           ))}
         </div>
+
+        {/* ===== MERCHANT CRM ===== */}
+        {tab === '商家跟進' && token && (
+          <MerchantCRM token={token} showMsg={showMsg} />
+        )}
 
         {/* ===== USERS TAB ===== */}
         {tab === '用戶管理' && (
@@ -255,7 +261,8 @@ export default function AdminPage() {
             <h2 className="text-lg font-semibold mb-4">用戶列表</h2>
             <div className="bg-white rounded-lg shadow border overflow-hidden">
               {usersLoading ? <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" /></div> : (
-                <table className="w-full text-sm">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
                   <thead className="bg-gray-50 text-xs text-gray-500 uppercase">
                     <tr>
                       <th className="px-4 py-3 text-left">Email</th>
@@ -287,6 +294,7 @@ export default function AdminPage() {
                     ))}
                   </tbody>
                 </table>
+                </div>
               )}
             </div>
           </div>
@@ -330,7 +338,8 @@ export default function AdminPage() {
 
             <div className="bg-white rounded-lg shadow border overflow-hidden">
               {sysLoading ? <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" /></div> : (
-                <table className="w-full text-sm">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
                   <thead className="bg-gray-50 text-xs text-gray-500 uppercase">
                     <tr>
                       <th className="px-4 py-3 text-left">系統</th>
@@ -367,6 +376,7 @@ export default function AdminPage() {
                     {systems.length === 0 && <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-400">尚無試用系統，點擊「新增系統」開始</td></tr>}
                   </tbody>
                 </table>
+                </div>
               )}
             </div>
           </div>
@@ -417,7 +427,8 @@ export default function AdminPage() {
                   <div className="px-4 py-3 border-b bg-gray-50">
                     <h3 className="font-semibold text-sm">用戶進度明細</h3>
                   </div>
-                  <table className="w-full text-sm">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
                     <thead className="bg-gray-50 text-xs text-gray-500 uppercase">
                       <tr>
                         <th className="px-4 py-3 text-left">用戶</th>
@@ -455,6 +466,7 @@ export default function AdminPage() {
                       {userProgress.length === 0 && <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-400">尚無用戶數據</td></tr>}
                     </tbody>
                   </table>
+                  </div>
                 </div>
               </>
             )}
@@ -508,7 +520,8 @@ export default function AdminPage() {
                 {traffic.affConversions?.length > 0 && (
                   <div className="bg-white rounded-xl border p-4">
                     <div className="text-sm font-semibold text-gray-700 mb-3">💰 聯盟行銷轉換</div>
-                    <table className="w-full text-sm">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
                       <thead className="text-xs text-gray-500 uppercase bg-gray-50">
                         <tr>
                           <th className="px-3 py-2 text-left">推廣者</th>
@@ -530,6 +543,7 @@ export default function AdminPage() {
                         ))}
                       </tbody>
                     </table>
+                    </div>
                   </div>
                 )}
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-700">
@@ -577,7 +591,8 @@ export default function AdminPage() {
 
             <div className="bg-white rounded-xl border overflow-hidden">
               {affLoading ? <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" /></div> : (
-                <table className="w-full text-sm">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
                   <thead className="bg-gray-50 text-xs text-gray-500 uppercase">
                     <tr>
                       <th className="px-4 py-3 text-left">推廣者</th>
@@ -617,6 +632,7 @@ export default function AdminPage() {
                     {affiliates.length === 0 && <tr><td colSpan={8} className="px-4 py-8 text-center text-gray-400">尚無推廣者，點擊「新增推廣者」開始</td></tr>}
                   </tbody>
                 </table>
+                </div>
               )}
             </div>
           </div>

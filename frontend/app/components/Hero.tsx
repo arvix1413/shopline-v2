@@ -46,7 +46,7 @@ export default function Hero() {
         }}
       />
 
-      <div className="relative z-10 max-w-5xl mx-auto px-6 pt-28 pb-0 text-center">
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 pt-28 pb-0 text-center">
         <p className="font-brand rise-in text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight mb-8 brand-text">
           ARVIX
         </p>
