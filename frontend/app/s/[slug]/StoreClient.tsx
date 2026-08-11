@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { RESERVED_STORE_SLUGS } from '../../../lib/storeSlug'
@@ -18,27 +18,34 @@ type Store = {
 
 export default function BrandStoreClient() {
   const params = useParams<{ slug: string }>()
-  const slug = useMemo(() => {
-    if (typeof window !== 'undefined') {
-      const parts = window.location.pathname.split('/').filter(Boolean)
-      const fromPath = parts[0] === 's' ? parts[1] : parts[0]
-      if (fromPath && fromPath !== '_') return fromPath.toLowerCase()
-    }
-    const p = (params?.slug || '').toLowerCase()
-    return p === '_' ? '' : p
-  }, [params])
-
+  const [slug, setSlug] = useState('')
   const [store, setStore] = useState<Store | null>(null)
   const [loading, setLoading] = useState(true)
   const [missing, setMissing] = useState(false)
 
   useEffect(() => {
-    if (!slug || RESERVED_STORE_SLUGS.has(slug)) {
+    const parts = window.location.pathname.split('/').filter(Boolean)
+    const fromPath = parts[0] === 's' ? parts[1] : parts[0]
+    const resolved = (fromPath && fromPath !== '_' && fromPath !== 'shop'
+      ? fromPath
+      : (params?.slug || '')
+    ).toLowerCase()
+    setSlug(resolved === '_' || resolved === 'shop' ? '' : resolved)
+  }, [params])
+
+  useEffect(() => {
+    if (!slug) {
+      // still resolving pathname on first tick
+      return
+    }
+    if (RESERVED_STORE_SLUGS.has(slug)) {
       setMissing(true)
       setLoading(false)
       return
     }
     let cancelled = false
+    setLoading(true)
+    setMissing(false)
     ;(async () => {
       try {
         const res = await fetch(`${API}/api/stores/${encodeURIComponent(slug)}`)
