@@ -43,7 +43,7 @@ export default function RegisterPage() {
       login(data.token, data.user)
       track('sign_up_complete', { email: form.email, slug: data.store?.slug }, data.user.id)
       bindUser(data.user.id)
-      const path = data.store?.slug ? `/${data.store.slug}` : '/'
+      const path = data.store?.slug ? `/s/shop?slug=${encodeURIComponent(data.store.slug)}` : '/'
       router.push(path)
     } catch {
       setError('網路錯誤，請重試')
@@ -82,7 +82,7 @@ export default function RegisterPage() {
 
           <div className="rounded-xl px-4 py-3 text-sm" style={{ background: '#F0F1FE', color: '#3A3D55' }}>
             註冊後網址：
-            <span className="font-semibold" style={{ color: '#5B5FF0' }}> arvixai.com/{previewSlug}</span>
+            <span className="font-semibold" style={{ color: '#5B5FF0' }}> arvixai.com/s/shop?slug={previewSlug}</span>
           </div>
 
           <button type="submit" disabled={loading}

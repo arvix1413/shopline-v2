@@ -24,6 +24,11 @@ export default function BrandStoreClient() {
   const [missing, setMissing] = useState(false)
 
   useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get('slug')
+    if (q) {
+      setSlug(q.toLowerCase())
+      return
+    }
     const parts = window.location.pathname.split('/').filter(Boolean)
     const fromPath = parts[0] === 's' ? parts[1] : parts[0]
     const resolved = (fromPath && fromPath !== '_' && fromPath !== 'shop'
@@ -88,7 +93,8 @@ export default function BrandStoreClient() {
   }
 
   const host = typeof window !== 'undefined' ? window.location.host : 'arvixai.com'
-  const publicUrl = `${host}/${store.slug}`
+  const publicUrl = `${host}/s/shop?slug=${store.slug}`
+  const brandPath = `/${store.slug}`
 
   return (
     <main className="min-h-screen" style={{ background: '#FFFFFF', color: '#12131F' }}>
@@ -134,12 +140,12 @@ export default function BrandStoreClient() {
           <div className="rounded-2xl p-10 text-center" style={{ background: '#F6F7FB', border: '1px solid rgba(91,95,240,0.12)' }}>
             <h2 className="text-xl font-black mb-3">商品區即將上線</h2>
             <p className="text-sm mb-6" style={{ color: '#5C5F7A' }}>
-              你的公開網址已生效：<span className="font-semibold" style={{ color: '#5B5FF0' }}>/{store.slug}</span>
-              。接下來可以把商品、版型與金物流接上來。
+              你的商店已上線：<span className="font-semibold" style={{ color: '#5B5FF0' }}>{publicUrl}</span>
+              <br />品牌識別碼：<span className="font-semibold" style={{ color: '#5B5FF0' }}>{brandPath}</span>
             </p>
             <div className="grid sm:grid-cols-3 gap-4 text-left">
               {[
-                { t: '品牌網址', d: `arvixai.com/${store.slug}` },
+                { t: '品牌網址', d: publicUrl },
                 { t: '開店狀態', d: store.status === 'active' ? '已啟用' : store.status },
                 { t: '下一步', d: '上架第一件商品，開始接單' },
               ].map((item) => (

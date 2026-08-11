@@ -465,7 +465,7 @@ app.post('/api/auth/register', async (c) => {
     return c.json({
       token,
       user: { id: user.id, email: user.email, name: user.name, isAdmin: user.isAdmin },
-      store: { slug, name: storeName, urlPath: `/${slug}` },
+      store: { slug, name: storeName, urlPath: `/s/shop?slug=${slug}` },
     }, 201)
   } catch (error) {
     console.error('Register error:', error)
@@ -1545,7 +1545,7 @@ app.get('/api/stores/me', async (c) => {
       `SELECT id, user_id as userId, slug, name, tagline, status, created_at as createdAt FROM stores WHERE user_id = ? ORDER BY id ASC LIMIT 1`
     ).bind(payload.userId).first()
     if (!store) return c.json({ error: '尚未建立商店' }, 404)
-    return c.json({ ...store, urlPath: `/${(store as any).slug}` })
+    return c.json({ ...store, urlPath: `/s/shop?slug=${(store as any).slug}` })
   } catch (e: any) {
     return c.json({ error: String(e) }, 500)
   }
@@ -1561,7 +1561,7 @@ app.get('/api/stores/:slug', async (c) => {
       `SELECT id, slug, name, tagline, status, created_at as createdAt FROM stores WHERE slug = ? AND status = 'active'`
     ).bind(slug).first()
     if (!store) return c.json({ error: '商店不存在' }, 404)
-    return c.json({ ...store, urlPath: `/${slug}` })
+    return c.json({ ...store, urlPath: `/s/shop?slug=${slug}` })
   } catch (e: any) {
     return c.json({ error: String(e) }, 500)
   }
