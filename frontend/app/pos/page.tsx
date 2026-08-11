@@ -13,7 +13,7 @@ export default function PosPage() {
             <p className="text-lg mb-8" style={{ color: '#687280' }}>
               一台 iPad 為你搞定開店大小事！收銀、庫存、會員、報表，全部一手掌握。
             </p>
-            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#356DFF' }}>
+            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>
               立即免費試用
             </a>
           </div>
@@ -46,12 +46,12 @@ export default function PosPage() {
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center gap-12">
           <div className="flex-1">
             <h2 className="text-3xl font-black mb-2" style={{ color: '#00142D' }}>一台 iPad<br />為你搞定開店大小事！</h2>
-            <h2 className="text-2xl font-black mb-4" style={{ color: '#356DFF' }}>簡單直覺收銀結帳效率 UP</h2>
+            <h2 className="text-2xl font-black mb-4" style={{ color: '#5B5FF0' }}>簡單直覺收銀結帳效率 UP</h2>
             <p className="mb-6" style={{ color: '#687280' }}>簡單直覺的收銀介面，讓結帳效率大幅提升，減少顧客等待時間。</p>
             <div className="space-y-3">
               {['串接 POS 刷卡機及多元支付選項', '一鍵套用優惠 / 加入會員', '發票、收據快速開立', '即時掌握實時交易明細'].map(h3 => (
                 <div key={h3} className="flex items-center gap-3">
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#356DFF' }}></span>
+                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#5B5FF0' }}></span>
                   <span className="font-semibold" style={{ color: '#00142D' }}>{h3}</span>
                 </div>
               ))}
@@ -72,7 +72,7 @@ export default function PosPage() {
             <div className="space-y-3">
               {['顧客快速加入會員', '顧客線上、線下消費紀錄', '會員分級與專屬價格', '顧客標籤與備註'].map(h3 => (
                 <div key={h3} className="flex items-center gap-3">
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#356DFF' }}></span>
+                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#5B5FF0' }}></span>
                   <span className="font-semibold" style={{ color: '#00142D' }}>{h3}</span>
                 </div>
               ))}
@@ -93,7 +93,7 @@ export default function PosPage() {
             <div className="space-y-3">
               {['即時掌握實時交易明細', '多維度銷售報表', '商品銷售排行', '員工業績統計'].map(h3 => (
                 <div key={h3} className="flex items-center gap-3">
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#356DFF' }}></span>
+                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#5B5FF0' }}></span>
                   <span className="font-semibold" style={{ color: '#00142D' }}>{h3}</span>
                 </div>
               ))}
@@ -114,7 +114,7 @@ export default function PosPage() {
             <div className="space-y-3">
               {['即時庫存同步', '商品批量管理', '庫存預警通知', '網店與門市庫存整合'].map(h3 => (
                 <div key={h3} className="flex items-center gap-3">
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#356DFF' }}></span>
+                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#5B5FF0' }}></span>
                   <span className="font-semibold" style={{ color: '#00142D' }}>{h3}</span>
                 </div>
               ))}
@@ -131,7 +131,7 @@ export default function PosPage() {
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">ARVIX POS 讓品牌再進化！</h2>
           <p className="text-white mb-8 opacity-80">全球超過 600,000 商家已使用 ARVIX</p>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             立即免費試用
           </a>
         </div>

@@ -26,7 +26,7 @@ export default function TrialPage() {
     if (!isLoading && !user) router.push('/login')
   }, [user, isLoading, router])
 
-  // Fetch SSO token (signed with SHOPLINE_JWT_SECRET for subsystems)
+  // Fetch SSO token for subsystems
   useEffect(() => {
     if (!token) return
     fetch(`${API}/api/auth/sso-token`, {
@@ -48,7 +48,7 @@ export default function TrialPage() {
   }, [user])
 
   if (isLoading || fetching || !ssoToken) return (
-    <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#08081A' }}>
+    <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#07071A' }}>
       <div className="text-white/40 text-sm">載入中...</div>
     </main>
   )
@@ -56,13 +56,13 @@ export default function TrialPage() {
   if (!user) return null
 
   return (
-    <main className="min-h-screen" style={{ backgroundColor: '#08081A', color: '#fff' }}>
+    <main className="min-h-screen" style={{ backgroundColor: '#07071A', color: '#fff' }}>
       <Header />
       <div className="max-w-7xl mx-auto px-6 py-20">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 rounded-full text-xs font-semibold"
-            style={{ background: 'rgba(30,64,175,0.15)', border: '1px solid rgba(30,64,175,0.3)', color: '#93C5FD' }}>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#1E40AF', display: 'inline-block' }} />
+            style={{ background: 'rgba(91,95,240,0.15)', border: '1px solid rgba(91,95,240,0.3)', color: '#B4B7FF' }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#5B5FF0', display: 'inline-block' }} />
             系統試用中心
           </div>
           <h1 className="text-4xl font-black mb-4">選擇你想試用的系統</h1>

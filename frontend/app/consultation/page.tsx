@@ -36,7 +36,7 @@ export default function ConsultationPage() {
           <p className="text-lg mb-10" style={{ color: '#687280' }}>
             專業顧問一對一解答開店疑難雜症！從數位轉型到全通路整合，立即預約免費專人諮詢，開啟你的電商生意。
           </p>
-          <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>
             立即預約免費諮詢
           </a>
         </div>
@@ -101,7 +101,7 @@ export default function ConsultationPage() {
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">商家好評推薦<br />全球超過 60 萬品牌已使用 ARVIX</h2>
           <p className="text-white/80 mb-8">與 ARVIX 專業顧問進行一對一免費電話諮詢！</p>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             立即預約免費諮詢
           </a>
         </div>

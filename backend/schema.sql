@@ -136,3 +136,17 @@ INSERT OR IGNORE INTO operation_types (id, category, action, description, risk_l
 ('admin_user_delete', '管理', '删除用户', '管理员删除用户', 4),
 ('error_404', '错误', '404', '页面不存在', 2),
 ('error_500', '错误', '500', '服务器错误', 3);
+
+-- Merchant brand stores (public URL /{slug})
+CREATE TABLE IF NOT EXISTS stores (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  name TEXT NOT NULL,
+  tagline TEXT DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'active',
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_stores_user_id ON stores(user_id);
+

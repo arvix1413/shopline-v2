@@ -13,7 +13,7 @@ export default function TargetedMarketingPage() {
             <p className="text-lg mb-8" style={{ color: '#687280' }}>
               獨家 RFIM 價值模型，9 大智慧顧客分群，讓你精準觸達對的人，有效提升行銷 ROI。
             </p>
-            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#356DFF' }}>
+            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>
               立即免費試用
             </a>
           </div>
@@ -35,7 +35,7 @@ export default function TargetedMarketingPage() {
                 { title: '內建分群', sub: '6 大分類、55+ 篩選條件' },
               ].map(item => (
                 <div key={item.title} className="flex items-start gap-3">
-                  <span className="w-2 h-2 rounded-full flex-shrink-0 mt-2" style={{ backgroundColor: '#356DFF' }}></span>
+                  <span className="w-2 h-2 rounded-full flex-shrink-0 mt-2" style={{ backgroundColor: '#5B5FF0' }}></span>
                   <div>
                     <span className="font-bold block" style={{ color: '#00142D' }}>{item.title}</span>
                     <span className="text-sm" style={{ color: '#687280' }}>{item.sub}</span>
@@ -45,7 +45,7 @@ export default function TargetedMarketingPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               {['指標性分類篩選', '細緻的分眾選項', '預先掌握觸及人數', '自動更新分群名單獨家支援', '靈活運用客群'].map(tag => (
-                <div key={tag} className="text-xs px-3 py-2 rounded-lg font-medium" style={{ backgroundColor: '#EBF1F8', color: '#356DFF' }}>{tag}</div>
+                <div key={tag} className="text-xs px-3 py-2 rounded-lg font-medium" style={{ backgroundColor: '#EEF0FF', color: '#5B5FF0' }}>{tag}</div>
               ))}
             </div>
           </div>
@@ -98,7 +98,7 @@ export default function TargetedMarketingPage() {
       <section className="py-20 text-center" style={{ backgroundColor: '#00142D' }}>
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">全球超過 600,000 商家已使用 ARVIX</h2>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             立即免費試用
           </a>
         </div>

@@ -94,7 +94,7 @@ export default function FaqPage() {
 
   return (
     <main>
-      <section className="py-24 text-center" style={{ background: 'linear-gradient(135deg, #F2F7FC 0%, #EBF1F8 100%)' }}>
+      <section className="py-24 text-center" style={{ background: 'linear-gradient(135deg, #F2F7FC 0%, #EEF0FF 100%)' }}>
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-4xl md:text-5xl font-black mb-6" style={{ color: '#00142D' }}>ARVIX 新手問答</h1>
           <p className="text-lg" style={{ color: '#687280' }}>有更多疑問嗎？聯繫 ARVIX 團隊吧！讓我們知道你需要幫助，我們的團隊將盡力為你找到最佳的解決方案。</p>
@@ -119,7 +119,7 @@ export default function FaqPage() {
                           style={{ color: '#00142D' }}
                           onClick={() => setOpenItem(isOpen ? null : key)}>
                           {faq.q}
-                          <span className="ml-4 flex-shrink-0 text-lg" style={{ color: '#356DFF' }}>{isOpen ? '−' : '+'}</span>
+                          <span className="ml-4 flex-shrink-0 text-lg" style={{ color: '#5B5FF0' }}>{isOpen ? '−' : '+'}</span>
                         </button>
                         {isOpen && (
                           <div className="px-5 pb-5 text-sm leading-relaxed" style={{ color: '#687280' }}>
@@ -142,14 +142,14 @@ export default function FaqPage() {
           <div className="grid md:grid-cols-2 gap-6">
             {resources.map((r) => (
               <div key={r.title} className="p-6 bg-white rounded-2xl flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#EBF1F8' }}>
-                  <span style={{ color: '#356DFF' }}>📄</span>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#EEF0FF' }}>
+                  <span style={{ color: '#5B5FF0' }}>📄</span>
                 </div>
                 <div>
                   <h3 className="font-bold mb-1" style={{ color: '#00142D' }}>{r.title}</h3>
                   <p className="text-sm" style={{ color: '#687280' }}>{r.desc}</p>
                 </div>
-                <span className="ml-auto text-sm font-bold" style={{ color: '#356DFF' }}>立即下載</span>
+                <span className="ml-auto text-sm font-bold" style={{ color: '#5B5FF0' }}>立即下載</span>
               </div>
             ))}
           </div>
@@ -160,7 +160,7 @@ export default function FaqPage() {
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">使用有疑問？ 歡迎與我們聯繫！</h2>
           <p className="text-white opacity-70 mb-8">服務時間 星期一至五 上午 10 點至晚上 7 點</p>
-          <a href="/consultation" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/consultation" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             聯繫我們
           </a>
         </div>

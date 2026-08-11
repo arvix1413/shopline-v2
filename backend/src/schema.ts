@@ -85,3 +85,16 @@ export const events = sqliteTable('events', {
   properties: text('properties').default('{}'), // JSON
   createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
 })
+
+/** Public storefront path: /{slug} on ARVIX host */
+export const stores = sqliteTable('stores', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  userId: integer('user_id').references(() => users.id).notNull(),
+  slug: text('slug').notNull().unique(),
+  name: text('name').notNull(),
+  tagline: text('tagline').default(''),
+  status: text('status').notNull().default('active'),
+  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  updatedAt: text('updated_at').default('CURRENT_TIMESTAMP'),
+})
+

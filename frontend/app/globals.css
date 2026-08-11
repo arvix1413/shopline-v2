@@ -1,27 +1,33 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Noto+Sans+TC:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ── Design Tokens ─────────────────────────────────────
-   Deep Space Aurora — dark, premium, editorial
-   Primary bg  : #08081A  (deep space black-violet)
-   Secondary bg: #0E0E2C  (dark indigo)
-   Surface     : rgba(255,255,255,0.04)
-   Accent      : #6366F1 → #8B5CF6 (indigo-violet)
-   CTA         : #6366F1
-   Light section: #F5F4FF (near-white lavender)
+   ARVIX Brand — light-first, founder energy
+   Primary     : #5B5FF0
+   Deep        : #484CE8
+   Soft        : #8B8FF5
+   Base        : #FFFFFF
+   Soft bg     : #F6F7FB
+   Tint        : #F0F1FE
+   Ink         : #12131F
 ──────────────────────────────────────────────────────── */
 
 :root {
-  --bg-base:    #08081A;
-  --bg-deep:    #0E0E2C;
-  --bg-light:   #F5F4FF;
-  --accent:     #1E40AF;
-  --accent-2:   #1D4ED8;
-  --text-muted: rgba(255,255,255,0.55);
-  --border:     rgba(255,255,255,0.08);
+  --bg-base:    #FFFFFF;
+  --bg-soft:    #F6F7FB;
+  --bg-tint:    #F0F1FE;
+  --bg-ink:     #15162A;
+  --brand:      #5B5FF0;
+  --brand-deep: #484CE8;
+  --brand-soft: #8B8FF5;
+  --accent:     #5B5FF0;
+  --accent-2:   #484CE8;
+  --text-ink:   #12131F;
+  --text-muted: #5C5F7A;
+  --border:     rgba(18,19,31,0.08);
 }
 
 * {
@@ -30,46 +36,72 @@
   margin: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html, body {
   max-width: 100vw;
   overflow-x: hidden;
   font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
   background-color: var(--bg-base);
+  color: var(--text-ink);
 }
 
 a { color: inherit; text-decoration: none; }
 
+.font-brand {
+  font-family: 'Outfit', 'Noto Sans TC', sans-serif;
+}
+
 .section-padding { padding: 80px 0; }
-
-/* Glass card utility */
-.glass {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  backdrop-filter: blur(12px);
-}
-
-/* Subtle noise texture overlay */
-.noise::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 0;
-}
 
 @keyframes marquee {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
 .animate-marquee {
-  animation: marquee 20s linear infinite;
+  animation: marquee 22s linear infinite;
 }
 
-/* Glow accent for CTA buttons */
+@keyframes aurora {
+  0%, 100% { opacity: 0.55; transform: translate(0, 0) scale(1); }
+  50% { opacity: 0.9; transform: translate(2%, -3%) scale(1.06); }
+}
+.animate-aurora {
+  animation: aurora 12s ease-in-out infinite;
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.rise-in {
+  animation: rise-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.rise-in-delay-1 { animation-delay: 0.12s; }
+.rise-in-delay-2 { animation-delay: 0.24s; }
+.rise-in-delay-3 { animation-delay: 0.36s; }
+.rise-in-delay-4 { animation-delay: 0.5s; }
+
 .btn-glow {
-  box-shadow: 0 0 24px rgba(30,64,175,0.5), 0 2px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 8px 28px rgba(91,95,240,0.28), 0 2px 8px rgba(18,19,31,0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
 }
 .btn-glow:hover {
-  box-shadow: 0 0 36px rgba(30,64,175,0.7), 0 4px 16px rgba(0,0,0,0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 36px rgba(91,95,240,0.4), 0 4px 14px rgba(18,19,31,0.1);
+  filter: brightness(1.03);
+}
+
+.btn-brand {
+  background: linear-gradient(135deg, #5B5FF0 0%, #484CE8 100%);
+  color: #fff;
+}
+
+.brand-text {
+  background: linear-gradient(135deg, #484CE8 0%, #5B5FF0 45%, #7A7EF5 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

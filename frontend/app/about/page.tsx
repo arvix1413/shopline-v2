@@ -21,7 +21,7 @@ const awards = [
 export default function AboutPage() {
   return (
     <main>
-      <section className="py-24 text-center" style={{ background: 'linear-gradient(135deg, #F2F7FC 0%, #EBF1F8 100%)' }}>
+      <section className="py-24 text-center" style={{ background: 'linear-gradient(135deg, #F2F7FC 0%, #EEF0FF 100%)' }}>
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-4xl md:text-5xl font-black mb-6" style={{ color: '#00142D' }}>
             我們協助商家成功「賣」向全世界
@@ -47,9 +47,9 @@ export default function AboutPage() {
                 如今，全球超過 600,000 個商家信賴 ARVIX，我們的足跡遍及台灣、香港、馬來西亞、新加坡等地，持續擴展全球版圖。
               </p>
             </div>
-            <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: '#EBF1F8', height: '360px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: '#EEF0FF', height: '360px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <div className="text-center">
-                <div className="text-6xl font-black mb-2" style={{ color: '#356DFF' }}>600K+</div>
+                <div className="text-6xl font-black mb-2" style={{ color: '#5B5FF0' }}>600K+</div>
                 <div className="text-lg font-bold" style={{ color: '#00142D' }}>全球商家數</div>
               </div>
             </div>
@@ -67,11 +67,11 @@ export default function AboutPage() {
                 <div key={m.year} className={`flex items-center gap-8 ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
                   <div className={`flex-1 ${i % 2 === 0 ? 'md:text-right' : 'md:text-left'}`}>
                     <div className="inline-block p-6 bg-white rounded-2xl shadow-sm">
-                      <div className="text-2xl font-black mb-1" style={{ color: '#356DFF' }}>{m.year}</div>
+                      <div className="text-2xl font-black mb-1" style={{ color: '#5B5FF0' }}>{m.year}</div>
                       <p className="text-sm" style={{ color: '#354253' }}>{m.desc}</p>
                     </div>
                   </div>
-                  <div className="w-4 h-4 rounded-full flex-shrink-0 hidden md:block" style={{ backgroundColor: '#356DFF' }} />
+                  <div className="w-4 h-4 rounded-full flex-shrink-0 hidden md:block" style={{ backgroundColor: '#5B5FF0' }} />
                   <div className="flex-1 hidden md:block" />
                 </div>
               ))}
@@ -86,7 +86,7 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-5 gap-6">
             {awards.map((a) => (
               <div key={a.title} className="p-6 rounded-2xl border border-gray-100 text-center hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center" style={{ backgroundColor: '#EBF1F8' }}>
+                <div className="w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center" style={{ backgroundColor: '#EEF0FF' }}>
                   <span className="text-xl">🏆</span>
                 </div>
                 <h3 className="font-bold text-sm mb-1" style={{ color: '#00142D' }}>{a.title}</h3>
@@ -100,7 +100,7 @@ export default function AboutPage() {
       <section className="py-20 text-center" style={{ backgroundColor: '#00142D' }}>
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">全球超過 600,000 商家已使用 ARVIX</h2>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             立即免費試用
           </a>
         </div>

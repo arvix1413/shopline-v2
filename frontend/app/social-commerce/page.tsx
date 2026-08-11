@@ -32,7 +32,7 @@ function FeatureList({ items }: { items: string[] }) {
     <div className="space-y-3 mt-6">
       {items.map(item => (
         <div key={item} className="flex items-center gap-3">
-          <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#356DFF' }} />
+          <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#5B5FF0' }} />
           <span className="font-semibold text-sm" style={{ color: '#00142D' }}>{item}</span>
         </div>
       ))}
@@ -53,7 +53,7 @@ export default function SocialCommercePage() {
             <p className="text-lg mb-8" style={{ color: '#3D4A5C' }}>
               全方位的「社群＋電商」購物系統！善用社群的高互動性並透過系統的高導購性，包含直播購物、導購機器人及訊息整合中心，從直播互動、留言導購到後續整單付款等無縫整合購物體驗，讓顧客快速下單，你輕鬆收單！
             </p>
-            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#356DFF' }}>
+            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>
               立即免費試用
             </a>
           </div>
@@ -116,7 +116,7 @@ export default function SocialCommercePage() {
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black mb-4" style={{ color: '#00142D' }}>ARVIX 社群購物系統完美結合「社群＋電商」</h2>
           <p className="mb-8" style={{ color: '#3D4A5C' }}>跳脫一般社群平台破碎化的購物流程，讓你的顧客邊看直播就能邊下單，打造全方位的社群購物體驗！</p>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             立即免費試用
           </a>
         </div>

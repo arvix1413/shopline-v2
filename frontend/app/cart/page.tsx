@@ -150,7 +150,7 @@ export default function CartPage() {
             <p className="text-gray-600 mb-6">快去挑选一些心仪的商品吧！</p>
             <Link
               href="/products"
-              className="bg-shopline-blue text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors inline-block"
+              className="bg-brand-blue text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors inline-block"
             >
               去购物
             </Link>
@@ -176,7 +176,7 @@ export default function CartPage() {
                       <div className="flex-1">
                         <h3 className="font-medium text-gray-900">{item.product.name}</h3>
                         <p className="text-sm text-gray-500">{item.product.category}</p>
-                        <p className="text-lg font-semibold text-shopline-blue mt-1">
+                        <p className="text-lg font-semibold text-brand-blue mt-1">
                           NT$ {item.product.price.toLocaleString()}
                         </p>
                       </div>
@@ -235,18 +235,18 @@ export default function CartPage() {
                   <div className="border-t pt-3">
                     <div className="flex justify-between font-semibold text-lg">
                       <span>总计</span>
-                      <span className="text-shopline-blue">NT$ {totalAmount.toLocaleString()}</span>
+                      <span className="text-brand-blue">NT$ {totalAmount.toLocaleString()}</span>
                     </div>
                   </div>
                 </div>
                 
-                <button className="w-full bg-shopline-blue text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                <button className="w-full bg-brand-blue text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
                   立即结账
                 </button>
                 
                 <Link
                   href="/products"
-                  className="block w-full text-center text-shopline-blue py-3 mt-3 border border-shopline-blue rounded-lg hover:bg-blue-50 transition-colors"
+                  className="block w-full text-center text-brand-blue py-3 mt-3 border border-brand-blue rounded-lg hover:bg-blue-50 transition-colors"
                 >
                   继续购物
                 </Link>

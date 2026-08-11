@@ -22,9 +22,9 @@ const colHrefs = [
 
 const socials = [
   { label: 'Facebook', href: 'https://www.facebook.com/arvix', icon: 'f' },
-  { label: 'Instagram', href: 'https://www.instagram.com/shopline_tw/', icon: 'ig' },
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/company/shopline', icon: 'in' },
-  { label: 'YouTube', href: 'https://www.youtube.com/c/shoplineglobalsmartcommerceenabler', icon: 'yt' },
+  { label: 'Instagram', href: 'https://www.instagram.com/arvix/', icon: 'ig' },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/company/arvix', icon: 'in' },
+  { label: 'YouTube', href: 'https://www.youtube.com/@arvix', icon: 'yt' },
   { label: 'LINE', href: 'https://line.me/R/ti/p/%40prs5793t', icon: 'L' },
 ]
 
@@ -39,7 +39,7 @@ export default function Footer() {
     : ['網站地圖', '隱私權政策', '會員條款']
 
   return (
-    <footer style={{ backgroundColor: '#050510', color: '#fff' }}>
+    <footer style={{ backgroundColor: '#15162A', color: '#fff' }}>
       {/* Top bar */}
       <div className="border-b border-white/10">
         <div className="max-w-7xl mx-auto px-6 py-6 flex flex-wrap items-center gap-4">

@@ -15,7 +15,7 @@ const news = [
 
 const tagColors: Record<string, { bg: string; color: string }> = {
   '最新': { bg: '#FEF3C7', color: '#D97706' },
-  '轉載': { bg: '#EBF1F8', color: '#356DFF' },
+  '轉載': { bg: '#EEF0FF', color: '#5B5FF0' },
   '公告': { bg: '#DCFCE7', color: '#16A34A' },
   '白皮書': { bg: '#F3E8FF', color: '#9333EA' },
 }
@@ -23,7 +23,7 @@ const tagColors: Record<string, { bg: string; color: string }> = {
 export default function PressPage() {
   return (
     <main>
-      <section className="py-24 text-center" style={{ background: 'linear-gradient(135deg, #F2F7FC 0%, #EBF1F8 100%)' }}>
+      <section className="py-24 text-center" style={{ background: 'linear-gradient(135deg, #F2F7FC 0%, #EEF0FF 100%)' }}>
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-4xl md:text-5xl font-black mb-6" style={{ color: '#00142D' }}>最新消息</h1>
           <p className="text-lg" style={{ color: '#687280' }}>
@@ -36,7 +36,7 @@ export default function PressPage() {
         <div className="max-w-4xl mx-auto px-6">
           <div className="space-y-4">
             {news.map((n) => {
-              const tc = tagColors[n.tag] || { bg: '#EBF1F8', color: '#356DFF' }
+              const tc = tagColors[n.tag] || { bg: '#EEF0FF', color: '#5B5FF0' }
               return (
                 <article key={n.title} className="p-6 rounded-2xl border border-gray-100 hover:shadow-md transition-shadow cursor-pointer">
                   <div className="flex items-center gap-3 mb-3">
@@ -54,7 +54,7 @@ export default function PressPage() {
       <section className="py-20 text-center" style={{ backgroundColor: '#00142D' }}>
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">全球超過 600,000 商家已使用 ARVIX</h2>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             立即免費試用
           </a>
         </div>

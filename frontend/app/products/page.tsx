@@ -106,7 +106,7 @@ export default function ProductsPage() {
               onClick={() => setSelectedCategory('')}
               className={`px-4 py-2 rounded-full transition-colors ${
                 selectedCategory === '' 
-                  ? 'bg-shopline-blue text-white' 
+                  ? 'bg-brand-blue text-white' 
                   : 'bg-white text-gray-700 hover:bg-gray-100'
               }`}
             >
@@ -118,7 +118,7 @@ export default function ProductsPage() {
                 onClick={() => setSelectedCategory(category)}
                 className={`px-4 py-2 rounded-full transition-colors ${
                   selectedCategory === category 
-                    ? 'bg-shopline-blue text-white' 
+                    ? 'bg-brand-blue text-white' 
                     : 'bg-white text-gray-700 hover:bg-gray-100'
                 }`}
               >
@@ -143,7 +143,7 @@ export default function ProductsPage() {
                     className="w-full h-48 object-cover"
                   />
                   {product.featured && (
-                    <div className="absolute top-2 left-2 bg-shopline-orange text-white px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                    <div className="absolute top-2 left-2 bg-brand-orange text-white px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
                       <Star size={12} fill="currentColor" />
                       精选
                     </div>
@@ -169,7 +169,7 @@ export default function ProductsPage() {
                   )}
                   
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-2xl font-bold text-shopline-blue">
+                    <span className="text-2xl font-bold text-brand-blue">
                       NT$ {product.price.toLocaleString()}
                     </span>
                     <span className="text-sm text-gray-500">
@@ -185,7 +185,7 @@ export default function ProductsPage() {
                         ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                         : addingToCart === product.id
                         ? 'bg-gray-400 text-white cursor-not-allowed'
-                        : 'bg-shopline-blue text-white hover:bg-blue-700'
+                        : 'bg-brand-blue text-white hover:bg-blue-700'
                     }`}
                   >
                     <ShoppingCart size={16} />

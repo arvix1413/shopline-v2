@@ -39,7 +39,7 @@ export default function ShowcasePage() {
 
   return (
     <main>
-      <section className="py-24 text-center" style={{ background: 'linear-gradient(135deg, #F2F7FC 0%, #EBF1F8 100%)' }}>
+      <section className="py-24 text-center" style={{ background: 'linear-gradient(135deg, #F2F7FC 0%, #EEF0FF 100%)' }}>
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-4xl md:text-5xl font-black mb-6" style={{ color: '#00142D' }}>精選品牌案例</h1>
           <p className="text-lg" style={{ color: '#687280' }}>
@@ -55,7 +55,7 @@ export default function ShowcasePage() {
               <button key={cat.slug} onClick={() => setActive(cat.slug)}
                 className="px-5 py-2 rounded-full text-sm font-semibold transition-all"
                 style={active === cat.slug
-                  ? { backgroundColor: '#356DFF', color: 'white' }
+                  ? { backgroundColor: '#5B5FF0', color: 'white' }
                   : { backgroundColor: '#F4F7FC', color: '#687280' }}>
                 {cat.label}
               </button>
@@ -69,11 +69,11 @@ export default function ShowcasePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filtered.map((c) => (
               <div key={`${c.brand}-${c.result}`} className="p-8 rounded-2xl border border-gray-100 hover:shadow-lg transition-shadow">
-                <div className="text-xs font-bold mb-3 px-3 py-1 rounded-full inline-block" style={{ backgroundColor: '#EBF1F8', color: '#356DFF' }}>
+                <div className="text-xs font-bold mb-3 px-3 py-1 rounded-full inline-block" style={{ backgroundColor: '#EEF0FF', color: '#5B5FF0' }}>
                   {categories.find(cat => cat.slug === c.category)?.label}
                 </div>
                 <h3 className="text-xl font-bold mt-2 mb-2" style={{ color: '#00142D' }}>{c.brand}</h3>
-                <h4 className="text-lg font-black mb-3" style={{ color: '#356DFF' }}>{c.result}</h4>
+                <h4 className="text-lg font-black mb-3" style={{ color: '#5B5FF0' }}>{c.result}</h4>
                 <p className="text-sm" style={{ color: '#687280' }}>{c.desc}</p>
               </div>
             ))}
@@ -84,7 +84,7 @@ export default function ShowcasePage() {
       <section className="py-20 text-center" style={{ backgroundColor: '#00142D' }}>
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">全球超過 600,000 商家已使用 ARVIX</h2>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             立即免費試用
           </a>
         </div>

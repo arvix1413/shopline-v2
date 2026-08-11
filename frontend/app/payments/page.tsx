@@ -21,7 +21,7 @@ export default function PaymentsPage() {
             <p className="text-lg mb-8" style={{ color: '#687280' }}>
               ARVIX Payments 安全支付、提升交易成功率。多元收款服務，線上就能申請，一次開通多種支付方式。
             </p>
-            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#356DFF' }}>
+            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>
               立即免費試用
             </a>
           </div>
@@ -61,7 +61,7 @@ export default function PaymentsPage() {
             <div className="space-y-4">
               {['一頁完成付款免跳轉告別訂單流失', '線上就能申請 一次開通多種支付方式', '穩定流暢！ 刷卡成功率高於 99%'].map(h3 => (
                 <div key={h3} className="flex items-center gap-3">
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#356DFF' }}></span>
+                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#5B5FF0' }}></span>
                   <span className="font-semibold" style={{ color: '#00142D' }}>{h3}</span>
                 </div>
               ))}
@@ -94,7 +94,7 @@ export default function PaymentsPage() {
       <section className="py-20 text-center" style={{ backgroundColor: '#00142D' }}>
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">全球超過 600,000 商家已使用 ARVIX</h2>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             立即免費試用
           </a>
         </div>

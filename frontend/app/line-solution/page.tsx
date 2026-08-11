@@ -16,7 +16,7 @@ export default function LineSolutionPage() {
             <p className="text-lg mb-8" style={{ color: '#687280' }}>
               全效整合 LINE 好友，流量＋留量再行銷一氣呵成，360° 導購流量變現就靠它。
             </p>
-            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#356DFF' }}>
+            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>
               立即免費試用
             </a>
           </div>
@@ -35,7 +35,7 @@ export default function LineSolutionPage() {
             <div className="space-y-4">
               {['輕鬆圈粉', '導購衝單', '智慧客服'].map(h3 => (
                 <div key={h3} className="flex items-center gap-3">
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#356DFF' }}></span>
+                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#5B5FF0' }}></span>
                   <span className="font-semibold" style={{ color: '#00142D' }}>{h3}</span>
                 </div>
               ))}
@@ -61,7 +61,7 @@ export default function LineSolutionPage() {
                 { title: 'LINE 精準廣播', desc: '依據顧客分群，發送精準廣播訊息，提升開封率。' },
               ].map(item => (
                 <div key={item.title} className="flex items-start gap-3">
-                  <span className="w-2 h-2 rounded-full flex-shrink-0 mt-2" style={{ backgroundColor: '#356DFF' }}></span>
+                  <span className="w-2 h-2 rounded-full flex-shrink-0 mt-2" style={{ backgroundColor: '#5B5FF0' }}></span>
                   <div>
                     <span className="font-semibold block text-sm" style={{ color: '#00142D' }}>{item.title}</span>
                     <span className="text-xs" style={{ color: '#687280' }}>{item.desc}</span>
@@ -93,7 +93,7 @@ export default function LineSolutionPage() {
       <section className="py-20 text-center" style={{ backgroundColor: '#00142D' }}>
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">全球超過 600,000 商家已使用 ARVIX</h2>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             立即免費試用
           </a>
         </div>

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     siteName: 'ARVIX',
     locale: 'zh_TW',
     type: 'website',
-    url: 'https://shopline-frontend.pages.dev',
+    url: 'https://arvixai.com',
   },
   twitter: {
     card: 'summary_large_image',
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     description: '超過 60 萬商家信賴的電商解決方案，免費試用 14 天',
   },
   robots: { index: true, follow: true },
-  alternates: { canonical: 'https://shopline-frontend.pages.dev' },
+  alternates: { canonical: 'https://arvixai.com' },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -31,9 +31,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet" />
       </head>
-      <body><I18nProvider><AuthProvider><TrafficCapture />{children}</AuthProvider></I18nProvider></body>
+      <body>
+        <I18nProvider>
+          <AuthProvider>
+            <TrafficCapture />
+            {children}
+          </AuthProvider>
+        </I18nProvider>
+      </body>
     </html>
   )
 }

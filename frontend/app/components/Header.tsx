@@ -123,7 +123,7 @@ export default function Header() {
     <>
       {showBanner && (
         <div className="text-white text-sm py-2 overflow-hidden relative flex items-center"
-          style={{ background: 'linear-gradient(90deg, #1E3A8A 0%, #1E40AF 100%)' }}>
+          style={{ background: 'linear-gradient(90deg, #484CE8 0%, #5B5FF0 55%, #6B6FF5 100%)' }}>
           <div className="flex whitespace-nowrap animate-marquee">
             {Array.from({ length: 6 }).map((_, i) => (
               <span key={i} className="mx-12">{t.banner}</span>
@@ -131,7 +131,7 @@ export default function Header() {
           </div>
           <button onClick={() => setShowBanner(false)}
             className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white z-10 pl-2"
-            style={{ background: 'linear-gradient(90deg, transparent, #1E40AF)' }}
+            style={{ background: 'linear-gradient(90deg, transparent, #5B5FF0)' }}
             aria-label="Close">
             <X size={16} />
           </button>
@@ -139,12 +139,11 @@ export default function Header() {
       )}
 
       <header className="sticky top-0 z-50"
-        style={{ backgroundColor: 'rgba(8,8,26,0.85)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+        style={{ backgroundColor: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(18,19,31,0.08)' }}>
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between h-16">
             <Link href="/" className="flex-shrink-0">
-              <span className="text-2xl font-black tracking-tight"
-                style={{ background: 'linear-gradient(135deg, #60A5FA, #93C5FD)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              <span className="font-brand text-2xl font-extrabold tracking-tight brand-text">
                 ARVIX
               </span>
             </Link>
@@ -156,13 +155,13 @@ export default function Header() {
                   onMouseLeave={item.dropdown ? handleMouseLeave : undefined}>
                   {item.href ? (
                     <Link href={item.href}
-                      className="flex items-center gap-0.5 px-3 py-2 text-sm font-medium transition-colors rounded-md"
-                      style={{ color: 'rgba(255,255,255,0.75)' }}>
+                      className="flex items-center gap-0.5 px-3 py-2 text-sm font-medium transition-colors rounded-md hover:text-[#5B5FF0]"
+                      style={{ color: '#3A3D55' }}>
                       {item.label}
                     </Link>
                   ) : (
                     <button className="flex items-center gap-0.5 px-3 py-2 text-sm font-medium transition-colors rounded-md"
-                      style={{ color: activeDropdown === i ? '#93C5FD' : 'rgba(255,255,255,0.75)' }}>
+                      style={{ color: activeDropdown === i ? '#5B5FF0' : '#3A3D55' }}>
                       {item.label}
                       <ChevronDown size={14} className="transition-transform duration-200"
                         style={{ transform: activeDropdown === i ? 'rotate(180deg)' : 'rotate(0deg)' }} />
@@ -171,17 +170,17 @@ export default function Header() {
 
                   {item.dropdown && activeDropdown === i && (
                     <div className="absolute top-full left-0 mt-1 rounded-2xl z-50"
-                      style={{ background: 'rgba(14,14,44,0.97)', backdropFilter: 'blur(24px)', boxShadow: '0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08)', minWidth: 380 }}
+                      style={{ background: '#fff', boxShadow: '0 12px 40px rgba(18,19,31,0.12)', border: '1px solid rgba(18,19,31,0.08)', minWidth: 380 }}
                       onMouseEnter={() => handleMouseEnter(i)}
                       onMouseLeave={handleMouseLeave}>
                       {isSolutionsDropdown(item.dropdown) ? (
                         <div className="flex">
-                          <div className="p-5 rounded-l-2xl" style={{ backgroundColor: 'rgba(30,64,175,0.15)', minWidth: 180 }}>
+                          <div className="p-5 rounded-l-2xl" style={{ backgroundColor: '#F0F1FE', minWidth: 180 }}>
                             <Link href={(item.dropdown as SolutionsDropdown).featured.href}
-                              className="font-black text-sm mb-1 block hover:text-[#93C5FD]" style={{ color: '#fff' }}>
+                              className="font-black text-sm mb-1 block hover:text-[#5B5FF0]" style={{ color: '#12131F' }}>
                               {(item.dropdown as SolutionsDropdown).featured.title}
                             </Link>
-                            <div className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                            <div className="text-xs leading-relaxed" style={{ color: '#5C5F7A' }}>
                               {(item.dropdown as SolutionsDropdown).featured.desc}
                             </div>
                           </div>
@@ -189,8 +188,8 @@ export default function Header() {
                             {(item.dropdown as SolutionsDropdown).links.map((link) => (
                               <li key={link.label}>
                                 <Link href={link.href}
-                                  className="block px-3 py-2 text-sm rounded-lg transition-colors hover:text-[#93C5FD] hover:bg-white/5"
-                                  style={{ color: 'rgba(255,255,255,0.7)' }}>
+                                  className="block px-3 py-2 text-sm rounded-lg transition-colors hover:text-[#5B5FF0] hover:bg-[#F0F1FE]"
+                                  style={{ color: '#3A3D55' }}>
                                   {link.label}
                                 </Link>
                               </li>
@@ -202,7 +201,7 @@ export default function Header() {
                           {(item.dropdown as ColsDropdown).cols.map((col) => (
                             <div key={col.title} className="min-w-[120px]">
                               {col.title && (
-                                <div className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                                <div className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: '#8A8DA8' }}>
                                   {col.title}
                                 </div>
                               )}
@@ -210,8 +209,8 @@ export default function Header() {
                                 {col.links.map((link) => (
                                   <li key={link.label}>
                                     <Link href={link.href}
-                                      className="block text-sm py-1.5 px-2 rounded-md hover:text-[#93C5FD] hover:bg-white/5 transition-colors"
-                                      style={{ color: 'rgba(255,255,255,0.65)' }}>
+                                      className="block text-sm py-1.5 px-2 rounded-md hover:text-[#5B5FF0] hover:bg-[#F0F1FE] transition-colors"
+                                      style={{ color: '#3A3D55' }}>
                                       {link.label}
                                     </Link>
                                   </li>
@@ -220,12 +219,12 @@ export default function Header() {
                             </div>
                           ))}
                           {(item.dropdown as ColsDropdown).featured && (
-                            <div className="pl-4 min-w-[180px]" style={{ borderLeft: '1px solid rgba(255,255,255,0.08)' }}>
+                            <div className="pl-4 min-w-[180px]" style={{ borderLeft: '1px solid rgba(18,19,31,0.08)' }}>
                               {(item.dropdown as ColsDropdown).featured!.map((f) => (
                                 <Link key={f.name} href={f.href}
-                                  className="block py-2 px-2 rounded-lg hover:bg-white/5 transition-colors group">
-                                  <div className="text-sm font-semibold group-hover:text-[#93C5FD] transition-colors" style={{ color: '#fff' }}>{f.name}</div>
-                                  <div className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>{f.desc}</div>
+                                  className="block py-2 px-2 rounded-lg hover:bg-[#F0F1FE] transition-colors group">
+                                  <div className="text-sm font-semibold group-hover:text-[#5B5FF0] transition-colors" style={{ color: '#12131F' }}>{f.name}</div>
+                                  <div className="text-xs mt-0.5" style={{ color: '#5C5F7A' }}>{f.desc}</div>
                                 </Link>
                               ))}
                             </div>
@@ -239,11 +238,10 @@ export default function Header() {
             </nav>
 
             <div className="hidden lg:flex items-center gap-3">
-              {/* Language switcher */}
               <div className="relative">
                 <button
-                  className="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg transition-colors hover:bg-white/5"
-                  style={{ color: 'rgba(255,255,255,0.65)', border: '1px solid rgba(255,255,255,0.1)' }}
+                  className="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg transition-colors hover:bg-[#F0F1FE]"
+                  style={{ color: '#5C5F7A', border: '1px solid rgba(18,19,31,0.1)' }}
                   onClick={() => setShowRegion(!showRegion)}
                 >
                   <Globe size={14} />
@@ -252,15 +250,15 @@ export default function Header() {
                 </button>
                 {showRegion && (
                   <div className="absolute right-0 top-full mt-1 rounded-xl py-1 min-w-[160px] z-50"
-                    style={{ background: 'rgba(14,14,44,0.97)', backdropFilter: 'blur(24px)', boxShadow: '0 8px 32px rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    style={{ background: '#fff', boxShadow: '0 12px 32px rgba(18,19,31,0.12)', border: '1px solid rgba(18,19,31,0.08)' }}>
                     {locales.map(l => (
                       <button key={l.code}
                         onClick={() => { setLocale(l.code as Locale); setShowRegion(false) }}
-                        className="w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm transition-colors hover:bg-white/5"
-                        style={{ color: locale === l.code ? '#93C5FD' : 'rgba(255,255,255,0.65)' }}>
+                        className="w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm transition-colors hover:bg-[#F0F1FE]"
+                        style={{ color: locale === l.code ? '#5B5FF0' : '#3A3D55' }}>
                         <span>{l.flag}</span>
                         <span>{l.label}</span>
-                        {locale === l.code && <span className="ml-auto text-xs" style={{ color: '#93C5FD' }}>✓</span>}
+                        {locale === l.code && <span className="ml-auto text-xs" style={{ color: '#5B5FF0' }}>✓</span>}
                       </button>
                     ))}
                   </div>
@@ -271,10 +269,10 @@ export default function Header() {
                 <div className="relative">
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors hover:bg-white/10"
-                    style={{ border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.85)' }}>
-                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
-                      style={{ background: 'linear-gradient(135deg, #1E40AF, #1D4ED8)' }}>
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors hover:bg-[#F0F1FE]"
+                    style={{ border: '1px solid rgba(18,19,31,0.12)', color: '#12131F' }}>
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                      style={{ background: 'linear-gradient(135deg, #5B5FF0, #484CE8)' }}>
                       {user.name.charAt(0).toUpperCase()}
                     </div>
                     <span className="text-sm font-medium max-w-[100px] truncate">{user.name}</span>
@@ -282,32 +280,32 @@ export default function Header() {
                   </button>
                   {showUserMenu && (
                     <div className="absolute right-0 top-full mt-2 rounded-xl py-1 min-w-[180px] z-50"
-                      style={{ background: 'rgba(14,14,44,0.97)', backdropFilter: 'blur(24px)', boxShadow: '0 8px 32px rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                      <div className="px-4 py-2.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-                        <div className="text-sm font-semibold text-white truncate">{user.name}</div>
-                        <div className="text-xs truncate" style={{ color: 'rgba(255,255,255,0.45)' }}>{user.email}</div>
+                      style={{ background: '#fff', boxShadow: '0 12px 32px rgba(18,19,31,0.12)', border: '1px solid rgba(18,19,31,0.08)' }}>
+                      <div className="px-4 py-2.5" style={{ borderBottom: '1px solid rgba(18,19,31,0.08)' }}>
+                        <div className="text-sm font-semibold truncate" style={{ color: '#12131F' }}>{user.name}</div>
+                        <div className="text-xs truncate" style={{ color: '#5C5F7A' }}>{user.email}</div>
                       </div>
                       <Link href="/profile" onClick={() => setShowUserMenu(false)}
-                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors hover:bg-white/5"
-                        style={{ color: 'rgba(255,255,255,0.7)' }}>
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors hover:bg-[#F0F1FE]"
+                        style={{ color: '#3A3D55' }}>
                         <User size={14} /> 個人資料
                       </Link>
                       <Link href="/settings" onClick={() => setShowUserMenu(false)}
-                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors hover:bg-white/5"
-                        style={{ color: 'rgba(255,255,255,0.7)' }}>
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors hover:bg-[#F0F1FE]"
+                        style={{ color: '#3A3D55' }}>
                         <Settings size={14} /> 帳號設定
                       </Link>
                       {user.isAdmin === 1 && (
                         <Link href="/admin" onClick={() => setShowUserMenu(false)}
-                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors hover:bg-white/5"
-                          style={{ color: '#FBBF24' }}>
+                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors hover:bg-[#F0F1FE]"
+                          style={{ color: '#B45309' }}>
                           <span style={{ fontSize: 14 }}>⚙️</span> 管理後台
                         </Link>
                       )}
-                      <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', marginTop: 4, paddingTop: 4 }}>
+                      <div style={{ borderTop: '1px solid rgba(18,19,31,0.08)', marginTop: 4, paddingTop: 4 }}>
                         <button onClick={() => { logout(); setShowUserMenu(false) }}
-                          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors hover:bg-white/5"
-                          style={{ color: '#F87171' }}>
+                          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors hover:bg-[#F0F1FE]"
+                          style={{ color: '#DC2626' }}>
                           <LogOut size={14} /> 登出
                         </button>
                       </div>
@@ -316,13 +314,12 @@ export default function Header() {
                 </div>
               ) : (
                 <>
-                  <a href="/login" className="text-sm font-medium px-2 py-1 transition-colors hover:text-white"
-                    style={{ color: 'rgba(255,255,255,0.65)' }}>
+                  <a href="/login" className="text-sm font-medium px-2 py-1 transition-colors hover:text-[#5B5FF0]"
+                    style={{ color: '#5C5F7A' }}>
                     {t.nav.login}
                   </a>
                   <a href="/trial-redirect"
-                    className="text-white text-sm font-bold px-6 py-2 rounded-full transition-all btn-glow"
-                    style={{ background: 'linear-gradient(135deg, #1E40AF 0%, #1D4ED8 100%)' }}>
+                    className="text-white text-sm font-bold px-6 py-2 rounded-full transition-all btn-glow btn-brand">
                     {t.nav.freeTrial}
                   </a>
                 </>
@@ -330,42 +327,40 @@ export default function Header() {
             </div>
 
             <button className="lg:hidden p-2" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Menu"
-              style={{ color: 'rgba(255,255,255,0.8)' }}>
+              style={{ color: '#3A3D55' }}>
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
 
         {isMenuOpen && (
-          <div className="lg:hidden px-6 py-4" style={{ borderTop: '1px solid rgba(255,255,255,0.07)', backgroundColor: 'rgba(8,8,26,0.97)' }}>
+          <div className="lg:hidden px-6 py-4" style={{ borderTop: '1px solid rgba(18,19,31,0.08)', backgroundColor: '#fff' }}>
             <nav className="flex flex-col space-y-3">
               {navItems.map((item) => (
                 <a key={item.label} href={item.href || '#'}
                   className="text-sm font-medium py-1 flex items-center justify-between"
-                  style={{ color: 'rgba(255,255,255,0.75)' }}>
+                  style={{ color: '#3A3D55' }}>
                   {item.label}
                   {item.dropdown && <ChevronDown size={14} />}
                 </a>
               ))}
-              {/* Mobile language switcher */}
               <div className="flex gap-2 pt-2">
                 {locales.map(l => (
                   <button key={l.code}
                     onClick={() => setLocale(l.code as Locale)}
                     className="flex-1 text-xs py-1.5 rounded-lg transition-colors"
                     style={{
-                      background: locale === l.code ? 'rgba(30,64,175,0.3)' : 'rgba(255,255,255,0.05)',
-                      border: `1px solid ${locale === l.code ? 'rgba(30,64,175,0.5)' : 'rgba(255,255,255,0.08)'}`,
-                      color: locale === l.code ? '#93C5FD' : 'rgba(255,255,255,0.55)',
+                      background: locale === l.code ? '#F0F1FE' : '#F6F7FB',
+                      border: `1px solid ${locale === l.code ? 'rgba(91,95,240,0.4)' : 'rgba(18,19,31,0.08)'}`,
+                      color: locale === l.code ? '#5B5FF0' : '#5C5F7A',
                     }}>
                     {l.flag} {l.label}
                   </button>
                 ))}
               </div>
-              <div className="pt-3 flex flex-col gap-3" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-                <a href="/login" className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.65)' }}>{t.nav.login}</a>
-                <a href="/trial-redirect" className="text-white text-sm font-semibold px-5 py-2.5 rounded-lg text-center"
-                  style={{ background: 'linear-gradient(135deg, #1E40AF 0%, #1D4ED8 100%)' }}>
+              <div className="pt-3 flex flex-col gap-3" style={{ borderTop: '1px solid rgba(18,19,31,0.08)' }}>
+                <a href="/login" className="text-sm font-medium" style={{ color: '#5C5F7A' }}>{t.nav.login}</a>
+                <a href="/trial-redirect" className="text-white text-sm font-semibold px-5 py-2.5 rounded-lg text-center btn-brand">
                   {t.nav.freeTrial}
                 </a>
               </div>

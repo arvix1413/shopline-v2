@@ -13,7 +13,7 @@ export default function GroupBuyingPage() {
             <p className="text-lg mb-8" style={{ color: '#687280' }}>
               業績放大術，團購經濟魅力無法擋。ARVIX 推出「團購解決方案」，你的開團得力助手。
             </p>
-            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#356DFF' }}>
+            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>
               立即免費試用
             </a>
           </div>
@@ -28,7 +28,7 @@ export default function GroupBuyingPage() {
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center gap-12">
           <div className="flex-1">
             <h2 className="text-3xl font-black mb-2" style={{ color: '#00142D' }}>ARVIX 推出「團購解決方案」<br />你的開團得力助手</h2>
-            <h2 className="text-xl font-black mb-4" style={{ color: '#356DFF' }}>獨立分潤賣場快速下單超方便</h2>
+            <h2 className="text-xl font-black mb-4" style={{ color: '#5B5FF0' }}>獨立分潤賣場快速下單超方便</h2>
             <p className="mb-6" style={{ color: '#687280' }}>為每位合作夥伴建立獨立分潤賣場，讓顧客快速下單，提升購買體驗。</p>
             <div className="grid grid-cols-2 gap-3">
               {[
@@ -95,7 +95,7 @@ export default function GroupBuyingPage() {
       <section className="py-20 text-center" style={{ backgroundColor: '#00142D' }}>
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">全球超過 600,000 商家已使用 ARVIX</h2>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             立即免費試用
           </a>
         </div>

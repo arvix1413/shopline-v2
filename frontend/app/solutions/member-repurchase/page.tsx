@@ -12,7 +12,7 @@ export default function MemberRepurchasePage() {
           <div className="flex-1">
             <h1 className="text-4xl md:text-5xl font-black mb-6 text-white">會員回購解決方案<br />4 步驟打造高回購閉環</h1>
             <p className="text-lg mb-8" style={{ color: 'rgba(255,255,255,0.75)' }}>在流量紅利消失的時代，ARVIX 提供 4 大核心策略，透過「會員分眾」、「行銷優惠」、「回購驅動」、「數據分析」為你打造高轉換的會員行銷閉環。</p>
-            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#356DFF' }}>立即免費試用</a>
+            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>立即免費試用</a>
           </div>
           <div className="flex-1">
             <img src="https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80" alt="ARVIX 會員回購解決方案" className="w-full rounded-2xl" />
@@ -35,7 +35,7 @@ export default function MemberRepurchasePage() {
               { stat: '+利潤', title: '多留住 5% 熟客，有助利潤提升' },
             ].map((item) => (
               <div key={item.stat} className="p-8 rounded-2xl text-center bg-white">
-                <div className="text-5xl font-black mb-4" style={{ color: '#356DFF' }}>{item.stat}</div>
+                <div className="text-5xl font-black mb-4" style={{ color: '#5B5FF0' }}>{item.stat}</div>
                 <h3 className="text-base font-bold" style={{ color: '#00142D' }}>{item.title}</h3>
               </div>
             ))}
@@ -49,7 +49,7 @@ export default function MemberRepurchasePage() {
             {steps.map((s, i) => (
               <div key={s.step} className={`flex flex-col ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} items-center gap-10`}>
                 <div className="flex-1">
-                  <div className="text-sm font-bold mb-2" style={{ color: '#356DFF' }}>{s.step}</div>
+                  <div className="text-sm font-bold mb-2" style={{ color: '#5B5FF0' }}>{s.step}</div>
                   <h3 className="text-xl font-bold" style={{ color: '#00142D' }}>{s.title}</h3>
                 </div>
                 <div className="flex-1">
@@ -70,7 +70,7 @@ export default function MemberRepurchasePage() {
               { title: '持續優化行銷投資報酬', desc: '數據驅動決策，精準投放資源，最大化每一分行銷預算的效益。' },
             ].map((item) => (
               <div key={item.title} className="p-8 bg-white rounded-2xl shadow-sm">
-                <h3 className="text-lg font-bold mb-3" style={{ color: '#356DFF' }}>{item.title}</h3>
+                <h3 className="text-lg font-bold mb-3" style={{ color: '#5B5FF0' }}>{item.title}</h3>
                 <p className="text-sm leading-relaxed" style={{ color: '#687280' }}>{item.desc}</p>
               </div>
             ))}
@@ -81,7 +81,7 @@ export default function MemberRepurchasePage() {
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">全球超過 600,000 商家已使用 ARVIX</h2>
           <p className="text-white/70 mb-8">立即加入，開始你的全通路零售之旅</p>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>立即免費試用</a>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>立即免費試用</a>
         </div>
       </section>
     </main>

@@ -13,7 +13,7 @@ export default function ShopBuilderPage() {
             <p className="text-lg mb-8" style={{ color: '#687280' }}>
               免寫程式，自由拖曳完成頁面編排，打造一流品牌網站不再是夢。
             </p>
-            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#356DFF' }}>
+            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>
               立即免費試用
             </a>
           </div>
@@ -32,7 +32,7 @@ export default function ShopBuilderPage() {
             <div className="space-y-4">
               {['免寫程式自由拖曳完成編排', '產業推薦版型多種設計版型任選', 'Layout Engine前端語言編輯權限'].map(h3 => (
                 <div key={h3} className="flex items-center gap-3">
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#356DFF' }}></span>
+                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#5B5FF0' }}></span>
                   <span className="font-semibold" style={{ color: '#00142D' }}>{h3}</span>
                 </div>
               ))}
@@ -53,7 +53,7 @@ export default function ShopBuilderPage() {
             <div className="space-y-4">
               {['SHOP Builder 促購元件 APP', '官網也能建立募資頁面'].map(h3 => (
                 <div key={h3} className="flex items-center gap-3">
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#356DFF' }}></span>
+                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#5B5FF0' }}></span>
                   <span className="font-semibold" style={{ color: '#00142D' }}>{h3}</span>
                 </div>
               ))}
@@ -74,7 +74,7 @@ export default function ShopBuilderPage() {
             <div className="space-y-4">
               {['有助提升頁面元素載入速度', '有助優化Google 網站評分', '絕佳 SEO帶來更多長尾效益'].map(h3 => (
                 <div key={h3} className="flex items-center gap-3">
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#356DFF' }}></span>
+                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#5B5FF0' }}></span>
                   <span className="font-semibold" style={{ color: '#00142D' }}>{h3}</span>
                 </div>
               ))}
@@ -90,7 +90,7 @@ export default function ShopBuilderPage() {
       <section className="py-20 text-center" style={{ backgroundColor: '#00142D' }}>
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">全球超過 600,000 商家已使用 ARVIX</h2>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             立即免費試用
           </a>
         </div>

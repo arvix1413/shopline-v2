@@ -22,7 +22,7 @@ export default function TrafficConversionPage() {
           <div className="flex-1">
             <h1 className="text-4xl md:text-5xl font-black mb-6 text-white">流量獲取與轉換解決方案</h1>
             <p className="text-lg mb-8" style={{ color: 'rgba(255,255,255,0.75)' }}>在消費者注意高度分散、廣告效益明顯下降的今日，ARVIX 提供全方位的流量獲取與轉換解決方案，從多流量池的佈局到跨平台的數據整合分析，全面賦能品牌在多變的數位環境中搶占先機！</p>
-            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#356DFF' }}>立即免費試用</a>
+            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>立即免費試用</a>
           </div>
           <div className="flex-1">
             <img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&q=80" alt="ARVIX 流量獲取與轉換解決方案" className="w-full rounded-2xl" />
@@ -53,7 +53,7 @@ export default function TrafficConversionPage() {
           <div className="flex flex-col md:flex-row gap-4 mb-8">
             {tabs.map((tab, i) => (
               <button key={i} onClick={() => setActiveTab(i)} className="flex-1 px-5 py-4 rounded-xl text-sm font-semibold text-left transition-all"
-                style={{ backgroundColor: activeTab === i ? '#356DFF' : '#fff', color: activeTab === i ? '#fff' : '#354253', boxShadow: activeTab === i ? '0 4px 16px rgba(53,109,255,0.3)' : '0 1px 4px rgba(0,0,0,0.08)' }}>
+                style={{ backgroundColor: activeTab === i ? '#5B5FF0' : '#fff', color: activeTab === i ? '#fff' : '#354253', boxShadow: activeTab === i ? '0 4px 16px rgba(91,95,240,0.3)' : '0 1px 4px rgba(0,0,0,0.08)' }}>
                 {tab.title}
               </button>
             ))}
@@ -83,7 +83,7 @@ export default function TrafficConversionPage() {
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">全球超過 600,000 商家已使用 ARVIX</h2>
           <p className="text-white/70 mb-8">立即加入，開始你的全通路零售之旅</p>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>立即免費試用</a>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>立即免費試用</a>
         </div>
       </section>
     </main>

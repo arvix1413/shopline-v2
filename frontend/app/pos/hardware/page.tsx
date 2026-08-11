@@ -45,7 +45,7 @@ export default function PosHardwarePage() {
           <div className="grid md:grid-cols-3 gap-6 mb-16">
             {steps.map((step) => (
               <div key={step.num} className="p-8 rounded-2xl text-center" style={{ backgroundColor: '#F4F7FC' }}>
-                <h3 className="text-lg font-black mb-4" style={{ color: '#356DFF' }}>{step.num}</h3>
+                <h3 className="text-lg font-black mb-4" style={{ color: '#5B5FF0' }}>{step.num}</h3>
                 <p className="text-sm leading-relaxed" style={{ color: '#354253' }}>{step.desc}</p>
               </div>
             ))}
@@ -71,7 +71,7 @@ export default function PosHardwarePage() {
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">專為零售業設計的 iPad POS 系統，讓你管理店面超 Easy！</h2>
           <p className="text-white opacity-70 mb-8">與 ARVIX 專業顧問進行一對一免費電話諮詢！</p>
-          <a href="/consultation" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/consultation" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             免費諮詢
           </a>
         </div>

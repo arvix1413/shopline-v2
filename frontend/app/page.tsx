@@ -10,20 +10,15 @@ import TrackPageView from './components/TrackPageView'
 
 export default function Home() {
   return (
-    <main className="min-h-screen" style={{ backgroundColor: '#08081A', color: '#fff' }}>
+    <main className="min-h-screen" style={{ backgroundColor: '#FFFFFF', color: '#12131F' }}>
       <TrackPageView event="visit_homepage" />
       <Header />
       <Hero />
-      {/* Dark block: Features + Solutions */}
-      <div style={{ backgroundColor: '#0E0E2C' }}>
-        <Features />
-        <Solutions />
-      </div>
+      <Features />
+      <Solutions />
       <Integration />
       <OneStop />
-      <div style={{ backgroundColor: '#08081A' }}>
-        <Growth />
-      </div>
+      <Growth />
       <Footer />
     </main>
   )

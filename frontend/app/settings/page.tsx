@@ -25,7 +25,7 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen px-4 py-16"
-      style={{ background: 'linear-gradient(160deg, #08081A 0%, #0E0E2C 100%)' }}>
+      style={{ background: 'linear-gradient(160deg, #07071A 0%, #0C0C28 100%)' }}>
       <div className="max-w-lg mx-auto">
         <Link href="/profile" className="inline-flex items-center gap-2 text-sm mb-8 transition-colors hover:text-white"
           style={{ color: 'rgba(255,255,255,0.5)' }}>
@@ -45,7 +45,7 @@ export default function SettingsPage() {
         <div className="rounded-2xl p-6 mb-4"
           style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
           <div className="flex items-center gap-2 mb-4">
-            <Lock size={16} style={{ color: '#60A5FA' }} />
+            <Lock size={16} style={{ color: '#9B9EF8' }} />
             <h2 className="text-sm font-bold text-white">變更密碼</h2>
           </div>
           <form onSubmit={handleSave} className="space-y-3">
@@ -60,7 +60,7 @@ export default function SettingsPage() {
               style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }} />
             <button type="submit"
               className="px-6 py-2.5 rounded-lg text-sm font-bold text-white transition-all hover:brightness-110"
-              style={{ background: 'linear-gradient(90deg, #1E40AF, #1D4ED8)' }}>
+              style={{ background: 'linear-gradient(90deg, #5B5FF0, #484CE8)' }}>
               更新密碼
             </button>
           </form>
@@ -70,7 +70,7 @@ export default function SettingsPage() {
         <div className="rounded-2xl p-6 mb-4"
           style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
           <div className="flex items-center gap-2 mb-4">
-            <Bell size={16} style={{ color: '#60A5FA' }} />
+            <Bell size={16} style={{ color: '#9B9EF8' }} />
             <h2 className="text-sm font-bold text-white">通知設定</h2>
           </div>
           <div className="space-y-3">
@@ -78,7 +78,7 @@ export default function SettingsPage() {
               <label key={label} className="flex items-center justify-between cursor-pointer">
                 <span className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>{label}</span>
                 <div className="w-10 h-5 rounded-full relative transition-colors"
-                  style={{ background: 'rgba(30,64,175,0.6)' }}>
+                  style={{ background: 'rgba(91,95,240,0.6)' }}>
                   <div className="absolute right-0.5 top-0.5 w-4 h-4 rounded-full bg-white" />
                 </div>
               </label>
@@ -90,7 +90,7 @@ export default function SettingsPage() {
         <div className="rounded-2xl p-6"
           style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
           <div className="flex items-center gap-2 mb-4">
-            <Shield size={16} style={{ color: '#60A5FA' }} />
+            <Shield size={16} style={{ color: '#9B9EF8' }} />
             <h2 className="text-sm font-bold text-white">安全性</h2>
           </div>
           <p className="text-sm mb-3" style={{ color: 'rgba(255,255,255,0.5)' }}>
@@ -98,7 +98,7 @@ export default function SettingsPage() {
           </p>
           <Link href="/forgot-password"
             className="text-sm transition-colors hover:text-white"
-            style={{ color: '#60A5FA' }}>
+            style={{ color: '#9B9EF8' }}>
             忘記密碼？點此重設 →
           </Link>
         </div>

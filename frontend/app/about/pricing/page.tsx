@@ -10,7 +10,7 @@ const plans = [
     features: ['網路商店', '無限商品上架', '基本版型主題', '訂單管理', '基本客服支援', 'SSL 安全憑證'],
     cta: '免費試用',
     popular: false,
-    color: '#356DFF',
+    color: '#5B5FF0',
   },
   {
     name: '電商戰略家',
@@ -20,7 +20,7 @@ const plans = [
     features: ['網店探索者全部功能', '社群購物', '分眾行銷 RFIM', 'Shoplytics 數據分析', '優先客服支援', '多語言商店'],
     cta: '免費試用',
     popular: true,
-    color: '#356DFF',
+    color: '#5B5FF0',
   },
   {
     name: 'OMO 大師',
@@ -30,7 +30,7 @@ const plans = [
     features: ['電商戰略家全部功能', 'POS 零售系統', 'Smart OMO', '全通路庫存管理', '專屬顧問服務', 'API 串接'],
     cta: '免費試用',
     popular: false,
-    color: '#356DFF',
+    color: '#5B5FF0',
   },
   {
     name: '全通路領航員',
@@ -54,7 +54,7 @@ export default function PricingPage() {
 
   return (
     <main>
-      <section className="py-24 text-center" style={{ background: 'linear-gradient(135deg, #F2F7FC 0%, #EBF1F8 100%)' }}>
+      <section className="py-24 text-center" style={{ background: 'linear-gradient(135deg, #F2F7FC 0%, #EEF0FF 100%)' }}>
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-4xl md:text-5xl font-black mb-6" style={{ color: '#00142D' }}>
             選擇最適合你的方案
@@ -62,12 +62,12 @@ export default function PricingPage() {
           <p className="text-lg mb-8" style={{ color: '#687280' }}>立即開始免費試用，無需信用卡，14 天免費體驗所有功能</p>
           <div className="inline-flex rounded-full p-1 mb-8" style={{ backgroundColor: '#E5EAF0' }}>
             <button onClick={() => setBilling('monthly')} className="px-6 py-2 rounded-full text-sm font-bold transition-all"
-              style={billing === 'monthly' ? { backgroundColor: '#356DFF', color: 'white' } : { color: '#687280' }}>
+              style={billing === 'monthly' ? { backgroundColor: '#5B5FF0', color: 'white' } : { color: '#687280' }}>
               月繳
             </button>
             <button onClick={() => setBilling('yearly')} className="px-6 py-2 rounded-full text-sm font-bold transition-all"
-              style={billing === 'yearly' ? { backgroundColor: '#356DFF', color: 'white' } : { color: '#687280' }}>
-              年繳 <span className="text-xs ml-1" style={{ color: billing === 'yearly' ? 'rgba(255,255,255,0.8)' : '#356DFF' }}>省 20%</span>
+              style={billing === 'yearly' ? { backgroundColor: '#5B5FF0', color: 'white' } : { color: '#687280' }}>
+              年繳 <span className="text-xs ml-1" style={{ color: billing === 'yearly' ? 'rgba(255,255,255,0.8)' : '#5B5FF0' }}>省 20%</span>
             </button>
           </div>
         </div>
@@ -79,7 +79,7 @@ export default function PricingPage() {
             {plans.map((plan) => (
               <div key={plan.name} className={`rounded-2xl overflow-hidden flex flex-col ${plan.popular ? 'shadow-2xl ring-2 ring-blue-500' : 'border border-gray-100'}`}>
                 {plan.popular && (
-                  <div className="py-2 text-center text-sm font-bold text-white" style={{ backgroundColor: '#356DFF' }}>
+                  <div className="py-2 text-center text-sm font-bold text-white" style={{ backgroundColor: '#5B5FF0' }}>
                     最受歡迎
                   </div>
                 )}
@@ -87,7 +87,7 @@ export default function PricingPage() {
                   <h3 className="text-xl font-black mb-2" style={{ color: '#00142D' }}>{plan.name}</h3>
                   <p className="text-sm mb-4" style={{ color: '#687280' }}>{plan.desc}</p>
                   <div className="mb-6">
-                    <span className="text-3xl font-black" style={{ color: '#356DFF' }}>{plan.price}</span>
+                    <span className="text-3xl font-black" style={{ color: '#5B5FF0' }}>{plan.price}</span>
                     <span className="text-sm" style={{ color: '#687280' }}>{plan.period}</span>
                   </div>
                   <ul className="space-y-3 mb-8 flex-1">
@@ -98,7 +98,7 @@ export default function PricingPage() {
                     ))}
                   </ul>
                   <a href="/trial-redirect" className="block text-center py-3 rounded-full font-bold transition-opacity hover:opacity-90"
-                    style={plan.popular ? { backgroundColor: '#356DFF', color: 'white' } : { border: '2px solid #356DFF', color: '#356DFF' }}>
+                    style={plan.popular ? { backgroundColor: '#5B5FF0', color: 'white' } : { border: '2px solid #5B5FF0', color: '#5B5FF0' }}>
                     {plan.cta}
                   </a>
                 </div>
@@ -126,7 +126,7 @@ export default function PricingPage() {
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">全球超過 600,000 商家已使用 ARVIX</h2>
           <p className="text-white opacity-70 mb-8">立即開始，14 天免費試用</p>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             立即免費試用
           </a>
         </div>

@@ -113,7 +113,7 @@ export default function PosFeaturesPage() {
                   onClick={() => setActive(i)}
                   className="text-left px-4 py-3 rounded-lg font-semibold text-sm transition-all"
                   style={{
-                    backgroundColor: active === i ? '#356DFF' : 'transparent',
+                    backgroundColor: active === i ? '#5B5FF0' : 'transparent',
                     color: active === i ? '#fff' : '#00142D',
                   }}
                 >
@@ -139,7 +139,7 @@ export default function PosFeaturesPage() {
       <section className="py-20 text-center" style={{ backgroundColor: '#00142D' }}>
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">全球超過 600,000 商家已使用 ARVIX</h2>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             立即免費試用
           </a>
         </div>

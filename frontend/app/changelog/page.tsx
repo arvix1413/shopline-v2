@@ -12,7 +12,7 @@ const updates = [
 export default function ChangelogPage() {
   return (
     <main>
-      <section className="py-24 text-center" style={{ background: 'linear-gradient(135deg, #F2F7FC 0%, #EBF1F8 100%)' }}>
+      <section className="py-24 text-center" style={{ background: 'linear-gradient(135deg, #F2F7FC 0%, #EEF0FF 100%)' }}>
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-4xl md:text-5xl font-black mb-6" style={{ color: '#00142D' }}>產品最新動態</h1>
           <p className="text-lg" style={{ color: '#687280' }}>
@@ -27,10 +27,10 @@ export default function ChangelogPage() {
           <div className="space-y-6">
             {updates.map((u) => (
               <div key={u.version} className={`p-8 rounded-2xl ${u.highlight ? 'text-white' : 'border border-gray-100'}`}
-                style={u.highlight ? { backgroundColor: '#356DFF' } : {}}>
+                style={u.highlight ? { backgroundColor: '#5B5FF0' } : {}}>
                 <div className="flex items-center gap-3 mb-3">
                   <span className="text-xs font-bold px-3 py-1 rounded-full"
-                    style={u.highlight ? { backgroundColor: 'rgba(255,255,255,0.2)', color: 'white' } : { backgroundColor: '#EBF1F8', color: '#356DFF' }}>
+                    style={u.highlight ? { backgroundColor: 'rgba(255,255,255,0.2)', color: 'white' } : { backgroundColor: '#EEF0FF', color: '#5B5FF0' }}>
                     {u.date}
                   </span>
                   <span className="text-xs font-semibold" style={{ color: u.highlight ? 'rgba(255,255,255,0.7)' : '#687280' }}>{u.version}</span>
@@ -47,7 +47,7 @@ export default function ChangelogPage() {
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">全球超過 600,000 商家已使用 ARVIX</h2>
           <p className="text-white opacity-70 mb-8">有疑問嗎？我們的團隊隨時為您解答</p>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             立即免費試用
           </a>
         </div>

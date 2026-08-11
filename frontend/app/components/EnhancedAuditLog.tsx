@@ -14,7 +14,7 @@ const EVENT_META: Record<string, { label: string; color: string; bg: string; ico
 }
 
 const SYSTEM_COLORS: Record<string, string> = {
-  'Shopline': '#1E40AF',
+  'ARVIX': '#5B5FF0',
   'TinyWearhouse': '#7C3AED',
   'DAF Shoes': '#DC2626',
   'MeierQ': '#D97706',
@@ -81,7 +81,7 @@ export default function EnhancedAuditLog({ token }: { token: string }) {
       const m: Record<string, number> = {}
       logs.forEach(l => {
         let p: any = {}; try { p = JSON.parse(l.properties || '{}') } catch {}
-        const s = p.system || 'Shopline'
+        const s = p.system || 'ARVIX'
         m[s] = (m[s] || 0) + 1
       })
       return Object.entries(m).sort((a, b) => b[1] - a[1])
@@ -270,7 +270,7 @@ function TableView({ logs, expandedRow, setExpandedRow, onUserClick }: any) {
             {logs.map((log: any, i: number) => {
               let props: any = {}; try { props = JSON.parse(log.properties || '{}') } catch {}
               const meta = EVENT_META[log.event] || { label: log.event, color: '#6B7280', bg: '#F9FAFB', icon: '📋' }
-              const system = props.system || 'Shopline'
+              const system = props.system || 'ARVIX'
               const isExpanded = expandedRow === i
               return (
                 <>
@@ -359,7 +359,7 @@ function TimelineView({ logs, onUserClick }: any) {
             {dayLogs.map((log: any) => {
               let props: any = {}; try { props = JSON.parse(log.properties || '{}') } catch {}
               const meta = EVENT_META[log.event] || { label: log.event, color: '#6B7280', bg: '#F9FAFB', icon: '📋' }
-              const system = props.system || 'Shopline'
+              const system = props.system || 'ARVIX'
               return (
                 <div key={log.id} className="relative flex gap-3">
                   <div className="absolute -left-4 w-4 h-4 rounded-full border-2 border-white flex items-center justify-center text-[10px]"

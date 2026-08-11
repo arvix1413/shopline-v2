@@ -19,7 +19,7 @@ export default function SelectedPartnersPage() {
 
   return (
     <main>
-      <section className="py-24 text-center" style={{ background: 'linear-gradient(135deg, #F2F7FC 0%, #EBF1F8 100%)' }}>
+      <section className="py-24 text-center" style={{ background: 'linear-gradient(135deg, #F2F7FC 0%, #EEF0FF 100%)' }}>
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-4xl md:text-5xl font-black mb-6" style={{ color: '#00142D' }}>
             ARVIX 夥伴提供您各式支援
@@ -27,7 +27,7 @@ export default function SelectedPartnersPage() {
           <p className="text-lg mb-8" style={{ color: '#687280' }}>
             精選合作夥伴生態圈，為你的品牌提供全方位的專業服務支援
           </p>
-          <a href="/cooperate" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#356DFF' }}>
+          <a href="/cooperate" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>
             成為合作夥伴
           </a>
         </div>
@@ -43,7 +43,7 @@ export default function SelectedPartnersPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {cat.partners.map((p) => (
                 <div key={p} className="p-4 bg-white rounded-xl border border-gray-100 text-center hover:shadow-md transition-shadow">
-                  <div className="w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center" style={{ backgroundColor: '#EBF1F8' }}>
+                  <div className="w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center" style={{ backgroundColor: '#EEF0FF' }}>
                     <span className="text-xl">🤝</span>
                   </div>
                   <p className="text-sm font-semibold" style={{ color: '#354253' }}>{p}</p>
@@ -57,7 +57,7 @@ export default function SelectedPartnersPage() {
       <section className="py-20 text-center" style={{ backgroundColor: '#00142D' }}>
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">全球超過 600,000 商家已使用 ARVIX</h2>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             立即免費試用
           </a>
         </div>

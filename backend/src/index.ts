@@ -4,6 +4,7 @@ import { drizzle } from 'drizzle-orm/d1'
 import { eq } from 'drizzle-orm'
 import * as schema from './schema'
 import { hashPassword, verifyPassword, signToken, verifyToken } from './auth'
+import { allocateUniqueSlug, ensureStoresTable } from './stores'
 
 type Bindings = {
   DB: D1Database
@@ -31,6 +32,8 @@ app.use('*', cors({
     'https://zenlet-v2.pages.dev',
     'https://meierq-frontend.pages.dev',
     'https://meierq-v2.pages.dev',
+    'https://arvixai.com',
+    'https://www.arvixai.com',
     'http://localhost:3000',
     'http://localhost:3001'
   ],
@@ -409,7 +412,7 @@ app.post('/api/init', async (c) => {
 // Auth 路由
 app.post('/api/auth/register', async (c) => {
   try {
-    const { email, password, name, phone, shopName, ref, utm_source, utm_medium, utm_campaign, utm_content, utm_term } = await c.req.json()
+    const { email, password, name, phone, shopName, slug: requestedSlug, ref, utm_source, utm_medium, utm_campaign, utm_content, utm_term } = await c.req.json()
     if (!email || !password) return c.json({ error: '請填寫 Email 和密碼' }, 400)
     if (password.length < 6) return c.json({ error: '密碼至少 6 個字元' }, 400)
 
@@ -418,9 +421,10 @@ app.post('/api/auth/register', async (c) => {
     if (existing) return c.json({ error: 'Email 已被註冊' }, 409)
 
     const passwordHash = await hashPassword(password)
+    const displayName = name || shopName || email.split('@')[0]
     const user = await db.insert(schema.users).values({
       email,
-      name: name || shopName || email.split('@')[0],
+      name: displayName,
       passwordHash,
       phone: phone || null,
     }).returning().get()
@@ -448,8 +452,21 @@ app.post('/api/auth/register', async (c) => {
       }
     }
 
+    // Provision brand store: public URL /{slug}
+    await ensureStoresTable(c.env.DB)
+    const preferred = requestedSlug || shopName || displayName
+    const slug = await allocateUniqueSlug(c.env.DB, preferred, email.split('@')[0] || `shop${user.id}`)
+    const storeName = (shopName || displayName || slug).trim()
+    await c.env.DB.prepare(
+      `INSERT INTO stores (user_id, slug, name, tagline, status) VALUES (?, ?, ?, ?, 'active')`
+    ).bind(user.id, slug, storeName, '用 ARVIX 架起來的品牌電商').run()
+
     const token = await signToken({ userId: user.id, email: user.email, isAdmin: user.isAdmin }, c.env.JWT_SECRET)
-    return c.json({ token, user: { id: user.id, email: user.email, name: user.name, isAdmin: user.isAdmin } }, 201)
+    return c.json({
+      token,
+      user: { id: user.id, email: user.email, name: user.name, isAdmin: user.isAdmin },
+      store: { slug, name: storeName, urlPath: `/${slug}` },
+    }, 201)
   } catch (error) {
     console.error('Register error:', error)
     return c.json({ error: '註冊失敗，請重試' }, 500)
@@ -1497,6 +1514,57 @@ app.post('/api/admin/clean-test-data', requireAdmin, async (c) => {
     await c.env.DB.prepare(`DELETE FROM events WHERE anonymous_id LIKE 'test_%'`).run().catch(()=>{})
     return c.json({ ok: true })
   } catch(e:any) { return c.json({error:String(e)},500) }
+})
+
+
+// ── Brand stores (public /{slug}) ─────────────────────────────────────────────
+app.get('/api/stores/check-slug', async (c) => {
+  try {
+    await ensureStoresTable(c.env.DB)
+    const { slugifyBrand, RESERVED_STORE_SLUGS } = await import('./stores')
+    const raw = c.req.query('slug') || ''
+    const slug = slugifyBrand(raw)
+    if (!slug) return c.json({ ok: false, reason: 'empty' })
+    if (RESERVED_STORE_SLUGS.has(slug)) return c.json({ ok: false, reason: 'reserved', slug })
+    const row = await c.env.DB.prepare(`SELECT id FROM stores WHERE slug = ?`).bind(slug).first()
+    if (row) return c.json({ ok: false, reason: 'taken', slug })
+    return c.json({ ok: true, slug })
+  } catch (e: any) {
+    return c.json({ error: String(e) }, 500)
+  }
+})
+
+app.get('/api/stores/me', async (c) => {
+  try {
+    const authHeader = c.req.header('Authorization')
+    if (!authHeader?.startsWith('Bearer ')) return c.json({ error: '未授權' }, 401)
+    const payload = await verifyToken(authHeader.slice(7), c.env.JWT_SECRET)
+    if (!payload) return c.json({ error: 'Token 無效或已過期' }, 401)
+    await ensureStoresTable(c.env.DB)
+    const store = await c.env.DB.prepare(
+      `SELECT id, user_id as userId, slug, name, tagline, status, created_at as createdAt FROM stores WHERE user_id = ? ORDER BY id ASC LIMIT 1`
+    ).bind(payload.userId).first()
+    if (!store) return c.json({ error: '尚未建立商店' }, 404)
+    return c.json({ ...store, urlPath: `/${(store as any).slug}` })
+  } catch (e: any) {
+    return c.json({ error: String(e) }, 500)
+  }
+})
+
+app.get('/api/stores/:slug', async (c) => {
+  try {
+    await ensureStoresTable(c.env.DB)
+    const slug = c.req.param('slug').toLowerCase()
+    const { RESERVED_STORE_SLUGS } = await import('./stores')
+    if (RESERVED_STORE_SLUGS.has(slug)) return c.json({ error: '商店不存在' }, 404)
+    const store = await c.env.DB.prepare(
+      `SELECT id, slug, name, tagline, status, created_at as createdAt FROM stores WHERE slug = ? AND status = 'active'`
+    ).bind(slug).first()
+    if (!store) return c.json({ error: '商店不存在' }, 404)
+    return c.json({ ...store, urlPath: `/${slug}` })
+  } catch (e: any) {
+    return c.json({ error: String(e) }, 500)
+  }
 })
 
 export default app

@@ -14,7 +14,7 @@ export default function TrialRedirectPage() {
   }, [user, isLoading, router])
 
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#08081A' }}>
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#07071A' }}>
       <div className="text-white/40 text-sm">載入中...</div>
     </div>
   )

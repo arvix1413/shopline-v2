@@ -33,17 +33,17 @@ const modules = [
 export default function PricingModulePage() {
   return (
     <main>
-      <section className="py-24 text-center" style={{ background: 'linear-gradient(135deg, #F2F7FC 0%, #EBF1F8 100%)' }}>
+      <section className="py-24 text-center" style={{ background: 'linear-gradient(135deg, #F2F7FC 0%, #EEF0FF 100%)' }}>
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-4xl md:text-5xl font-black mb-6" style={{ color: '#00142D' }}>功能模組費用</h1>
           <p className="text-lg mb-8" style={{ color: '#687280' }}>
             依需求彈性選購功能模組，搭配主方案打造最適合你的電商解決方案
           </p>
           <div className="flex gap-4 justify-center">
-            <a href="/about/pricing" className="inline-block font-bold px-8 py-3 rounded-full border-2 hover:opacity-80 transition-opacity" style={{ borderColor: '#356DFF', color: '#356DFF' }}>
+            <a href="/about/pricing" className="inline-block font-bold px-8 py-3 rounded-full border-2 hover:opacity-80 transition-opacity" style={{ borderColor: '#5B5FF0', color: '#5B5FF0' }}>
               查看主方案費用
             </a>
-            <a href="/trial-redirect" className="inline-block text-white font-bold px-8 py-3 rounded-full hover:opacity-90 transition-opacity" style={{ backgroundColor: '#356DFF' }}>
+            <a href="/trial-redirect" className="inline-block text-white font-bold px-8 py-3 rounded-full hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>
               免費試用
             </a>
           </div>
@@ -59,7 +59,7 @@ export default function PricingModulePage() {
                 <div key={item.name} className="p-6 bg-white rounded-2xl border border-gray-100 hover:shadow-lg transition-shadow">
                   <h3 className="text-lg font-bold mb-2" style={{ color: '#00142D' }}>{item.name}</h3>
                   <p className="text-sm mb-4" style={{ color: '#687280' }}>{item.desc}</p>
-                  <div className="text-xl font-black" style={{ color: '#356DFF' }}>{item.price}</div>
+                  <div className="text-xl font-black" style={{ color: '#5B5FF0' }}>{item.price}</div>
                 </div>
               ))}
             </div>
@@ -71,7 +71,7 @@ export default function PricingModulePage() {
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">More solutions for your business</h2>
           <p className="text-white opacity-70 mb-8">全球超過 600,000 商家已使用 ARVIX</p>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             立即免費試用
           </a>
         </div>

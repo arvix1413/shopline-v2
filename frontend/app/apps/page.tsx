@@ -45,7 +45,7 @@ export default function AppsPage() {
           </p>
           <a href="/trial-redirect"
             className="inline-block text-white font-bold px-8 py-3 rounded-full text-base hover:opacity-90 transition-opacity"
-            style={{ backgroundColor: '#356DFF' }}>
+            style={{ backgroundColor: '#5B5FF0' }}>
             {user ? '前往試用中心' : '免費試用 14 天'}
           </a>
         </div>
@@ -60,9 +60,9 @@ export default function AppsPage() {
                 <button key={tag} onClick={() => setActiveTag(tag)}
                   className="px-4 py-2 rounded-full text-sm font-medium transition-all"
                   style={{
-                    backgroundColor: activeTag === tag ? '#356DFF' : '#fff',
+                    backgroundColor: activeTag === tag ? '#5B5FF0' : '#fff',
                     color: activeTag === tag ? '#fff' : '#354253',
-                    border: `1px solid ${activeTag === tag ? '#356DFF' : '#E0E3E8'}`,
+                    border: `1px solid ${activeTag === tag ? '#5B5FF0' : '#E0E3E8'}`,
                   }}>
                   {tag}
                 </button>
@@ -123,7 +123,7 @@ export default function AppsPage() {
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">立即體驗完整功能</h2>
           <p className="text-white/70 mb-8">所有系統均為完整功能展示，免費試用無需信用卡</p>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             {user ? '前往試用中心' : '免費試用 14 天'}
           </a>
         </div>

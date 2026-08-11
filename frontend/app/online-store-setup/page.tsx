@@ -29,7 +29,7 @@ export default function OnlineStoreSetupPage() {
 
   return (
     <main>
-      <section className="py-24 text-center" style={{ background: 'linear-gradient(135deg, #F2F7FC 0%, #EBF1F8 100%)' }}>
+      <section className="py-24 text-center" style={{ background: 'linear-gradient(135deg, #F2F7FC 0%, #EEF0FF 100%)' }}>
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-4xl md:text-5xl font-black mb-6" style={{ color: '#00142D' }}>
             5 個步驟<br />輕鬆建立你的網路商店
@@ -45,7 +45,7 @@ export default function OnlineStoreSetupPage() {
           <div className="space-y-8">
             {steps.map((step) => (
               <div key={step.num} className="flex gap-6 p-8 rounded-2xl" style={{ backgroundColor: '#F4F7FC' }}>
-                <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-xl shrink-0" style={{ backgroundColor: '#356DFF' }}>
+                <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-xl shrink-0" style={{ backgroundColor: '#5B5FF0' }}>
                   {step.num}
                 </div>
                 <div>
@@ -53,7 +53,7 @@ export default function OnlineStoreSetupPage() {
                   <ul className="space-y-2">
                     {step.items.map((item) => (
                       <li key={item} className="flex items-center gap-2 text-sm" style={{ color: '#354253' }}>
-                        <span style={{ color: '#356DFF' }}>→</span> {item}
+                        <span style={{ color: '#5B5FF0' }}>→</span> {item}
                       </li>
                     ))}
                   </ul>
@@ -67,7 +67,7 @@ export default function OnlineStoreSetupPage() {
       <section className="py-20 text-center" style={{ backgroundColor: '#00142D' }}>
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">大功告成！ 立即開始你的網路生意</h2>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             立即免費試用
           </a>
         </div>

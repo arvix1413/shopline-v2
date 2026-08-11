@@ -25,7 +25,7 @@ export default function SeminarPage() {
           <p className="text-lg mb-10" style={{ color: '#687280' }}>
             全通路開店講座 — 專業顧問解析零售開店趨勢，一次掌握數位轉型所有秘訣
           </p>
-          <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>
             立即報名免費講座
           </a>
         </div>
@@ -53,7 +53,7 @@ export default function SeminarPage() {
           <div className="space-y-4">
             {topics.map((t, i) => (
               <div key={t.title} className="bg-white p-6 rounded-2xl flex gap-5 items-start" style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-                <span className="text-2xl font-black flex-shrink-0" style={{ color: '#356DFF' }}>0{i + 1}</span>
+                <span className="text-2xl font-black flex-shrink-0" style={{ color: '#5B5FF0' }}>0{i + 1}</span>
                 <div>
                   <h3 className="font-bold mb-1" style={{ color: '#00142D' }}>{t.title}</h3>
                   <p className="text-sm" style={{ color: '#687280' }}>{t.desc}</p>
@@ -89,7 +89,7 @@ export default function SeminarPage() {
       <section className="py-20 text-center" style={{ background: 'linear-gradient(270.52deg, rgb(0, 79, 209) 0%, rgb(37, 124, 255) 100%)' }}>
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">商家好評推薦<br />全球超過 60 萬品牌使用 ARVIX</h2>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             立即報名免費講座
           </a>
         </div>

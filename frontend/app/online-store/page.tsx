@@ -13,7 +13,7 @@ export default function OnlineStorePage() {
             <p className="text-lg mb-8" style={{ color: '#687280' }}>
               想開網路商店？開店一切所需都在 ARVIX，從商品上架、金物流串接到行銷推廣，一站就能輕鬆搞定。
             </p>
-            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#356DFF' }}>
+            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>
               立即免費試用
             </a>
           </div>
@@ -36,7 +36,7 @@ export default function OnlineStorePage() {
                 { title: 'ARVIX Payments', desc: '內建金流服務，支援信用卡、電子支付等多元收款方式，安全便利。' },
               ].map(item => (
                 <div key={item.title} className="flex items-start gap-3">
-                  <span className="w-2 h-2 rounded-full flex-shrink-0 mt-2" style={{ backgroundColor: '#356DFF' }}></span>
+                  <span className="w-2 h-2 rounded-full flex-shrink-0 mt-2" style={{ backgroundColor: '#5B5FF0' }}></span>
                   <div>
                     <span className="font-semibold block" style={{ color: '#00142D' }}>{item.title}</span>
                     <span className="text-sm" style={{ color: '#687280' }}>{item.desc}</span>
@@ -64,7 +64,7 @@ export default function OnlineStorePage() {
                 { step: 'STEP 3', title: '發布上線', desc: '一鍵發布，立即開始接單，輕鬆衝刺業績。' },
               ].map(item => (
                 <div key={item.step} className="flex items-start gap-4">
-                  <span className="text-sm font-black px-3 py-1 rounded-full flex-shrink-0" style={{ backgroundColor: '#356DFF', color: '#fff' }}>{item.step}</span>
+                  <span className="text-sm font-black px-3 py-1 rounded-full flex-shrink-0" style={{ backgroundColor: '#5B5FF0', color: '#fff' }}>{item.step}</span>
                   <div>
                     <span className="font-semibold block" style={{ color: '#00142D' }}>{item.title}</span>
                     <span className="text-sm" style={{ color: '#687280' }}>{item.desc}</span>
@@ -88,7 +88,7 @@ export default function OnlineStorePage() {
             <div className="space-y-3">
               {['色塊化區分訂單類別', '未完成購物車結帳提醒', '拆單功能', '彈性匯出訂單報表'].map(h3 => (
                 <div key={h3} className="flex items-center gap-3">
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#356DFF' }}></span>
+                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#5B5FF0' }}></span>
                   <span className="font-semibold" style={{ color: '#00142D' }}>{h3}</span>
                 </div>
               ))}
@@ -105,7 +105,7 @@ export default function OnlineStorePage() {
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">ARVIX 為你的網路開店做好一切準備！</h2>
           <p className="text-white mb-8 opacity-80">全球超過 600,000 商家已使用 ARVIX</p>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             立即免費試用
           </a>
         </div>

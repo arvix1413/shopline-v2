@@ -16,7 +16,7 @@ export default function OmoPage() {
           <div className="flex-1">
             <h1 className="text-4xl md:text-5xl font-black mb-6 text-white">OMO 全通路整合解決方案</h1>
             <p className="text-lg mb-8" style={{ color: 'rgba(255,255,255,0.75)' }}>ARVIX 提供一站式的 OMO 全通路整合方案，讓實體店及網店無縫接軌，全面整合「通路x系統x數據」拓展新商機。實現線上線下零斷點體驗，精準打造個人化消費旅程。</p>
-            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#356DFF' }}>立即免費試用</a>
+            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>立即免費試用</a>
           </div>
           <div className="flex-1">
             <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80" alt="ARVIX OMO 全通路整合解決方案" className="w-full rounded-2xl" />
@@ -44,7 +44,7 @@ export default function OmoPage() {
             {steps1.map((s, i) => (
               <div key={s.step} className={`flex flex-col ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} items-center gap-10`}>
                 <div className="flex-1">
-                  <div className="text-sm font-bold mb-2" style={{ color: '#356DFF' }}>{s.step}</div>
+                  <div className="text-sm font-bold mb-2" style={{ color: '#5B5FF0' }}>{s.step}</div>
                   <h4 className="text-xl font-bold" style={{ color: '#00142D' }}>{s.title}</h4>
                 </div>
                 <div className="flex-1">
@@ -62,7 +62,7 @@ export default function OmoPage() {
             {steps2.map((s, i) => (
               <div key={s.step} className={`flex flex-col ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} items-center gap-10`}>
                 <div className="flex-1">
-                  <div className="text-sm font-bold mb-2" style={{ color: '#356DFF' }}>{s.step}</div>
+                  <div className="text-sm font-bold mb-2" style={{ color: '#5B5FF0' }}>{s.step}</div>
                   <h4 className="text-xl font-bold" style={{ color: '#00142D' }}>{s.title}</h4>
                 </div>
                 <div className="flex-1">
@@ -77,7 +77,7 @@ export default function OmoPage() {
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">全球超過 600,000 商家已使用 ARVIX</h2>
           <p className="text-white/70 mb-8">立即加入，開始你的全通路零售之旅</p>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>立即免費試用</a>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>立即免費試用</a>
         </div>
       </section>
     </main>

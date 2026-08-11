@@ -11,7 +11,7 @@ export default function DataAnalysisPage() {
           <div className="flex-1">
             <h1 className="text-4xl md:text-5xl font-black mb-6 text-white">數據賦能解決方案</h1>
             <p className="text-lg mb-8" style={{ color: 'rgba(255,255,255,0.75)' }}>擺脫數據迷霧，擁抱精準洞察！ARVIX 整合第一方數據，精煉「人」、「貨」、「場」三大核心指標數據，搭配顧問服務與產業趨勢報告，讓數據驅動決策、有效提升業績！</p>
-            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#356DFF' }}>立即免費試用</a>
+            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>立即免費試用</a>
           </div>
           <div className="flex-1">
             <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80" alt="ARVIX 數據賦能解決方案" className="w-full rounded-2xl" />
@@ -44,11 +44,11 @@ export default function DataAnalysisPage() {
             {items.map((item, i) => (
               <div key={item.key} className={`flex flex-col ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} items-center gap-10`}>
                 <div className="flex-1">
-                  <div className="text-4xl font-black mb-3" style={{ color: '#356DFF' }}>「{item.key}」</div>
+                  <div className="text-4xl font-black mb-3" style={{ color: '#5B5FF0' }}>「{item.key}」</div>
                   <h3 className="text-2xl font-bold mb-4" style={{ color: '#00142D' }}>{item.title}</h3>
                   <div className="flex flex-wrap gap-2">
                     {item.tags.map(tag => (
-                      <span key={tag} className="text-xs px-3 py-1 rounded-full font-medium" style={{ backgroundColor: '#EBF1F8', color: '#356DFF' }}>{tag}</span>
+                      <span key={tag} className="text-xs px-3 py-1 rounded-full font-medium" style={{ backgroundColor: '#EEF0FF', color: '#5B5FF0' }}>{tag}</span>
                     ))}
                   </div>
                 </div>
@@ -75,7 +75,7 @@ export default function DataAnalysisPage() {
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">全球超過 600,000 商家已使用 ARVIX</h2>
           <p className="text-white/70 mb-8">立即加入，開始你的全通路零售之旅</p>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>立即免費試用</a>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>立即免費試用</a>
         </div>
       </section>
     </main>

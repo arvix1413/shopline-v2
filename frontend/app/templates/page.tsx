@@ -54,7 +54,7 @@ export default function TemplatesPage() {
           <p className="text-lg mb-8" style={{ color: '#687280' }}>
             多樣化的設計樣式供你隨時套用，為你的品牌打造最合適的風格店面
           </p>
-          <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>
             免費試用版型
           </a>
         </div>
@@ -81,7 +81,7 @@ export default function TemplatesPage() {
                     <div className="absolute inset-0 flex items-center justify-center gap-2" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}>
                       <a href={previewUrl} target="_blank" rel="noopener noreferrer"
                         className="text-white font-bold px-4 py-2 rounded-full text-sm hover:opacity-90"
-                        style={{ backgroundColor: '#356DFF' }}>
+                        style={{ backgroundColor: '#5B5FF0' }}>
                         預覽版型
                       </a>
                       <a href="/trial-redirect"
@@ -97,7 +97,7 @@ export default function TemplatesPage() {
                   {t.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1">
                       {t.tags.map(tag => (
-                        <span key={tag} className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#EBF1F8', color: '#356DFF' }}>{tag}</span>
+                        <span key={tag} className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#EEF0FF', color: '#5B5FF0' }}>{tag}</span>
                       ))}
                     </div>
                   )}
@@ -113,7 +113,7 @@ export default function TemplatesPage() {
       <section className="py-20 text-center" style={{ background: 'linear-gradient(270.52deg, rgb(0, 79, 209) 0%, rgb(37, 124, 255) 100%)' }}>
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-8">全球超過 600,000 商家已使用 ARVIX</h2>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             免費試用 14 天
           </a>
         </div>

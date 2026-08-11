@@ -74,7 +74,7 @@ export default function SolutionsPage() {
           <div className="flex-1">
             <h1 className="text-4xl md:text-5xl font-black mb-6 text-white">全方位零售解決方案<br />OMO 虛實整合再進化</h1>
             <p className="text-lg mb-8" style={{ color: 'rgba(255,255,255,0.75)' }}>ARVIX 提供全方位零售解決方案，橫跨電商與實體通路，打造無縫購物體驗，從新創到國際級品牌都能輕鬆擴展市場版圖！</p>
-            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#356DFF' }}>立即免費試用</a>
+            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>立即免費試用</a>
           </div>
           <div className="flex-1">
             <img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80" alt="ARVIX 全方位零售解決方案" className="w-full rounded-2xl" />
@@ -128,13 +128,13 @@ export default function SolutionsPage() {
             {solutions.map((s, i) => (
               <div key={s.href} className={`flex flex-col ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} items-start gap-10 bg-white rounded-2xl p-8 shadow-sm`}>
                 <div className="flex-1">
-                  <div className="text-sm font-bold mb-1" style={{ color: '#356DFF' }}>{s.subtitle}</div>
+                  <div className="text-sm font-bold mb-1" style={{ color: '#5B5FF0' }}>{s.subtitle}</div>
                   <h3 className="text-2xl font-black mb-3" style={{ color: '#00142D' }}>{s.title}</h3>
                   <p className="text-sm leading-relaxed mb-6" style={{ color: '#687280' }}>{s.desc}</p>
                   <div className="space-y-4 mb-6">
                     {s.items.map(item => (
                       <div key={item.title} className="flex gap-3">
-                        <span className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: '#356DFF' }}>✓</span>
+                        <span className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: '#5B5FF0' }}>✓</span>
                         <div>
                           <h3 className="text-sm font-bold mb-0.5" style={{ color: '#00142D' }}>{item.title}</h3>
                           <p className="text-xs leading-relaxed" style={{ color: '#687280' }}>{item.desc}</p>
@@ -142,7 +142,7 @@ export default function SolutionsPage() {
                       </div>
                     ))}
                   </div>
-                  <Link href={s.href} className="inline-block text-sm font-semibold px-6 py-2 rounded-full border-2 hover:bg-[#356DFF] hover:text-white transition-colors" style={{ borderColor: '#356DFF', color: '#356DFF' }}>了解更多</Link>
+                  <Link href={s.href} className="inline-block text-sm font-semibold px-6 py-2 rounded-full border-2 hover:bg-[#5B5FF0] hover:text-white transition-colors" style={{ borderColor: '#5B5FF0', color: '#5B5FF0' }}>了解更多</Link>
                 </div>
                 <div className="flex-1">
                   <img src={s.img} alt={"ARVIX " + s.title} className="w-full rounded-xl" />
@@ -157,7 +157,7 @@ export default function SolutionsPage() {
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">全球超過 600,000 商家已使用 ARVIX</h2>
           <p className="text-white/70 mb-8">立即加入，開始你的全通路零售之旅</p>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>立即免費試用</a>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>立即免費試用</a>
         </div>
       </section>
 
@@ -165,7 +165,7 @@ export default function SolutionsPage() {
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-2xl font-black mb-4" style={{ color: '#00142D' }}>有疑問嗎？</h2>
           <p className="mb-6" style={{ color: '#687280' }}>我們的專業顧問團隊隨時為你解答，協助你找到最適合的解決方案</p>
-          <a href="/trial-redirect" className="inline-block text-white font-bold px-8 py-3 rounded-full hover:opacity-90 transition-opacity" style={{ backgroundColor: '#356DFF' }}>預約免費諮詢</a>
+          <a href="/trial-redirect" className="inline-block text-white font-bold px-8 py-3 rounded-full hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>預約免費諮詢</a>
         </div>
       </section>
     </main>

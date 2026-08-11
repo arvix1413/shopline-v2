@@ -62,6 +62,11 @@ export default function AdminPage() {
   const [shopStats, setShopStats] = useState<any[]>([])
   const [statsLoading, setStatsLoading] = useState(false)
 
+  // SEO settings state
+  const [seoSettings, setSeoSettings] = useState<Record<string, string>>({})
+  const [seoLoading, setSeoLoading] = useState(false)
+  const [seoSaving, setSeoSaving] = useState(false)
+
   // Users state
   const [users, setUsers] = useState<UserRow[]>([])
   const [usersLoading, setUsersLoading] = useState(false)
@@ -137,6 +142,29 @@ export default function AdminPage() {
     } catch { showMsg('error', '獲取店鋪數據失敗') } finally { setStatsLoading(false) }
   }, [])
 
+  const fetchSEO = useCallback(async () => {
+    setSeoLoading(true)
+    try {
+      const res = await fetch(`${API}/api/site-settings`)
+      if (!res.ok) throw new Error()
+      setSeoSettings(await res.json())
+    } catch { showMsg('error', '獲取 SEO 設定失敗') } finally { setSeoLoading(false) }
+  }, [])
+
+  const saveSEO = async (updates: Record<string, string>) => {
+    setSeoSaving(true)
+    try {
+      const res = await fetch(`${API}/api/site-settings`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(updates),
+      })
+      if (!res.ok) throw new Error()
+      setSeoSettings(prev => ({ ...prev, ...updates }))
+      showMsg('success', 'SEO 設定已儲存')
+    } catch { showMsg('error', '儲存 SEO 設定失敗') } finally { setSeoSaving(false) }
+  }
+
   useEffect(() => {
     if (!user || !user.isAdmin) return
     if (tab === '用戶管理') fetchUsers()
@@ -145,8 +173,9 @@ export default function AdminPage() {
     if (tab === '增強審計日誌') {}
     if (tab === '流量分析') fetchTraffic()
     if (tab === '聯盟行銷') fetchAffiliates()
+    if (tab === 'SEO 內容') fetchSEO()
     if (tab === '店鋪報表') fetchShopStats()
-  }, [tab, user, fetchUsers, fetchSystems, fetchFunnel, fetchTraffic, fetchAffiliates, fetchShopStats])
+  }, [tab, user, fetchUsers, fetchSystems, fetchFunnel, fetchTraffic, fetchAffiliates, fetchShopStats, fetchSEO])
 
   if (isLoading) return <main className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></main>
   if (!user || !user.isAdmin) {
@@ -579,7 +608,7 @@ export default function AdminPage() {
                           </span>
                         </td>
                         <td className="px-4 py-3 text-xs text-gray-500 max-w-[200px] truncate">
-                          <a href={`https://shopline-frontend.pages.dev/register?ref=${a.code}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                          <a href={`/register?ref=${a.code}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
                             ?ref={a.code}
                           </a>
                         </td>

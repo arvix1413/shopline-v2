@@ -39,7 +39,7 @@ export default function ComplianceCenterPage() {
 
   return (
     <main>
-      <section className="py-24 text-center" style={{ background: 'linear-gradient(135deg, #F2F7FC 0%, #EBF1F8 100%)' }}>
+      <section className="py-24 text-center" style={{ background: 'linear-gradient(135deg, #F2F7FC 0%, #EEF0FF 100%)' }}>
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-4xl md:text-5xl font-black mb-6" style={{ color: '#00142D' }}>資格與認證</h1>
           <p className="text-lg" style={{ color: '#687280' }}>
@@ -57,7 +57,7 @@ export default function ComplianceCenterPage() {
           <div className="grid md:grid-cols-2 gap-8">
             {sections.map((s) => (
               <div key={s.title} className="p-8 rounded-2xl border border-gray-100">
-                <h3 className="text-xl font-bold mb-6" style={{ color: '#356DFF' }}>{s.title}</h3>
+                <h3 className="text-xl font-bold mb-6" style={{ color: '#5B5FF0' }}>{s.title}</h3>
                 <ul className="space-y-3">
                   {s.items.map((item) => (
                     <li key={item} className="flex items-start gap-3 text-sm" style={{ color: '#354253' }}>
@@ -78,7 +78,7 @@ export default function ComplianceCenterPage() {
           <div className="grid md:grid-cols-3 gap-8">
             {certifications.map((c) => (
               <div key={c.title} className="p-8 bg-white rounded-2xl text-center">
-                <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: '#EBF1F8' }}>
+                <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: '#EEF0FF' }}>
                   <span className="text-2xl">🏆</span>
                 </div>
                 <h3 className="text-lg font-bold mb-3" style={{ color: '#00142D' }}>{c.title}</h3>
@@ -111,7 +111,7 @@ export default function ComplianceCenterPage() {
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">全球超過 600,000 商家已使用 ARVIX</h2>
           <p className="text-white opacity-70 mb-8">有疑問嗎？我們的安全團隊隨時為您解答</p>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             立即免費試用
           </a>
         </div>

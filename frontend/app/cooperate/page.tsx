@@ -31,7 +31,7 @@ export default function CooperatePage() {
 
   return (
     <main>
-      <section className="py-24 text-center" style={{ background: 'linear-gradient(135deg, #F2F7FC 0%, #EBF1F8 100%)' }}>
+      <section className="py-24 text-center" style={{ background: 'linear-gradient(135deg, #F2F7FC 0%, #EEF0FF 100%)' }}>
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-4xl md:text-5xl font-black mb-6" style={{ color: '#00142D' }}>
             加入 ARVIX 開放生態圈，成為我們的合作夥伴！
@@ -39,7 +39,7 @@ export default function CooperatePage() {
           <p className="text-lg mb-8" style={{ color: '#687280' }}>
             與全球超過 600,000 商家的電商平台合作，共同打造零售新未來
           </p>
-          <a href="#contact" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#356DFF' }}>
+          <a href="#contact" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>
             立即申請合作
           </a>
         </div>
@@ -66,7 +66,7 @@ export default function CooperatePage() {
           <div className="grid md:grid-cols-2 gap-8">
             {advantages.map((a) => (
               <div key={a.title} className="p-8 bg-white rounded-2xl">
-                <h3 className="text-xl font-bold mb-3" style={{ color: '#356DFF' }}>{a.title}</h3>
+                <h3 className="text-xl font-bold mb-3" style={{ color: '#5B5FF0' }}>{a.title}</h3>
                 <p className="text-sm leading-relaxed" style={{ color: '#687280' }}>{a.desc}</p>
               </div>
             ))}
@@ -78,7 +78,7 @@ export default function CooperatePage() {
         <div className="max-w-2xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-black mb-4" style={{ color: '#00142D' }}>想跟我們合作嗎？</h2>
           <p className="mb-8" style={{ color: '#687280' }}>請填寫以下表單，我們將盡快與您聯繫，謝謝！</p>
-          <a href="mailto:partner@arvix.com" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#356DFF' }}>
+          <a href="mailto:partner@arvix.com" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>
             聯繫合作團隊
           </a>
         </div>
@@ -87,7 +87,7 @@ export default function CooperatePage() {
       <section className="py-20 text-center" style={{ backgroundColor: '#00142D' }}>
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-3xl font-black text-white mb-4">全球超過 600,000 商家已使用 ARVIX</h2>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#356DFF' }}>
+          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             立即免費試用
           </a>
         </div>
