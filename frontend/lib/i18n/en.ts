@@ -80,7 +80,7 @@ const en: Translations = {
   hero: {
     badge: 'Built for founders ready to launch',
     title: 'Build your site. Start selling today.',
-    subtitle: 'No code required. Drag a theme, connect payments, list products — one person can launch a brand store that feels pro from day one.',
+    subtitle: 'No code required. Drag a theme, connect payments, list products —\none person can launch a brand store that feels pro from day one.',
     cta: 'Start free store',
     ctaSecondary: 'See how setup works',
   },

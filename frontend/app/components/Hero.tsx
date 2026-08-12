@@ -59,8 +59,8 @@ export default function Hero() {
         </h1>
 
         <p
-          className="rise-in rise-in-delay-2 text-base md:text-lg leading-relaxed mb-10 mx-auto"
-          style={{ maxWidth: 560, color: '#5C5F7A' }}
+          className="rise-in rise-in-delay-2 text-base md:text-lg leading-relaxed mb-10 mx-auto whitespace-pre-line text-pretty"
+          style={{ maxWidth: 640, color: '#5C5F7A' }}
         >
           {t.hero.subtitle}
         </p>

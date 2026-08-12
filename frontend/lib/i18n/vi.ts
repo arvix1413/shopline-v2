@@ -80,7 +80,7 @@ const vi: Translations = {
   hero: {
     badge: 'SaaS mở shop chuẩn toàn cầu',
     title: 'Tự dựng website, bán ngay hôm nay',
-    subtitle: 'Không cần lập trình. Kéo thả giao diện, kết nối thanh toán & logistics, đăng sản phẩm — một mình cũng xây được thương hiệu TMĐT chuyên nghiệp.',
+    subtitle: 'Không cần lập trình. Kéo thả giao diện, kết nối thanh toán & logistics, đăng sản phẩm —\nmột mình cũng xây được thương hiệu TMĐT chuyên nghiệp.',
     cta: 'Bắt đầu mở shop miễn phí',
     ctaSecondary: 'Xem cách thiết lập',
   },

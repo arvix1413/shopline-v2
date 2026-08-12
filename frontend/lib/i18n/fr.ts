@@ -80,7 +80,7 @@ const fr: Translations = {
   hero: {
     badge: 'SaaS boutique de niveau mondial',
     title: 'Créez votre site et vendez dès aujourd’hui',
-    subtitle: 'Sans code. Glissez un thème, connectez paiements et logistique, publiez des produits — une seule personne peut lancer un e-commerce de marque au rendu pro.',
+    subtitle: 'Sans code. Glissez un thème, connectez paiements et logistique, publiez des produits —\nune seule personne peut lancer un e-commerce de marque au rendu pro.',
     cta: 'Démarrer une boutique gratuite',
     ctaSecondary: 'Voir comment configurer',
   },

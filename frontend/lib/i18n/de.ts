@@ -80,7 +80,7 @@ const de: Translations = {
   hero: {
     badge: 'Shop-SaaS auf globalem Niveau',
     title: 'Shop bauen. Heute schon verkaufen.',
-    subtitle: 'Kein Code nötig. Theme per Drag-and-Drop, Zahlungen und Logistik anbinden, Produkte listen — allein starten Sie einen Marken-Shop, der von Tag eins professionell wirkt.',
+    subtitle: 'Kein Code nötig. Theme per Drag-and-Drop, Zahlungen und Logistik anbinden, Produkte listen —\nallein starten Sie einen Marken-Shop, der von Tag eins professionell wirkt.',
     cta: 'Kostenlosen Shop starten',
     ctaSecondary: 'So funktioniert das Setup',
   },

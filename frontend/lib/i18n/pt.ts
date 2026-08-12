@@ -80,7 +80,7 @@ const pt: Translations = {
   hero: {
     badge: 'SaaS de lojas no padrão global',
     title: 'Monte seu site e comece a vender hoje',
-    subtitle: 'Sem código. Arraste um tema, conecte pagamentos e logística, cadastre produtos — uma pessoa só já lança um ecommerce de marca com cara profissional.',
+    subtitle: 'Sem código. Arraste um tema, conecte pagamentos e logística, cadastre produtos —\numa pessoa só já lança um ecommerce de marca com cara profissional.',
     cta: 'Começar loja grátis',
     ctaSecondary: 'Ver como configurar',
   },
