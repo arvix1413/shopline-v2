@@ -161,12 +161,11 @@ export default function Header() {
   return (
     <>
       {showBanner && (
-        <div className="text-white text-xs sm:text-sm py-2 overflow-hidden relative flex items-center"
+        <div className="text-white text-xs sm:text-sm py-2 overflow-hidden relative flex items-center justify-center"
           style={{ background: 'linear-gradient(90deg, #484CE8 0%, #5B5FF0 55%, #6B6FF5 100%)' }}>
-          <div className="flex whitespace-nowrap animate-marquee">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <span key={i} className="mx-8 sm:mx-12">{t.banner}</span>
-            ))}
+          <div className="flex items-center justify-center gap-2 px-12 font-medium tracking-wide">
+            <span className="w-1.5 h-1.5 rounded-full bg-white/80" aria-hidden="true" />
+            <span>{t.banner}</span>
           </div>
           <button onClick={() => setShowBanner(false)}
             className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white z-10 pl-2"
@@ -180,24 +179,24 @@ export default function Header() {
       <header className="sticky top-0 z-50"
         style={{ backgroundColor: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(18,19,31,0.08)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-[72px]">
             <Link href="/" className="flex-shrink-0">
-              <span className="font-brand text-2xl font-extrabold tracking-tight brand-text">ARVIX</span>
+              <span className="font-brand text-[26px] font-extrabold tracking-tight brand-text">ARVIX</span>
             </Link>
 
-            <nav className="hidden lg:flex items-center space-x-1">
+            <nav className="hidden lg:flex items-center space-x-0.5 xl:space-x-1">
               {navItems.map((item, i) => (
                 <div key={item.label} className="relative"
                   onMouseEnter={() => item.dropdown ? handleMouseEnter(i) : undefined}
                   onMouseLeave={item.dropdown ? handleMouseLeave : undefined}>
                   {item.href ? (
                     <Link href={item.href}
-                      className="flex items-center gap-0.5 px-3 py-2 text-sm font-medium transition-colors rounded-md hover:text-[#5B5FF0]"
+                      className="flex items-center gap-0.5 px-2.5 xl:px-3 py-2 text-sm font-medium transition-colors rounded-lg hover:text-[#5B5FF0] hover:bg-[#F6F7FB]"
                       style={{ color: '#3A3D55' }}>
                       {item.label}
                     </Link>
                   ) : (
-                    <button type="button" className="flex items-center gap-0.5 px-3 py-2 text-sm font-medium transition-colors rounded-md"
+                    <button type="button" className="flex items-center gap-0.5 px-2.5 xl:px-3 py-2 text-sm font-medium transition-colors rounded-lg hover:bg-[#F6F7FB]"
                       style={{ color: activeDropdown === i ? '#5B5FF0' : '#3A3D55' }}>
                       {item.label}
                       <ChevronDown size={14} className="transition-transform duration-200"

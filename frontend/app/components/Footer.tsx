@@ -36,7 +36,14 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14">
+        <div className="flex items-end justify-between gap-8 mb-12 pb-10 border-b border-white/10">
+          <div>
+            <div className="font-brand text-3xl font-extrabold tracking-tight mb-3">ARVIX</div>
+            <p className="text-sm max-w-md leading-relaxed" style={{ color: '#8F91A8' }}>Commerce, retail and business operations — connected in one platform.</p>
+          </div>
+          <a href="/trial-redirect" className="hidden md:inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold btn-brand transition-transform hover:-translate-y-0.5">{t.nav?.freeTrial ?? '免費開店'} <span>→</span></a>
+        </div>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-6 sm:gap-8 mb-12">
           {t.footer.cols.map((col, ci) => (
             <div key={ci}>

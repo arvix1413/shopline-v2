@@ -20,7 +20,7 @@ export default function Growth() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
             <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#5B5FF0' }}>{t.growth.eyebrow}</p>
-            <h2 className="font-black mb-4 text-3xl md:text-4xl" style={{ color: '#12131F' }}>{t.growth.title}</h2>
+            <h2 className="font-black mb-4 text-3xl md:text-[2.75rem] md:leading-tight tracking-tight" style={{ color: '#12131F' }}>{t.growth.title}</h2>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6 mb-6">
@@ -60,16 +60,23 @@ export default function Growth() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#5B5FF0' }}>{t.growth.testimonialsEyebrow}</p>
-            <h2 className="font-black text-3xl md:text-4xl" style={{ color: '#12131F' }}>{t.growth.testimonialsTitle}</h2>
+            <h2 className="font-black text-3xl md:text-[2.75rem] md:leading-tight tracking-tight" style={{ color: '#12131F' }}>{t.growth.testimonialsTitle}</h2>
           </div>
           <div className="max-w-3xl mx-auto">
-            <div className="rounded-2xl p-6 sm:p-10 mb-8 min-h-[160px]"
-              style={{ background: '#F0F1FE', border: '1px solid rgba(91,95,240,0.16)' }}>
-              <p className="text-base sm:text-lg leading-relaxed mb-6 italic" style={{ color: '#3A3D55' }}>
+            <div className="relative rounded-[28px] p-8 sm:p-12 mb-8 min-h-[200px] overflow-hidden"
+              style={{ background: 'linear-gradient(135deg, #F0F1FE 0%, #F8F8FF 100%)', border: '1px solid rgba(91,95,240,0.16)', boxShadow: '0 18px 50px rgba(91,95,240,0.08)' }}>
+              <div className="absolute -top-5 left-7 text-[110px] leading-none font-serif select-none" style={{ color: 'rgba(91,95,240,0.10)' }}>“</div>
+              <p className="relative text-base sm:text-xl leading-relaxed mb-8" style={{ color: '#3A3D55' }}>
                 "{t.growth.testimonials[activeTestimonial].quote}"
               </p>
-              <div className="font-bold text-sm" style={{ color: '#5B5FF0' }}>
-                {t.growth.testimonials[activeTestimonial].name} · {t.growth.testimonials[activeTestimonial].brand} {t.growth.testimonials[activeTestimonial].role}
+              <div className="relative flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-black" style={{ background: 'linear-gradient(135deg,#5B5FF0,#484CE8)' }}>
+                  {t.growth.testimonials[activeTestimonial].name.slice(0, 1)}
+                </div>
+                <div>
+                  <div className="font-bold text-sm" style={{ color: '#12131F' }}>{t.growth.testimonials[activeTestimonial].name}</div>
+                  <div className="text-xs mt-0.5" style={{ color: '#6B6B8A' }}>{t.growth.testimonials[activeTestimonial].brand} · {t.growth.testimonials[activeTestimonial].role}</div>
+                </div>
               </div>
             </div>
             <div className="flex justify-center gap-2">
