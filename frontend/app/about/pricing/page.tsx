@@ -1,5 +1,4 @@
 'use client'
-import { useState } from 'react'
 import { useI18n } from '../../../contexts/I18nContext'
 import { pickCopy } from '../../../lib/i18n/pageCopy'
 import type { Locale } from '../../../lib/i18n'
@@ -159,38 +158,30 @@ const copy: Partial<Record<Locale, PricingCopy>> & { 'zh-TW': PricingCopy; en: P
 export default function PricingPage() {
   const { locale } = useI18n()
   const c = pickCopy(locale, copy)
-  const [billing, setBilling] = useState<'monthly' | 'yearly'>('monthly')
 
   return (
     <main>
-      <section className="py-24 text-center" style={{ background: 'linear-gradient(135deg, #F2F7FC 0%, #EEF0FF 100%)' }}>
+      <section className="py-16 sm:py-24 text-center" style={{ background: 'linear-gradient(135deg, #F2F7FC 0%, #EEF0FF 100%)' }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <h1 className="text-4xl md:text-5xl font-black mb-6" style={{ color: '#00142D' }}>{c.title}</h1>
           <p className="text-lg mb-8" style={{ color: '#687280' }}>{c.subtitle}</p>
-          <div className="inline-flex rounded-full p-1 mb-8" style={{ backgroundColor: '#E5EAF0' }}>
-            <button onClick={() => setBilling('monthly')} className="px-6 py-2 rounded-full text-sm font-bold transition-all"
-              style={billing === 'monthly' ? { backgroundColor: '#5B5FF0', color: 'white' } : { color: '#687280' }}>
-              {c.monthly}
-            </button>
-            <button onClick={() => setBilling('yearly')} className="px-6 py-2 rounded-full text-sm font-bold transition-all"
-              style={billing === 'yearly' ? { backgroundColor: '#5B5FF0', color: 'white' } : { color: '#687280' }}>
-              {c.yearly} <span className="text-xs ml-1" style={{ color: billing === 'yearly' ? 'rgba(255,255,255,0.8)' : '#5B5FF0' }}>{c.save}</span>
-            </button>
+          <div className="inline-flex items-center rounded-full px-5 py-2 text-sm font-bold mb-8" style={{ backgroundColor: '#E8E9FD', color: '#484CE8' }}>
+            {c.monthly}
           </div>
         </div>
       </section>
 
-      <section className="py-20 bg-white">
+      <section className="py-14 sm:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {c.plans.map((plan, index) => (
-              <div key={plan.name} className={`rounded-2xl overflow-hidden flex flex-col ${plan.popular ? 'shadow-2xl ring-2 ring-blue-500' : 'border border-gray-100'}`}>
+              <div key={plan.name} className={`rounded-2xl overflow-hidden flex flex-col bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${plan.popular ? 'shadow-xl ring-2 ring-[#5B5FF0]' : 'border border-gray-100 shadow-sm'}`}>
                 {plan.popular && (
                   <div className="py-2 text-center text-sm font-bold text-white" style={{ backgroundColor: '#5B5FF0' }}>
                     {c.popular}
                   </div>
                 )}
-                <div className="p-8 flex flex-col flex-1">
+                <div className="p-6 sm:p-8 flex flex-col flex-1">
                   <h3 className="text-xl font-black mb-2" style={{ color: '#00142D' }}>{plan.name}</h3>
                   <p className="text-sm mb-4" style={{ color: '#687280' }}>{plan.desc}</p>
                   <div className="mb-6">

@@ -161,11 +161,11 @@ export default function Header() {
   return (
     <>
       {showBanner && (
-        <div className="text-white text-sm py-2 overflow-hidden relative flex items-center"
+        <div className="text-white text-xs sm:text-sm py-2 overflow-hidden relative flex items-center"
           style={{ background: 'linear-gradient(90deg, #484CE8 0%, #5B5FF0 55%, #6B6FF5 100%)' }}>
           <div className="flex whitespace-nowrap animate-marquee">
             {Array.from({ length: 6 }).map((_, i) => (
-              <span key={i} className="mx-12">{t.banner}</span>
+              <span key={i} className="mx-8 sm:mx-12">{t.banner}</span>
             ))}
           </div>
           <button onClick={() => setShowBanner(false)}

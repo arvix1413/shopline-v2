@@ -1,11 +1,9 @@
 'use client'
 
 import { useI18n } from '../../contexts/I18nContext'
-import { useAuth } from '../../contexts/AuthContext'
 
 export default function Hero() {
   const { t } = useI18n()
-  const { isLoading } = useAuth()
 
   return (
     <section className="relative overflow-hidden" style={{ backgroundColor: '#FFFFFF', color: '#12131F' }}>
@@ -46,37 +44,36 @@ export default function Hero() {
         }}
       />
 
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 pt-28 pb-0 text-center">
-        <p className="font-brand rise-in text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight mb-8 brand-text">
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 md:pt-28 pb-0 text-center">
+        <p className="font-brand rise-in text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight mb-5 sm:mb-8 brand-text">
           ARVIX
         </p>
 
         <h1
-          className="rise-in rise-in-delay-1 font-black leading-[1.12] mb-6 tracking-tight"
+          className="rise-in rise-in-delay-1 font-black leading-[1.12] mb-4 sm:mb-6 tracking-tight text-balance"
           style={{ fontSize: 'clamp(2rem, 5vw, 3.35rem)', color: '#12131F' }}
         >
           {t.hero.title}
         </h1>
 
         <p
-          className="rise-in rise-in-delay-2 text-base md:text-lg leading-relaxed mb-10 mx-auto whitespace-pre-line text-pretty"
+          className="rise-in rise-in-delay-2 text-[15px] sm:text-base md:text-lg leading-relaxed mb-8 sm:mb-10 mx-auto whitespace-pre-line text-pretty"
           style={{ maxWidth: 640, color: '#5C5F7A' }}
         >
           {t.hero.subtitle}
         </p>
 
-        {!isLoading && (
-          <div className="rise-in rise-in-delay-3 flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+        <div className="rise-in rise-in-delay-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 mb-10 sm:mb-16 max-w-sm sm:max-w-none mx-auto">
             <a
               href="/trial-redirect"
-              className="inline-block font-bold btn-glow btn-brand"
+              className="inline-block text-center font-bold btn-glow btn-brand"
               style={{ borderRadius: 999, fontSize: 16, padding: '14px 40px' }}
             >
               {t.hero.cta}
             </a>
             <a
               href="/online-store-setup"
-              className="inline-block font-semibold transition-all hover:bg-[#F0F1FE]"
+              className="inline-block text-center font-semibold transition-all hover:bg-[#F0F1FE]"
               style={{
                 borderRadius: 999,
                 fontSize: 15,
@@ -87,9 +84,7 @@ export default function Hero() {
             >
               {t.hero.ctaSecondary}
             </a>
-          </div>
-        )}
-        {isLoading && <div className="inline-block mb-16" style={{ height: 52 }} />}
+        </div>
 
         <div className="rise-in rise-in-delay-4 relative mx-auto" style={{ maxWidth: 1100 }}>
           <div

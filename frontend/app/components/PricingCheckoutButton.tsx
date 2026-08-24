@@ -1,12 +1,19 @@
 'use client'
 
 import { useState } from 'react'
+import { useI18n } from '../../contexts/I18nContext'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://shopline-backend.arvix1413.workers.dev'
 
 export default function PricingCheckoutButton({ plan }: { plan: string }) {
+  const { locale } = useI18n()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const labels = locale === 'zh-TW'
+    ? { action: '立即訂閱', loading: '正在前往安全付款…', error: '無法建立付款頁面', secure: '由 Stripe 安全處理 · 支援 Link' }
+    : locale === 'zh-CN'
+      ? { action: '立即订阅', loading: '正在前往安全付款…', error: '无法建立付款页面', secure: '由 Stripe 安全处理 · 支持 Link' }
+      : { action: 'Subscribe now', loading: 'Opening secure checkout…', error: 'Unable to open checkout', secure: 'Secure checkout by Stripe · Link supported' }
 
   const checkout = async () => {
     setLoading(true)
@@ -18,10 +25,10 @@ export default function PricingCheckoutButton({ plan }: { plan: string }) {
         body: JSON.stringify({ plan }),
       })
       const data = await response.json() as { url?: string; error?: string }
-      if (!response.ok || !data.url) throw new Error(data.error || '无法建立付款页面')
+      if (!response.ok || !data.url) throw new Error(data.error || labels.error)
       window.location.assign(data.url)
     } catch (err) {
-      setError(err instanceof Error ? err.message : '无法建立付款页面')
+      setError(err instanceof Error ? err.message : labels.error)
       setLoading(false)
     }
   }
@@ -33,12 +40,12 @@ export default function PricingCheckoutButton({ plan }: { plan: string }) {
         onClick={checkout}
         disabled={loading}
         className="w-full rounded-full px-6 py-3 font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-wait disabled:opacity-60"
-        style={{ backgroundColor: '#356DFF' }}
+        style={{ background: 'linear-gradient(135deg, #5B5FF0 0%, #484CE8 100%)' }}
       >
-        {loading ? '正在前往安全付款…' : '立即订阅'}
+        {loading ? labels.loading : labels.action}
       </button>
       {error && <p className="mt-3 text-sm text-red-600" role="alert">{error}</p>}
-      <p className="mt-3 text-center text-xs" style={{ color: '#687280' }}>由 Stripe 安全处理 · 支持 Link</p>
+      <p className="mt-3 text-center text-xs" style={{ color: '#687280' }}>{labels.secure}</p>
     </div>
   )
 }

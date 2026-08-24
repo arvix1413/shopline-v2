@@ -48,6 +48,15 @@ html, body {
   color: var(--text-ink);
 }
 
+body {
+  min-width: 0;
+}
+
+:focus-visible {
+  outline: 3px solid rgba(91, 95, 240, 0.35);
+  outline-offset: 3px;
+}
+
 a { color: inherit; text-decoration: none; }
 
 .font-brand {
@@ -116,6 +125,7 @@ video {
 }
 .animate-marquee {
   animation: marquee 22s linear infinite;
+  width: max-content;
 }
 
 @keyframes aurora {
@@ -137,6 +147,45 @@ video {
 .rise-in-delay-2 { animation-delay: 0.24s; }
 .rise-in-delay-3 { animation-delay: 0.36s; }
 .rise-in-delay-4 { animation-delay: 0.5s; }
+
+@media (max-width: 639px) {
+  .animate-marquee {
+    animation: none;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .animate-marquee > span {
+    display: none;
+    margin: 0;
+  }
+
+  .animate-marquee > span:first-child {
+    display: block;
+    max-width: calc(100vw - 3rem);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .rise-in,
+  .rise-in-delay-1,
+  .rise-in-delay-2,
+  .rise-in-delay-3,
+  .rise-in-delay-4 {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 
 .btn-glow {
   box-shadow: 0 8px 28px rgba(91,95,240,0.28), 0 2px 8px rgba(18,19,31,0.08);
