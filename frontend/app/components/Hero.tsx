@@ -44,26 +44,23 @@ export default function Hero() {
         }}
       />
 
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 md:pt-28 pb-0 text-center">
-        <p className="font-brand rise-in text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight mb-5 sm:mb-8 brand-text">
-          ARVIX
-        </p>
-
-        <h1
-          className="rise-in rise-in-delay-1 font-black leading-[1.12] mb-4 sm:mb-6 tracking-tight text-balance"
-          style={{ fontSize: 'clamp(2rem, 5vw, 3.35rem)', color: '#12131F' }}
-        >
-          {t.hero.title}
-        </h1>
-
-        <p
-          className="rise-in rise-in-delay-2 text-[15px] sm:text-base md:text-lg leading-relaxed mb-8 sm:mb-10 mx-auto whitespace-pre-line text-pretty"
-          style={{ maxWidth: 640, color: '#5C5F7A' }}
-        >
-          {t.hero.subtitle}
-        </p>
-
-        <div className="rise-in rise-in-delay-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 mb-10 sm:mb-16 max-w-sm sm:max-w-none mx-auto">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20 lg:py-24">
+        <div className="grid lg:grid-cols-[0.92fr_1.08fr] gap-12 lg:gap-16 items-center">
+          <div className="text-center lg:text-left">
+            <p className="font-brand rise-in text-4xl sm:text-5xl lg:text-[3.4rem] font-extrabold tracking-tight mb-5 brand-text">ARVIX</p>
+            <h1
+              className="rise-in rise-in-delay-1 font-black leading-[1.08] mb-5 tracking-[-0.035em] text-balance"
+              style={{ fontSize: 'clamp(2rem, 4vw, 3.65rem)', color: '#12131F', wordBreak: 'keep-all' }}
+            >
+              {t.hero.title}
+            </h1>
+            <p
+              className="rise-in rise-in-delay-2 text-[15px] sm:text-base md:text-lg leading-relaxed mb-8 sm:mb-9 mx-auto lg:mx-0 whitespace-pre-line text-pretty"
+              style={{ maxWidth: 620, color: '#5C5F7A' }}
+            >
+              {t.hero.subtitle}
+            </p>
+            <div className="rise-in rise-in-delay-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3 sm:gap-4 max-w-sm sm:max-w-none mx-auto lg:mx-0">
             <a
               href="/trial-redirect"
               className="inline-block text-center font-bold btn-glow btn-brand"
@@ -84,48 +81,35 @@ export default function Hero() {
             >
               {t.hero.ctaSecondary}
             </a>
-        </div>
+            </div>
+            <div className="rise-in rise-in-delay-4 mt-8 flex flex-wrap justify-center lg:justify-start gap-x-6 gap-y-2 text-xs font-semibold" style={{ color: '#6B6E88' }}>
+              <span className="flex items-center gap-2"><span className="text-emerald-500">✓</span>{t.banner}</span>
+              <span className="flex items-center gap-2"><span className="text-emerald-500">✓</span>SSL</span>
+              <span className="flex items-center gap-2"><span className="text-emerald-500">✓</span>OMO</span>
+            </div>
+          </div>
 
-        <div className="rise-in rise-in-delay-4 relative mx-auto" style={{ maxWidth: 1100 }}>
-          <div
-            className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
-            style={{
-              width: '70%',
-              height: 120,
-              bottom: -10,
-              background: 'radial-gradient(ellipse, rgba(91,95,240,0.22) 0%, transparent 70%)',
-              filter: 'blur(18px)',
-              zIndex: 0,
-            }}
-          />
-          <div
-            className="relative overflow-hidden"
-            style={{
-              borderRadius: '20px 20px 0 0',
-              border: '1px solid rgba(91,95,240,0.18)',
-              borderBottom: 'none',
-              boxShadow: '0 -12px 60px rgba(91,95,240,0.12)',
-            }}
-          >
-            <img
-              src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1800&q=85"
-              alt="ARVIX store builder"
-              width={1800}
-              height={900}
-              className="w-full h-auto block"
-              style={{
-                objectFit: 'cover',
-                objectPosition: 'center top',
-                maxHeight: 420,
-              }}
-            />
-            <div
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                background:
-                  'linear-gradient(180deg, transparent 60%, rgba(255,255,255,0.55) 88%, #FFFFFF 100%)',
-              }}
-            />
+          <div className="rise-in rise-in-delay-2 relative mx-auto w-full max-w-2xl lg:max-w-none">
+            <div className="absolute -inset-6 pointer-events-none rounded-[40px]" style={{ background: 'radial-gradient(circle, rgba(91,95,240,0.16), transparent 68%)', filter: 'blur(16px)' }} />
+            <div className="relative rounded-[28px] p-2.5 sm:p-3" style={{ background: 'rgba(255,255,255,0.86)', border: '1px solid rgba(91,95,240,0.18)', boxShadow: '0 28px 80px rgba(45,48,120,0.18), 0 8px 24px rgba(18,19,31,0.08)', backdropFilter: 'blur(18px)' }}>
+              <div className="flex items-center gap-1.5 px-3 py-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#FF6B6B]" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#FFD166]" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#4ADE80]" />
+                <span className="ml-3 h-5 flex-1 rounded-full" style={{ background: '#F0F1F6' }} />
+              </div>
+              <div className="relative overflow-hidden rounded-[20px]" style={{ aspectRatio: '16/10' }}>
+                <img
+                  src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1600&q=88"
+                  alt="ARVIX store builder"
+                  width={1600}
+                  height={1000}
+                  className="w-full h-full object-cover"
+                  style={{ objectPosition: 'center top' }}
+                />
+                <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(180deg, transparent 70%, rgba(21,22,42,0.12) 100%)' }} />
+              </div>
+            </div>
           </div>
         </div>
       </div>

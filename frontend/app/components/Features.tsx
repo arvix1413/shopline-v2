@@ -16,14 +16,14 @@ export default function Features() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-16">
           <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#5B5FF0' }}>{t.features.eyebrow}</p>
-          <h2 className="font-black mb-3 text-3xl md:text-4xl" style={{ color: '#12131F' }}>{t.features.title}</h2>
+          <h2 className="font-black mb-3 text-3xl md:text-[2.75rem] md:leading-tight tracking-tight" style={{ color: '#12131F' }}>{t.features.title}</h2>
           <p className="mt-4 max-w-2xl mx-auto leading-relaxed text-sm" style={{ color: '#5C5F7A' }}>{t.features.subtitle}</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
           {t.features.items.map((f, i) => (
-            <div key={i} className="rounded-2xl overflow-hidden transition-all duration-300 group hover:shadow-xl hover:-translate-y-1"
-              style={{ background: '#fff', border: '1px solid rgba(91,95,240,0.12)' }}>
+            <div key={i} className="rounded-[24px] overflow-hidden transition-all duration-300 group hover:shadow-xl hover:-translate-y-1"
+              style={{ background: '#fff', border: '1px solid rgba(91,95,240,0.12)', boxShadow: '0 8px 30px rgba(18,19,31,0.04)' }}>
               <div className="overflow-hidden relative">
                 <img src={imgs[i]} alt={f.title} className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500" />
               </div>
