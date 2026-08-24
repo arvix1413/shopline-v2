@@ -25,6 +25,9 @@ type Bindings = {
   R2_DOMAIN: string
   JWT_SECRET: string
   SHOPLINE_JWT_SECRET: string
+  STRIPE_SECRET_KEY?: string
+  STRIPE_WEBHOOK_SECRET?: string
+  SITE_URL?: string
 }
 
 type Variables = {
@@ -160,6 +163,84 @@ app.use('/api/*', async (c, next) => {
 // 健康检查
 app.get('/', (c) => {
   return c.json({ message: 'SHOPLINE Clone API is running!' })
+})
+
+const stripePlans = {
+  starter: { name: 'ARVIX 網店探索者', unitAmount: 99000 },
+  growth: { name: 'ARVIX 電商戰略家', unitAmount: 199000 },
+  omo: { name: 'ARVIX OMO 大師', unitAmount: 399000 },
+} as const
+
+const secureCompare = (left: string, right: string) => {
+  if (left.length !== right.length) return false
+  let diff = 0
+  for (let i = 0; i < left.length; i += 1) diff |= left.charCodeAt(i) ^ right.charCodeAt(i)
+  return diff === 0
+}
+
+const signStripePayload = async (secret: string, payload: string) => {
+  const encoder = new TextEncoder()
+  const key = await crypto.subtle.importKey('raw', encoder.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
+  const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(payload))
+  return Array.from(new Uint8Array(signature)).map((byte) => byte.toString(16).padStart(2, '0')).join('')
+}
+
+app.post('/api/checkout/session', async (c) => {
+  if (!c.env.STRIPE_SECRET_KEY) return c.json({ error: '付款功能尚未完成商戶配置' }, 503)
+  const body = await c.req.json<{ plan?: string; email?: string }>()
+  const planKey = String(body.plan || '').toLowerCase() as keyof typeof stripePlans
+  const plan = stripePlans[planKey]
+  if (!plan) return c.json({ error: '無效的訂閱方案' }, 400)
+
+  const siteUrl = (c.env.SITE_URL || 'https://arvixai.com').replace(/\/$/, '')
+  const params = new URLSearchParams({
+    mode: 'subscription',
+    'line_items[0][price_data][currency]': 'twd',
+    'line_items[0][price_data][unit_amount]': String(plan.unitAmount),
+    'line_items[0][price_data][recurring][interval]': 'month',
+    'line_items[0][price_data][product_data][name]': plan.name,
+    'line_items[0][quantity]': '1',
+    allow_promotion_codes: 'true',
+    'subscription_data[metadata][arvix_plan]': planKey,
+    success_url: `${siteUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${siteUrl}/about/pricing?checkout=cancelled`,
+  })
+  const email = String(body.email || '').trim()
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) params.set('customer_email', email)
+
+  const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${c.env.STRIPE_SECRET_KEY}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: params,
+  })
+  const result = await response.json<any>()
+  if (!response.ok || !result?.url) {
+    console.error('Stripe Checkout error', result?.error?.type, result?.error?.code)
+    return c.json({ error: '暫時無法建立付款頁面，請稍後再試' }, 502)
+  }
+  return c.json({ url: result.url })
+})
+
+app.post('/api/stripe/webhook', async (c) => {
+  if (!c.env.STRIPE_WEBHOOK_SECRET) return c.json({ error: 'Webhook 未配置' }, 503)
+  const header = c.req.header('Stripe-Signature') || ''
+  const timestamp = header.split(',').find((part) => part.startsWith('t='))?.slice(2) || ''
+  const signatures = header.split(',').filter((part) => part.startsWith('v1=')).map((part) => part.slice(3))
+  const rawBody = await c.req.text()
+  if (!timestamp || Math.abs(Math.floor(Date.now() / 1000) - Number(timestamp)) > 300) return c.json({ error: '無效或過期的簽名' }, 400)
+  const expected = await signStripePayload(c.env.STRIPE_WEBHOOK_SECRET, `${timestamp}.${rawBody}`)
+  if (!signatures.some((signature) => secureCompare(signature, expected))) return c.json({ error: '簽名驗證失敗' }, 400)
+
+  const event = JSON.parse(rawBody)
+  await c.env.DB.prepare(`
+    CREATE TABLE IF NOT EXISTS stripe_events (
+      id TEXT PRIMARY KEY, type TEXT NOT NULL, livemode INTEGER NOT NULL DEFAULT 0,
+      payload TEXT NOT NULL, received_at TEXT NOT NULL DEFAULT (datetime('now', '+8 hours'))
+    )
+  `).run()
+  await c.env.DB.prepare('INSERT OR IGNORE INTO stripe_events (id, type, livemode, payload) VALUES (?, ?, ?, ?)')
+    .bind(event.id, event.type, event.livemode ? 1 : 0, rawBody).run()
+  return c.json({ received: true })
 })
 
 // Admin middleware

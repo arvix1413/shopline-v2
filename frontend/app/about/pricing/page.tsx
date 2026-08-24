@@ -3,6 +3,9 @@ import { useState } from 'react'
 import { useI18n } from '../../../contexts/I18nContext'
 import { pickCopy } from '../../../lib/i18n/pageCopy'
 import type { Locale } from '../../../lib/i18n'
+import PricingCheckoutButton from '../../components/PricingCheckoutButton'
+
+const checkoutPlans = ['starter', 'growth', 'omo'] as const
 
 type PricingCopy = {
   title: string
@@ -180,7 +183,7 @@ export default function PricingPage() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {c.plans.map((plan) => (
+            {c.plans.map((plan, index) => (
               <div key={plan.name} className={`rounded-2xl overflow-hidden flex flex-col ${plan.popular ? 'shadow-2xl ring-2 ring-blue-500' : 'border border-gray-100'}`}>
                 {plan.popular && (
                   <div className="py-2 text-center text-sm font-bold text-white" style={{ backgroundColor: '#5B5FF0' }}>
@@ -201,10 +204,14 @@ export default function PricingPage() {
                       </li>
                     ))}
                   </ul>
-                  <a href="/trial-redirect" className="block text-center py-3 rounded-full font-bold transition-opacity hover:opacity-90"
-                    style={plan.popular ? { backgroundColor: '#5B5FF0', color: 'white' } : { border: '2px solid #5B5FF0', color: '#5B5FF0' }}>
-                    {plan.cta}
-                  </a>
+                  {index < checkoutPlans.length ? (
+                    <PricingCheckoutButton plan={checkoutPlans[index]} />
+                  ) : (
+                    <a href="/consultation" className="block text-center py-3 rounded-full font-bold transition-opacity hover:opacity-90"
+                      style={{ border: '2px solid #5B5FF0', color: '#5B5FF0' }}>
+                      {plan.cta}
+                    </a>
+                  )}
                 </div>
               </div>
             ))}

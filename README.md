@@ -31,7 +31,7 @@
 
 ### GitHub Actions 自动部署
 
-**Workflow：** `.github/workflows/deploy.yml`（触发：`push` → `main`，或 `workflow_dispatch`）
+**Workflow：** `.github/workflows/deploy.yml`（触发：`push` → `main`）
 
 | Job | 步骤 |
 |-----|------|
@@ -47,6 +47,12 @@
 | `CLOUDFLARE_ACCOUNT_ID` | `51908639511240656e3a5d46a004f299` |
 | `TELEGRAM_BOT_TOKEN` | 部署通知 |
 | `TELEGRAM_CHAT_ID` | 部署通知 |
+| `STRIPE_SECRET_KEY` | Stripe 服务器端密钥，通过 `wrangler secret put` 配置 |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook 签名密钥，通过 `wrangler secret put` 配置 |
+
+Stripe webhook 地址：`https://shopline-backend.arvix1413.workers.dev/api/stripe/webhook`。至少订阅
+`checkout.session.completed`、`invoice.paid`、`invoice.payment_failed` 和
+`customer.subscription.deleted` 事件。支付密钥不得写入仓库或前端环境变量。
 
 批量写入：`ern-projects/scripts/set-cf-deploy-secrets.sh`
 
