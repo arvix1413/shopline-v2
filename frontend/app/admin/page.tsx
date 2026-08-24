@@ -481,9 +481,130 @@ export default function AdminPage() {
         {/* ===== TRAFFIC TAB ===== */}
         {tab === '流量分析' && (
           <div className="space-y-5">
-            <h2 className="text-lg font-semibold">流量來源分析</h2>
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <h2 className="text-lg font-semibold">流量來源分析</h2>
+              <button type="button" onClick={fetchTraffic}
+                className="text-xs px-3 py-1.5 rounded-lg border bg-white hover:bg-gray-50 text-gray-600">
+                重新整理
+              </button>
+            </div>
             {trafficLoading ? <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" /></div> : traffic ? (
               <>
+                {/* Geo visitor dashboard */}
+                {(() => {
+                  const geo = traffic.geo || {}
+                  const totals = geo.totals || {}
+                  const maxCountry = Math.max(1, ...(geo.countries || []).map((x: any) => Number(x.visitors) || 0))
+                  const countryName = (code: string) => ({
+                    TW: '台灣', CN: '中國', HK: '香港', MO: '澳門', JP: '日本', KR: '韓國',
+                    US: '美國', SG: '新加坡', MY: '馬來西亞', VN: '越南', TH: '泰國',
+                    PH: '菲律賓', ID: '印尼', AU: '澳洲', GB: '英國', DE: '德國',
+                    FR: '法國', CA: '加拿大', IN: '印度', unknown: '未知',
+                  } as Record<string, string>)[code] || code
+                  return (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {[
+                          { label: '瀏覽次數', value: totals.views ?? 0, hint: `近 ${geo.days || 30} 天` },
+                          { label: '獨立訪客', value: totals.visitors ?? 0, hint: '依匿名 ID' },
+                          { label: '國家數', value: totals.countries ?? 0, hint: '含未知' },
+                          { label: '城市列數', value: geo.cities?.length ?? 0, hint: 'Top 列表' },
+                        ].map((card) => (
+                          <div key={card.label} className="bg-white rounded-xl border p-4">
+                            <div className="text-xs text-gray-500">{card.label}</div>
+                            <div className="text-2xl font-bold text-gray-900 mt-1">{Number(card.value).toLocaleString()}</div>
+                            <div className="text-[11px] text-gray-400 mt-1">{card.hint}</div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="bg-white rounded-xl border p-4">
+                          <div className="text-sm font-semibold text-gray-700 mb-3">🌍 訪客國家</div>
+                          {(geo.countries || []).length === 0 ? (
+                            <div className="text-xs text-gray-400">尚無瀏覽數據（訪客造訪網站後會自動累積）</div>
+                          ) : (geo.countries || []).map((row: any) => (
+                            <div key={row.country} className="py-2 border-b last:border-0">
+                              <div className="flex items-center justify-between text-sm mb-1">
+                                <span className="font-medium text-gray-800">{countryName(row.country)} <span className="text-gray-400 text-xs">{row.country}</span></span>
+                                <span className="text-xs text-gray-500">{row.visitors} 人 · {row.views} 次</span>
+                              </div>
+                              <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
+                                <div className="h-full rounded-full bg-blue-500" style={{ width: `${Math.max(4, (Number(row.visitors) / maxCountry) * 100)}%` }} />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="bg-white rounded-xl border p-4">
+                          <div className="text-sm font-semibold text-gray-700 mb-3">📍 訪客城市</div>
+                          {(geo.cities || []).length === 0 ? (
+                            <div className="text-xs text-gray-400">尚無城市數據</div>
+                          ) : (
+                            <div className="overflow-x-auto max-h-80 overflow-y-auto">
+                              <table className="w-full text-sm">
+                                <thead className="text-xs text-gray-500 uppercase bg-gray-50 sticky top-0">
+                                  <tr>
+                                    <th className="px-2 py-2 text-left">城市</th>
+                                    <th className="px-2 py-2 text-left">國家</th>
+                                    <th className="px-2 py-2 text-right">訪客</th>
+                                    <th className="px-2 py-2 text-right">瀏覽</th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y">
+                                  {(geo.cities || []).map((row: any, i: number) => (
+                                    <tr key={`${row.country}-${row.city}-${i}`} className="hover:bg-gray-50">
+                                      <td className="px-2 py-2 font-medium">{row.city || 'unknown'}{row.region ? <span className="text-gray-400 text-xs ml-1">({row.region})</span> : null}</td>
+                                      <td className="px-2 py-2 text-gray-600">{countryName(row.country)}</td>
+                                      <td className="px-2 py-2 text-right text-blue-600 font-semibold">{row.visitors}</td>
+                                      <td className="px-2 py-2 text-right text-gray-500">{row.views}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="bg-white rounded-xl border p-4">
+                          <div className="text-sm font-semibold text-gray-700 mb-3">📄 熱門頁面</div>
+                          {(geo.topPaths || []).length === 0 ? (
+                            <div className="text-xs text-gray-400">尚無數據</div>
+                          ) : (geo.topPaths || []).map((row: any) => (
+                            <div key={row.path} className="flex items-center justify-between py-1.5 border-b last:border-0 gap-3">
+                              <span className="text-sm text-gray-700 truncate font-mono text-xs">{row.path}</span>
+                              <span className="text-xs text-gray-500 whitespace-nowrap">{row.visitors} 人 · {row.views} 次</span>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="bg-white rounded-xl border p-4">
+                          <div className="text-sm font-semibold text-gray-700 mb-3">🕒 最近瀏覽</div>
+                          {(geo.recent || []).length === 0 ? (
+                            <div className="text-xs text-gray-400">尚無數據</div>
+                          ) : (
+                            <div className="max-h-80 overflow-y-auto space-y-2">
+                              {(geo.recent || []).map((row: any, i: number) => (
+                                <div key={`${row.created_at}-${i}`} className="text-xs border-b last:border-0 pb-2">
+                                  <div className="flex justify-between gap-2">
+                                    <span className="font-mono text-gray-800 truncate">{row.path}</span>
+                                    <span className="text-gray-400 whitespace-nowrap">{row.created_at}</span>
+                                  </div>
+                                  <div className="text-gray-500 mt-0.5">
+                                    {countryName(row.country)} · {row.city || 'unknown'}
+                                    {row.device_type ? ` · ${row.device_type}` : ''}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })()}
+
                 <div className="grid md:grid-cols-3 gap-4">
                   {/* UTM Source */}
                   <div className="bg-white rounded-xl border p-4">
@@ -547,7 +668,8 @@ export default function AdminPage() {
                   </div>
                 )}
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-700">
-                  💡 在推廣連結加上參數即可追蹤：<code className="bg-blue-100 px-1 rounded">?utm_source=ig&utm_campaign=春季活動&ref=kol_name</code>
+                  💡 國家／城市由 Cloudflare 依訪客 IP 自動判斷。推廣連結可加：
+                  <code className="bg-blue-100 px-1 rounded">?utm_source=ig&utm_campaign=春季活動&ref=kol_name</code>
                 </div>
               </>
             ) : <div className="text-center py-10 text-gray-400">點擊重新整理載入數據</div>}

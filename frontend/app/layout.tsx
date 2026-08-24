@@ -3,6 +3,7 @@ import './globals.css'
 import { I18nProvider } from '../contexts/I18nContext'
 import { AuthProvider } from '../contexts/AuthContext'
 import TrafficCapture from './components/TrafficCapture'
+import PageViewTracker from './components/PageViewTracker'
 import LineChatBubble from './components/LineChatBubble'
 import TrialBanner from './components/TrialBanner'
 
@@ -39,6 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <I18nProvider>
           <AuthProvider>
             <TrafficCapture />
+            <PageViewTracker />
             <TrialBanner />
             {children}
             <LineChatBubble />

@@ -40,6 +40,24 @@ export function track(event: string, properties?: Record<string, unknown>, userI
   }).catch(() => {})
 }
 
+/** Record a marketing-site page view (geo resolved server-side via Cloudflare). */
+export function trackPageview(path?: string) {
+  if (typeof window === 'undefined') return
+  const pathname = path || window.location.pathname || '/'
+  if (pathname.startsWith('/admin')) return
+  const anonymousId = getOrCreateAnonymousId()
+  fetch(`${API}/api/pageviews`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      anonymousId,
+      path: pathname,
+      referrer: document.referrer || '',
+    }),
+    keepalive: true,
+  }).catch(() => {})
+}
+
 export function bindUser(userId: number) {
   if (typeof window === 'undefined') return
   const anonymousId = getOrCreateAnonymousId()

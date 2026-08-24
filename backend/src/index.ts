@@ -18,6 +18,7 @@ import {
   type OnboardingStage,
   type FollowUpStatus,
 } from './trial'
+import { ensurePageviewsTable, getRequestGeo } from './geo'
 
 type Bindings = {
   DB: D1Database
@@ -70,7 +71,7 @@ app.use('/api/*', async (c, next) => {
   const path = new URL(url).pathname
   
   // 跳过不需要审计的路径
-  const skipPaths = ['/', '/api/init', '/api/init-admin', '/api/auth/login', '/api/auth/register']
+  const skipPaths = ['/', '/api/init', '/api/init-admin', '/api/auth/login', '/api/auth/register', '/api/pageviews', '/api/events']
   if (skipPaths.includes(path)) {
     await next()
     return
@@ -1077,6 +1078,52 @@ app.post('/api/events', async (c) => {
   } catch (e: any) { return c.json({ error: String(e) }, 500) }
 })
 
+// ── Pageview geo tracking ────────────────────────────────────────────────────
+app.post('/api/pageviews', async (c) => {
+  try {
+    await ensurePageviewsTable(c.env.DB)
+    const body = await c.req.json().catch(() => ({} as any))
+    const anonymousId = String(body.anonymousId || '').slice(0, 80)
+    let path = String(body.path || '/').slice(0, 500)
+    if (!anonymousId) return c.json({ error: 'missing anonymousId' }, 400)
+    if (!path.startsWith('/')) path = `/${path}`
+    // Skip admin / auth noise
+    if (path.startsWith('/admin') || path.startsWith('/api')) {
+      return c.json({ ok: true, skipped: true })
+    }
+    const referrer = String(body.referrer || '').slice(0, 500)
+    const geo = getRequestGeo(c)
+    const ua = (c.req.header('User-Agent') || '').slice(0, 400)
+
+    // Light dedupe: same visitor + path within 20s
+    const recent = await c.env.DB.prepare(
+      `SELECT id FROM pageviews
+       WHERE anonymous_id = ? AND path = ?
+         AND datetime(created_at) > datetime('now', '+8 hours', '-20 seconds')
+       LIMIT 1`
+    ).bind(anonymousId, path).first()
+    if (recent) return c.json({ ok: true, deduped: true })
+
+    await c.env.DB.prepare(
+      `INSERT INTO pageviews
+        (anonymous_id, path, referrer, country, city, region, device_type, user_agent, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now', '+8 hours'))`
+    ).bind(
+      anonymousId,
+      path,
+      referrer,
+      geo.country,
+      geo.city,
+      geo.region,
+      geo.deviceType,
+      ua,
+    ).run()
+    return c.json({ ok: true })
+  } catch (e: any) {
+    return c.json({ error: String(e) }, 500)
+  }
+})
+
 // GET /api/admin/funnel — conversion funnel (admin only)
 app.get('/api/admin/funnel', requireAdmin, async (c) => {
   try {
@@ -1576,9 +1623,10 @@ app.delete('/api/admin/affiliates/:id', requireAdmin, async (c) => {
   } catch(e:any) { return c.json({error:String(e)},500) }
 })
 
-// Traffic source analytics
+// Traffic source analytics (+ visitor geo)
 app.get('/api/admin/traffic', requireAdmin, async (c) => {
   try {
+    await ensurePageviewsTable(c.env.DB)
     // UTM source breakdown
     const sources = await c.env.DB.prepare(
       `SELECT COALESCE(utm_source,'direct') as source, COUNT(*) as users FROM users WHERE is_admin=0 GROUP BY utm_source ORDER BY users DESC`
@@ -1597,7 +1645,69 @@ app.get('/api/admin/traffic', requireAdmin, async (c) => {
        FROM affiliate_conversions ac LEFT JOIN affiliates a ON ac.affiliate_code=a.code
        GROUP BY ac.affiliate_code ORDER BY conversions DESC`
     ).all()
-    return c.json({ sources: sources.results, refs: refs.results, campaigns: campaigns.results, affConversions: affConversions.results })
+
+    const days = Math.min(90, Math.max(1, Number(c.req.query('days') || 30)))
+    const sinceExpr = `datetime('now', '+8 hours', '-${days} days')`
+
+    const totals = await c.env.DB.prepare(
+      `SELECT COUNT(*) as views,
+              COUNT(DISTINCT anonymous_id) as visitors,
+              COUNT(DISTINCT country) as countries
+       FROM pageviews WHERE datetime(created_at) >= ${sinceExpr}`
+    ).first()
+
+    const countries = await c.env.DB.prepare(
+      `SELECT country,
+              COUNT(*) as views,
+              COUNT(DISTINCT anonymous_id) as visitors
+       FROM pageviews
+       WHERE datetime(created_at) >= ${sinceExpr}
+       GROUP BY country
+       ORDER BY visitors DESC, views DESC
+       LIMIT 50`
+    ).all()
+
+    const cities = await c.env.DB.prepare(
+      `SELECT country, city, region,
+              COUNT(*) as views,
+              COUNT(DISTINCT anonymous_id) as visitors
+       FROM pageviews
+       WHERE datetime(created_at) >= ${sinceExpr}
+       GROUP BY country, city
+       ORDER BY visitors DESC, views DESC
+       LIMIT 80`
+    ).all()
+
+    const topPaths = await c.env.DB.prepare(
+      `SELECT path, COUNT(*) as views, COUNT(DISTINCT anonymous_id) as visitors
+       FROM pageviews
+       WHERE datetime(created_at) >= ${sinceExpr}
+       GROUP BY path
+       ORDER BY views DESC
+       LIMIT 20`
+    ).all()
+
+    const recent = await c.env.DB.prepare(
+      `SELECT path, country, city, region, device_type, created_at, anonymous_id
+       FROM pageviews
+       ORDER BY id DESC
+       LIMIT 40`
+    ).all()
+
+    return c.json({
+      sources: sources.results,
+      refs: refs.results,
+      campaigns: campaigns.results,
+      affConversions: affConversions.results,
+      geo: {
+        days,
+        totals: totals || { views: 0, visitors: 0, countries: 0 },
+        countries: countries.results || [],
+        cities: cities.results || [],
+        topPaths: topPaths.results || [],
+        recent: recent.results || [],
+      },
+    })
   } catch(e:any) { return c.json({error:String(e)},500) }
 })
 
