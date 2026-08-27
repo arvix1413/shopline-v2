@@ -27,9 +27,23 @@ export const STAGE_LABELS: Record<OnboardingStage, string> = {
 
 export function addDaysIso(days: number, from = new Date()): string {
   const d = new Date(from.getTime() + days * 24 * 60 * 60 * 1000)
-  // Store as SQLite-friendly local+8 style string without timezone noise
-  const pad = (n: number) => String(n).padStart(2, '0')
-  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`
+  // Persist as Asia/Taipei wall time (matches SQLite datetime('now', '+8 hours') elsewhere)
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Asia/Taipei',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    })
+      .formatToParts(d)
+      .filter((p) => p.type !== 'literal')
+      .map((p) => [p.type, p.value])
+  )
+  return `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:${parts.minute}:${parts.second}`
 }
 
 export function nowIso(): string {
@@ -38,9 +52,10 @@ export function nowIso(): string {
 
 export function parseSqlDate(value?: string | null): Date | null {
   if (!value) return null
-  // Accept "YYYY-MM-DD HH:MM:SS" or ISO
-  const normalized = value.includes('T') ? value : value.replace(' ', 'T') + (value.includes('Z') || value.includes('+') ? '' : 'Z')
-  const d = new Date(normalized)
+  // Accept "YYYY-MM-DD HH:MM:SS" or ISO. Naive strings are Asia/Taipei (+08:00).
+  const normalized = value.includes('T') ? value : value.replace(' ', 'T')
+  const withTz = /(?:Z|[+-]\d{2}:?\d{2})$/.test(normalized) ? normalized : `${normalized}+08:00`
+  const d = new Date(withTz)
   return Number.isNaN(d.getTime()) ? null : d
 }
 

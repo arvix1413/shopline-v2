@@ -7,7 +7,7 @@ import { Plus, Edit, Trash2, AlertCircle, CheckCircle } from 'lucide-react'
 import EnhancedAuditLog from '../components/EnhancedAuditLog'
 import MerchantCRM from '../components/MerchantCRM'
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8787'
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://shopline-backend.arvix1413.workers.dev'
 
 interface UserRow { id: number; email: string; name: string; phone: string | null; isAdmin: number | null; createdAt: string | null }
 interface TrialSystem { id: number; name: string; desc: string; url: string; color: string; bg: string; border: string; emoji: string; tags: string[]; active: number; sortOrder: number }

@@ -39,12 +39,29 @@ const FOLLOW_LABELS: Record<string, string> = {
   lost: '已流失',
 }
 
+/** Naive SQL timestamps are stored as Asia/Taipei wall time. */
+function formatTaipei(value?: string | null, withTime = true): string {
+  if (!value) return '—'
+  const normalized = value.includes('T') ? value : value.replace(' ', 'T')
+  const withTz = /(?:Z|[+-]\d{2}:?\d{2})$/.test(normalized) ? normalized : `${normalized}+08:00`
+  const d = new Date(withTz)
+  if (Number.isNaN(d.getTime())) return value
+  return d.toLocaleString('zh-TW', {
+    timeZone: 'Asia/Taipei',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    ...(withTime ? { hour: '2-digit', minute: '2-digit' } : {}),
+  })
+}
+
 export default function MerchantCRM({ token, showMsg }: Props) {
   const [merchants, setMerchants] = useState<Merchant[]>([])
   const [summary, setSummary] = useState<any>(null)
   const [stages, setStages] = useState<{ id: string; label: string }[]>([])
   const [loading, setLoading] = useState(false)
   const [q, setQ] = useState('')
+  const [qDebounced, setQDebounced] = useState('')
   const [plan, setPlan] = useState('')
   const [stage, setStage] = useState('')
   const [follow, setFollow] = useState('')
@@ -52,11 +69,16 @@ export default function MerchantCRM({ token, showMsg }: Props) {
   const [note, setNote] = useState('')
   const [saving, setSaving] = useState(false)
 
+  useEffect(() => {
+    const t = setTimeout(() => setQDebounced(q.trim()), 300)
+    return () => clearTimeout(t)
+  }, [q])
+
   const fetchMerchants = useCallback(async () => {
     setLoading(true)
     try {
       const params = new URLSearchParams()
-      if (q) params.set('q', q)
+      if (qDebounced) params.set('q', qDebounced)
       if (plan) params.set('plan', plan)
       if (stage) params.set('stage', stage)
       if (follow) params.set('follow', follow)
@@ -73,7 +95,7 @@ export default function MerchantCRM({ token, showMsg }: Props) {
     } finally {
       setLoading(false)
     }
-  }, [token, q, plan, stage, follow, showMsg])
+  }, [token, qDebounced, plan, stage, follow, showMsg])
 
   useEffect(() => { fetchMerchants() }, [fetchMerchants])
 
@@ -119,6 +141,7 @@ export default function MerchantCRM({ token, showMsg }: Props) {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') setQDebounced(q.trim()) }}
           placeholder="搜尋 email / 店名 / 電話"
           className="px-3 py-2 rounded-lg text-sm border min-w-[200px] flex-1"
         />
@@ -150,6 +173,7 @@ export default function MerchantCRM({ token, showMsg }: Props) {
           <thead>
             <tr style={{ background: '#F6F7FB', color: '#5C5F7A' }}>
               <th className="text-left px-4 py-3 font-semibold">商家</th>
+              <th className="text-left px-4 py-3 font-semibold">建立日期</th>
               <th className="text-left px-4 py-3 font-semibold">開店階段</th>
               <th className="text-left px-4 py-3 font-semibold">試用</th>
               <th className="text-left px-4 py-3 font-semibold">跟進</th>
@@ -159,10 +183,10 @@ export default function MerchantCRM({ token, showMsg }: Props) {
           </thead>
           <tbody>
             {loading && (
-              <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">載入中…</td></tr>
+              <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-400">載入中…</td></tr>
             )}
             {!loading && merchants.length === 0 && (
-              <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">尚無商家資料</td></tr>
+              <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-400">尚無商家資料</td></tr>
             )}
             {merchants.map((m) => (
               <tr key={m.id} className="border-t" style={{ borderColor: 'rgba(18,19,31,0.06)' }}>
@@ -170,6 +194,9 @@ export default function MerchantCRM({ token, showMsg }: Props) {
                   <div className="font-semibold" style={{ color: '#12131F' }}>{m.name || '—'}</div>
                   <div className="text-xs" style={{ color: '#5C5F7A' }}>{m.email}</div>
                   <div className="text-xs" style={{ color: '#8A8DA8' }}>{m.phone || '無電話'} · {m.storeName || m.slug || '未建店'}</div>
+                </td>
+                <td className="px-4 py-3 text-xs whitespace-nowrap" style={{ color: '#5C5F7A' }}>
+                  {formatTaipei(m.createdAt)}
                 </td>
                 <td className="px-4 py-3">
                   <span className="inline-block text-xs font-semibold px-2 py-1 rounded-full" style={{ background: '#F0F1FE', color: '#5B5FF0' }}>
@@ -186,6 +213,11 @@ export default function MerchantCRM({ token, showMsg }: Props) {
                       剩 {m.daysLeft ?? '—'} 天
                     </span>
                   )}
+                  {m.trialEndsAt && (
+                    <div className="text-[11px] mt-0.5" style={{ color: '#8A8DA8' }}>
+                      到期 {formatTaipei(m.trialEndsAt, false)}
+                    </div>
+                  )}
                 </td>
                 <td className="px-4 py-3">
                   <div className="text-xs font-semibold">{FOLLOW_LABELS[m.followUpStatus] || m.followUpStatus}</div>
@@ -200,8 +232,16 @@ export default function MerchantCRM({ token, showMsg }: Props) {
                       跟進
                     </button>
                     {m.planStatus !== 'paid' && (
-                      <button type="button" className="text-xs px-2 py-1 rounded text-white" style={{ background: '#059669' }}
-                        onClick={() => patch(m.id, { planStatus: 'paid' })}>
+                      <button
+                        type="button"
+                        className="text-xs px-2 py-1 rounded text-white"
+                        style={{ background: '#059669' }}
+                        onClick={() => {
+                          if (window.confirm(`確認將 ${m.email} 標記為已付款？`)) {
+                            patch(m.id, { planStatus: 'paid' })
+                          }
+                        }}
+                      >
                         標記已付
                       </button>
                     )}
@@ -228,7 +268,8 @@ export default function MerchantCRM({ token, showMsg }: Props) {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.45)' }}>
           <div className="w-full max-w-md rounded-2xl p-6" style={{ background: '#fff' }}>
             <h3 className="font-black mb-1" style={{ color: '#12131F' }}>跟進：{editing.name}</h3>
-            <p className="text-xs mb-4" style={{ color: '#8A8DA8' }}>{editing.email}</p>
+            <p className="text-xs mb-1" style={{ color: '#8A8DA8' }}>{editing.email}</p>
+            <p className="text-xs mb-4" style={{ color: '#8A8DA8' }}>建立：{formatTaipei(editing.createdAt)}</p>
 
             <label className="block text-xs font-semibold mb-1">跟進狀態</label>
             <select
@@ -244,7 +285,7 @@ export default function MerchantCRM({ token, showMsg }: Props) {
             <label className="block text-xs font-semibold mb-1">開店階段</label>
             <select
               className="w-full mb-3 px-3 py-2 rounded-lg border text-sm"
-              value={editing.onboardingStage || 'store_created'}
+              value={editing.onboardingStage || 'registered'}
               onChange={(e) => setEditing({ ...editing, onboardingStage: e.target.value })}
             >
               {stages.map((s) => (

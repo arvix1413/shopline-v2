@@ -1936,7 +1936,30 @@ app.get('/api/admin/merchants', requireAdmin, async (c) => {
     const follow = c.req.query('follow') || ''
     const q = (c.req.query('q') || '').trim()
 
-    let sql = `
+    // One store per user (oldest) to avoid duplicate merchant rows
+    const storeJoin = `
+      LEFT JOIN (
+        SELECT s.*
+        FROM stores s
+        INNER JOIN (
+          SELECT user_id, MIN(id) AS min_id FROM stores GROUP BY user_id
+        ) first ON first.min_id = s.id
+      ) s ON s.user_id = u.id
+    `
+
+    const whereParts = [`COALESCE(u.is_admin, 0) = 0`]
+    const binds: any[] = []
+    if (stage) { whereParts.push(`COALESCE(s.onboarding_stage, 'registered') = ?`); binds.push(stage) }
+    if (plan) { whereParts.push(`COALESCE(u.plan_status, 'trialing') = ?`); binds.push(plan) }
+    if (follow) { whereParts.push(`COALESCE(u.follow_up_status, 'new') = ?`); binds.push(follow) }
+    if (q) {
+      whereParts.push(`(u.email LIKE ? OR u.name LIKE ? OR u.phone LIKE ? OR IFNULL(s.slug,'') LIKE ? OR IFNULL(s.name,'') LIKE ?)`)
+      const like = `%${q}%`
+      binds.push(like, like, like, like, like)
+    }
+    const whereSql = whereParts.join(' AND ')
+
+    const listSql = `
       SELECT u.id, u.email, u.name, u.phone, u.created_at as createdAt,
              u.trial_started_at as trialStartedAt, u.trial_ends_at as trialEndsAt,
              u.plan_status as planStatus, u.follow_up_status as followUpStatus,
@@ -1946,22 +1969,16 @@ app.get('/api/admin/merchants', requireAdmin, async (c) => {
              s.payments_enabled as paymentsEnabled, s.is_live as isLive,
              s.product_count as productCount, s.last_active_at as lastActiveAt
       FROM users u
-      LEFT JOIN stores s ON s.user_id = u.id
-      WHERE COALESCE(u.is_admin, 0) = 0
+      ${storeJoin}
+      WHERE ${whereSql}
+      ORDER BY u.created_at DESC
+      LIMIT 300
     `
-    const binds: any[] = []
-    if (stage) { sql += ` AND s.onboarding_stage = ?`; binds.push(stage) }
-    if (plan) { sql += ` AND COALESCE(u.plan_status, 'trialing') = ?`; binds.push(plan) }
-    if (follow) { sql += ` AND COALESCE(u.follow_up_status, 'new') = ?`; binds.push(follow) }
-    if (q) {
-      sql += ` AND (u.email LIKE ? OR u.name LIKE ? OR u.phone LIKE ? OR s.slug LIKE ? OR s.name LIKE ?)`
-      const like = `%${q}%`
-      binds.push(like, like, like, like, like)
-    }
-    sql += ` ORDER BY u.created_at DESC LIMIT 300`
 
-    const stmt = c.env.DB.prepare(sql)
-    const rows = binds.length ? await stmt.bind(...binds).all() : await stmt.all()
+    const rows = binds.length
+      ? await c.env.DB.prepare(listSql).bind(...binds).all()
+      : await c.env.DB.prepare(listSql).all()
+
     const merchants = (rows.results || []).map((r: any) => {
       const trial = computeTrial({
         plan_status: r.planStatus,
@@ -1969,22 +1986,55 @@ app.get('/api/admin/merchants', requireAdmin, async (c) => {
         trial_ends_at: r.trialEndsAt,
         is_admin: 0,
       })
+      const stageKey = (r.onboardingStage || 'registered') as OnboardingStage
       return {
         ...r,
+        planStatus: trial.planStatus,
         daysLeft: trial.daysLeft,
         expired: trial.expired,
-        stageLabel: STAGE_LABELS[(r.onboardingStage || 'registered') as OnboardingStage] || r.onboardingStage,
+        stageLabel: STAGE_LABELS[stageKey] || r.onboardingStage || '已註冊',
         storeUrl: r.slug ? `/s/shop?slug=${r.slug}` : null,
       }
     })
 
-    // Summary counts
+    // Summary uses same filters but no LIMIT, so cards stay accurate
+    const summarySql = `
+      SELECT
+        COUNT(*) as total,
+        SUM(CASE WHEN COALESCE(u.plan_status, 'trialing') = 'paid' THEN 1 ELSE 0 END) as paid,
+        SUM(CASE
+          WHEN COALESCE(u.plan_status, 'trialing') = 'expired' THEN 1
+          WHEN COALESCE(u.plan_status, 'trialing') = 'trialing'
+            AND u.trial_ends_at IS NOT NULL
+            AND datetime(u.trial_ends_at) < datetime('now', '+8 hours') THEN 1
+          ELSE 0
+        END) as expired,
+        SUM(CASE
+          WHEN COALESCE(u.plan_status, 'trialing') = 'trialing'
+            AND (u.trial_ends_at IS NULL OR datetime(u.trial_ends_at) >= datetime('now', '+8 hours')) THEN 1
+          ELSE 0
+        END) as trialing,
+        SUM(CASE
+          WHEN COALESCE(u.plan_status, 'trialing') = 'trialing'
+            AND u.trial_ends_at IS NOT NULL
+            AND datetime(u.trial_ends_at) >= datetime('now', '+8 hours')
+            AND datetime(u.trial_ends_at) <= datetime('now', '+8 hours', '+3 days') THEN 1
+          ELSE 0
+        END) as expiringSoon
+      FROM users u
+      ${storeJoin}
+      WHERE ${whereSql}
+    `
+    const summaryRow = binds.length
+      ? await c.env.DB.prepare(summarySql).bind(...binds).first<any>()
+      : await c.env.DB.prepare(summarySql).first<any>()
+
     const summary = {
-      total: merchants.length,
-      trialing: merchants.filter((m: any) => m.planStatus === 'trialing' && !m.expired).length,
-      expiringSoon: merchants.filter((m: any) => m.planStatus === 'trialing' && !m.expired && (m.daysLeft ?? 99) <= 3).length,
-      expired: merchants.filter((m: any) => m.planStatus === 'expired' || m.expired).length,
-      paid: merchants.filter((m: any) => m.planStatus === 'paid').length,
+      total: Number(summaryRow?.total || 0),
+      trialing: Number(summaryRow?.trialing || 0),
+      expiringSoon: Number(summaryRow?.expiringSoon || 0),
+      expired: Number(summaryRow?.expired || 0),
+      paid: Number(summaryRow?.paid || 0),
       byStage: ONBOARDING_STAGES.reduce((acc, s) => {
         acc[s] = merchants.filter((m: any) => (m.onboardingStage || 'registered') === s).length
         return acc
