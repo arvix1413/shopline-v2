@@ -11,7 +11,7 @@ const colHrefs = [
   ['/trial-redirect', '/about/pricing', '/consultation'],
   ['/apps', '/faq/overview', '/faq/overview', '/faq/overview', 'https://line.me/R/ti/p/@kxh0647n'],
   ['/changelog', '/faq/overview'],
-  ['/about', '/about', '/about', '/contact'],
+  ['/cooperate', '/cooperate', '/about', '/contact'],
 ]
 
 const bottomHrefs = ['/about/sitemap', '/about/privacy', '/about/terms']

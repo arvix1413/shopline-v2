@@ -51,6 +51,7 @@ export default function AdminPage() {
   // Traffic & affiliate state
   const [traffic, setTraffic] = useState<any>(null)
   const [trafficLoading, setTrafficLoading] = useState(false)
+  const [trafficSegment, setTrafficSegment] = useState<'human' | 'bot' | 'datacenter' | 'internal' | 'all'>('human')
   const [affiliates, setAffiliates] = useState<any[]>([])
   const [affLoading, setAffLoading] = useState(false)
   const [showAffForm, setShowAffForm] = useState(false)
@@ -108,13 +109,13 @@ export default function AdminPage() {
     } catch { showMsg('error', '獲取漏斗數據失敗') } finally { setFunnelLoading(false) }
   }, [token])
 
-  const fetchTraffic = useCallback(async () => {
+  const fetchTraffic = useCallback(async (segment = trafficSegment) => {
     setTrafficLoading(true)
     try {
-      const res = await fetch(`${API}/api/admin/traffic`, { headers: { Authorization: `Bearer ${token}` } })
+      const res = await fetch(`${API}/api/admin/traffic?segment=${segment}`, { headers: { Authorization: `Bearer ${token}` } })
       if (res.ok) setTraffic(await res.json())
     } catch {} finally { setTrafficLoading(false) }
-  }, [token])
+  }, [token, trafficSegment])
 
   const fetchAffiliates = useCallback(async () => {
     setAffLoading(true)
@@ -483,7 +484,7 @@ export default function AdminPage() {
           <div className="space-y-5">
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <h2 className="text-lg font-semibold">流量來源分析</h2>
-              <button type="button" onClick={fetchTraffic}
+              <button type="button" onClick={() => fetchTraffic(trafficSegment)}
                 className="text-xs px-3 py-1.5 rounded-lg border bg-white hover:bg-gray-50 text-gray-600">
                 重新整理
               </button>
@@ -494,6 +495,7 @@ export default function AdminPage() {
                 {(() => {
                   const geo = traffic.geo || {}
                   const totals = geo.totals || {}
+                  const byType = geo.byType || {}
                   const maxCountry = Math.max(1, ...(geo.countries || []).map((x: any) => Number(x.visitors) || 0))
                   const countryName = (code: string) => ({
                     TW: '台灣', CN: '中國', HK: '香港', MO: '澳門', JP: '日本', KR: '韓國',
@@ -501,13 +503,47 @@ export default function AdminPage() {
                     PH: '菲律賓', ID: '印尼', AU: '澳洲', GB: '英國', DE: '德國',
                     FR: '法國', CA: '加拿大', IN: '印度', unknown: '未知',
                   } as Record<string, string>)[code] || code
+                  const typeLabel: Record<string, string> = {
+                    human: '真實訪客',
+                    bot: 'Bot',
+                    datacenter: '機房／雲端',
+                    internal: '內部測試',
+                    all: '全部',
+                  }
+                  const typeHint: Record<string, string> = {
+                    human: '排除 bot、機房、內部測試',
+                    bot: '爬蟲／監控／自動化 UA',
+                    datacenter: 'AWS／GCP 等機房出口（如 Boardman）',
+                    internal: '管理員登入瀏覽或手動標記',
+                    all: '未過濾總量',
+                  }
+                  const segments = ['human', 'bot', 'datacenter', 'internal', 'all'] as const
                   return (
                     <div className="space-y-4">
+                      <div className="flex flex-wrap gap-2">
+                        {segments.map((s) => (
+                          <button
+                            key={s}
+                            type="button"
+                            onClick={() => { setTrafficSegment(s); fetchTraffic(s) }}
+                            className="text-xs px-3 py-1.5 rounded-full border font-semibold transition-colors"
+                            style={
+                              trafficSegment === s
+                                ? { background: '#5B5FF0', color: '#fff', borderColor: '#5B5FF0' }
+                                : { background: '#fff', color: '#5C5F7A' }
+                            }
+                          >
+                            {typeLabel[s]}
+                            {byType[s] ? ` · ${byType[s].visitors}` : s === 'all' ? '' : ' · 0'}
+                          </button>
+                        ))}
+                      </div>
+
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         {[
-                          { label: '瀏覽次數', value: totals.views ?? 0, hint: `近 ${geo.days || 30} 天` },
-                          { label: '獨立訪客', value: totals.visitors ?? 0, hint: '依匿名 ID' },
-                          { label: '國家數', value: totals.countries ?? 0, hint: '含未知' },
+                          { label: '瀏覽次數', value: totals.views ?? 0, hint: `近 ${geo.days || 30} 天 · ${typeLabel[trafficSegment]}` },
+                          { label: '獨立訪客', value: totals.visitors ?? 0, hint: typeHint[trafficSegment] },
+                          { label: '國家數', value: totals.countries ?? 0, hint: '目前篩選結果' },
                           { label: '城市列數', value: geo.cities?.length ?? 0, hint: 'Top 列表' },
                         ].map((card) => (
                           <div key={card.label} className="bg-white rounded-xl border p-4">
@@ -518,11 +554,21 @@ export default function AdminPage() {
                         ))}
                       </div>
 
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {(['human', 'bot', 'datacenter', 'internal'] as const).map((s) => (
+                          <div key={s} className="bg-white rounded-xl border p-3">
+                            <div className="text-xs text-gray-500">{typeLabel[s]}</div>
+                            <div className="text-lg font-bold mt-0.5">{Number(byType[s]?.visitors || 0).toLocaleString()} <span className="text-xs font-normal text-gray-400">人</span></div>
+                            <div className="text-[11px] text-gray-400">{Number(byType[s]?.views || 0).toLocaleString()} 次瀏覽</div>
+                          </div>
+                        ))}
+                      </div>
+
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="bg-white rounded-xl border p-4">
-                          <div className="text-sm font-semibold text-gray-700 mb-3">🌍 訪客國家</div>
+                          <div className="text-sm font-semibold text-gray-700 mb-3">🌍 訪客國家（{typeLabel[trafficSegment]}）</div>
                           {(geo.countries || []).length === 0 ? (
-                            <div className="text-xs text-gray-400">尚無瀏覽數據（訪客造訪網站後會自動累積）</div>
+                            <div className="text-xs text-gray-400">此分類尚無數據</div>
                           ) : (geo.countries || []).map((row: any) => (
                             <div key={row.country} className="py-2 border-b last:border-0">
                               <div className="flex items-center justify-between text-sm mb-1">
@@ -537,7 +583,7 @@ export default function AdminPage() {
                         </div>
 
                         <div className="bg-white rounded-xl border p-4">
-                          <div className="text-sm font-semibold text-gray-700 mb-3">📍 訪客城市</div>
+                          <div className="text-sm font-semibold text-gray-700 mb-3">📍 訪客城市（{typeLabel[trafficSegment]}）</div>
                           {(geo.cities || []).length === 0 ? (
                             <div className="text-xs text-gray-400">尚無城市數據</div>
                           ) : (
@@ -592,8 +638,9 @@ export default function AdminPage() {
                                     <span className="text-gray-400 whitespace-nowrap">{row.created_at}</span>
                                   </div>
                                   <div className="text-gray-500 mt-0.5">
-                                    {countryName(row.country)} · {row.city || 'unknown'}
+                                    {typeLabel[row.traffic_type] || row.traffic_type || '—'} · {countryName(row.country)} · {row.city || 'unknown'}
                                     {row.device_type ? ` · ${row.device_type}` : ''}
+                                    {row.as_org ? ` · ${row.as_org}` : ''}
                                   </div>
                                 </div>
                               ))}

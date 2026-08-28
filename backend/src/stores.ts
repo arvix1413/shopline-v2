@@ -2,7 +2,7 @@
 
 export const RESERVED_STORE_SLUGS = new Set([
   'about', 'admin', 'api', 'apps', 'cart', 'changelog', 'compliance-center',
-  'components', 'consultation', 'cooperate', 'faq', 'forgot-password',
+  'components', 'consultation', 'contact', 'cooperate', 'faq', 'forgot-password',
   'group-buying', 'line-solution', 'login', 'online-store', 'online-store-setup',
   'payments', 'pos', 'products', 'profile', 'register', 'reset-password',
   'selectedpartners', 'seminar', 'settings', 'shoplytics', 'shopper-app',

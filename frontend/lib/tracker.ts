@@ -41,18 +41,30 @@ export function track(event: string, properties?: Record<string, unknown>, userI
 }
 
 /** Record a marketing-site page view (geo resolved server-side via Cloudflare). */
-export function trackPageview(path?: string) {
+export function trackPageview(path?: string, opts?: { internal?: boolean }) {
   if (typeof window === 'undefined') return
   const pathname = path || window.location.pathname || '/'
   if (pathname.startsWith('/admin')) return
   const anonymousId = getOrCreateAnonymousId()
+  const internal =
+    Boolean(opts?.internal) ||
+    localStorage.getItem('arvix_internal_traffic') === '1' ||
+    (() => {
+      try {
+        const u = JSON.parse(localStorage.getItem('user') || 'null')
+        return Boolean(u?.isAdmin)
+      } catch {
+        return false
+      }
+    })()
   fetch(`${API}/api/pageviews`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      anonymousId,
+      anonymousId: internal && !anonymousId.startsWith('internal_') ? `internal_${anonymousId}` : anonymousId,
       path: pathname,
       referrer: document.referrer || '',
+      internal,
     }),
     keepalive: true,
   }).catch(() => {})

@@ -18,7 +18,7 @@ import {
   type OnboardingStage,
   type FollowUpStatus,
 } from './trial'
-import { ensurePageviewsTable, getRequestGeo } from './geo'
+import { ensurePageviewsTable, getRequestGeo, classifyTraffic, TRAFFIC_TYPE_SQL } from './geo'
 
 type Bindings = {
   DB: D1Database
@@ -1094,6 +1094,14 @@ app.post('/api/pageviews', async (c) => {
     const referrer = String(body.referrer || '').slice(0, 500)
     const geo = getRequestGeo(c)
     const ua = (c.req.header('User-Agent') || '').slice(0, 400)
+    const trafficType = classifyTraffic({
+      ua,
+      city: geo.city,
+      region: geo.region,
+      asOrganization: geo.asOrganization,
+      anonymousId,
+      internal: Boolean(body.internal),
+    })
 
     // Light dedupe: same visitor + path within 20s
     const recent = await c.env.DB.prepare(
@@ -1106,8 +1114,8 @@ app.post('/api/pageviews', async (c) => {
 
     await c.env.DB.prepare(
       `INSERT INTO pageviews
-        (anonymous_id, path, referrer, country, city, region, device_type, user_agent, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now', '+8 hours'))`
+        (anonymous_id, path, referrer, country, city, region, device_type, user_agent, traffic_type, as_org, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', '+8 hours'))`
     ).bind(
       anonymousId,
       path,
@@ -1117,8 +1125,10 @@ app.post('/api/pageviews', async (c) => {
       geo.region,
       geo.deviceType,
       ua,
+      trafficType,
+      geo.asOrganization.slice(0, 120),
     ).run()
-    return c.json({ ok: true })
+    return c.json({ ok: true, trafficType })
   } catch (e: any) {
     return c.json({ error: String(e) }, 500)
   }
@@ -1623,7 +1633,7 @@ app.delete('/api/admin/affiliates/:id', requireAdmin, async (c) => {
   } catch(e:any) { return c.json({error:String(e)},500) }
 })
 
-// Traffic source analytics (+ visitor geo)
+// Traffic source analytics (+ visitor geo, segmentable)
 app.get('/api/admin/traffic', requireAdmin, async (c) => {
   try {
     await ensurePageviewsTable(c.env.DB)
@@ -1647,14 +1657,32 @@ app.get('/api/admin/traffic', requireAdmin, async (c) => {
     ).all()
 
     const days = Math.min(90, Math.max(1, Number(c.req.query('days') || 30)))
+    const segmentRaw = String(c.req.query('segment') || 'human').toLowerCase()
+    const segment = ['human', 'bot', 'datacenter', 'internal', 'all'].includes(segmentRaw)
+      ? segmentRaw
+      : 'human'
     const sinceExpr = `datetime('now', '+8 hours', '-${days} days')`
+    const typeExpr = TRAFFIC_TYPE_SQL
+    const segmentFilter = segment === 'all' ? '1=1' : `(${typeExpr}) = ?`
+    const segmentBinds = segment === 'all' ? [] : [segment]
 
     const totals = await c.env.DB.prepare(
       `SELECT COUNT(*) as views,
               COUNT(DISTINCT anonymous_id) as visitors,
               COUNT(DISTINCT country) as countries
-       FROM pageviews WHERE datetime(created_at) >= ${sinceExpr}`
-    ).first()
+       FROM pageviews
+       WHERE datetime(created_at) >= ${sinceExpr}
+         AND ${segmentFilter}`
+    ).bind(...segmentBinds).first()
+
+    const breakdown = await c.env.DB.prepare(
+      `SELECT (${typeExpr}) as traffic_type,
+              COUNT(*) as views,
+              COUNT(DISTINCT anonymous_id) as visitors
+       FROM pageviews
+       WHERE datetime(created_at) >= ${sinceExpr}
+       GROUP BY (${typeExpr})`
+    ).all()
 
     const countries = await c.env.DB.prepare(
       `SELECT country,
@@ -1662,37 +1690,56 @@ app.get('/api/admin/traffic', requireAdmin, async (c) => {
               COUNT(DISTINCT anonymous_id) as visitors
        FROM pageviews
        WHERE datetime(created_at) >= ${sinceExpr}
+         AND ${segmentFilter}
        GROUP BY country
        ORDER BY visitors DESC, views DESC
        LIMIT 50`
-    ).all()
+    ).bind(...segmentBinds).all()
 
     const cities = await c.env.DB.prepare(
       `SELECT country, city, region,
               COUNT(*) as views,
-              COUNT(DISTINCT anonymous_id) as visitors
+              COUNT(DISTINCT anonymous_id) as visitors,
+              (${typeExpr}) as traffic_type
        FROM pageviews
        WHERE datetime(created_at) >= ${sinceExpr}
+         AND ${segmentFilter}
        GROUP BY country, city
        ORDER BY visitors DESC, views DESC
        LIMIT 80`
-    ).all()
+    ).bind(...segmentBinds).all()
 
     const topPaths = await c.env.DB.prepare(
       `SELECT path, COUNT(*) as views, COUNT(DISTINCT anonymous_id) as visitors
        FROM pageviews
        WHERE datetime(created_at) >= ${sinceExpr}
+         AND ${segmentFilter}
        GROUP BY path
        ORDER BY views DESC
        LIMIT 20`
-    ).all()
+    ).bind(...segmentBinds).all()
 
     const recent = await c.env.DB.prepare(
-      `SELECT path, country, city, region, device_type, created_at, anonymous_id
+      `SELECT path, country, city, region, device_type, created_at, anonymous_id,
+              (${typeExpr}) as traffic_type, COALESCE(as_org,'') as as_org
        FROM pageviews
+       WHERE ${segmentFilter}
        ORDER BY id DESC
        LIMIT 40`
-    ).all()
+    ).bind(...segmentBinds).all()
+
+    const byType: Record<string, { views: number; visitors: number }> = {
+      human: { views: 0, visitors: 0 },
+      bot: { views: 0, visitors: 0 },
+      datacenter: { views: 0, visitors: 0 },
+      internal: { views: 0, visitors: 0 },
+    }
+    for (const row of (breakdown.results || []) as any[]) {
+      const key = String(row.traffic_type || 'human')
+      if (byType[key]) {
+        byType[key] = { views: Number(row.views) || 0, visitors: Number(row.visitors) || 0 }
+      }
+    }
 
     return c.json({
       sources: sources.results,
@@ -1701,7 +1748,9 @@ app.get('/api/admin/traffic', requireAdmin, async (c) => {
       affConversions: affConversions.results,
       geo: {
         days,
+        segment,
         totals: totals || { views: 0, visitors: 0, countries: 0 },
+        byType,
         countries: countries.results || [],
         cities: cities.results || [],
         topPaths: topPaths.results || [],
