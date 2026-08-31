@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { drizzle } from 'drizzle-orm/d1'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import * as schema from './schema'
 import { hashPassword, verifyPassword, signToken, verifyToken } from './auth'
 import { allocateUniqueSlug, ensureStoresTable } from './stores'
@@ -216,8 +216,12 @@ app.post('/api/checkout/session', async (c) => {
   })
   const result = await response.json<any>()
   if (!response.ok || !result?.url) {
-    console.error('Stripe Checkout error', result?.error?.type, result?.error?.code)
-    return c.json({ error: '暫時無法建立付款頁面，請稍後再試' }, 502)
+    console.error('Stripe Checkout error', result?.error?.type, result?.error?.code, result?.error?.message)
+    return c.json({
+      error: '暫時無法建立付款頁面，請稍後再試',
+      stripeCode: result?.error?.code || null,
+      stripeType: result?.error?.type || null,
+    }, 502)
   }
   return c.json({ url: result.url })
 })
@@ -241,6 +245,27 @@ app.post('/api/stripe/webhook', async (c) => {
   `).run()
   await c.env.DB.prepare('INSERT OR IGNORE INTO stripe_events (id, type, livemode, payload) VALUES (?, ?, ?, ?)')
     .bind(event.id, event.type, event.livemode ? 1 : 0, rawBody).run()
+
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data?.object || {}
+    const orderId = Number(session.metadata?.order_id || 0)
+    const cartSessionId = String(session.metadata?.cart_session_id || '')
+    if (orderId) {
+      await c.env.DB.prepare(
+        `UPDATE orders SET status='paid', updated_at=datetime('now', '+8 hours') WHERE id=?`
+      ).bind(orderId).run().catch(() => {})
+    }
+    if (cartSessionId) {
+      await c.env.DB.prepare(`DELETE FROM cart_items WHERE session_id=?`).bind(cartSessionId).run().catch(() => {})
+    }
+    const storeSlug = String(session.metadata?.store_slug || '')
+    if (storeSlug) {
+      await c.env.DB.prepare(
+        `UPDATE stores SET payments_enabled=1, onboarding_stage='payments_setup', updated_at=datetime('now', '+8 hours') WHERE slug=?`
+      ).bind(storeSlug).run().catch(() => {})
+    }
+  }
+
   return c.json({ received: true })
 })
 
@@ -934,10 +959,10 @@ app.post('/api/cart', async (c) => {
     // 检查购物车中是否已有该商品
     const existingItem = await db.select()
       .from(schema.cartItems)
-      .where(
-        eq(schema.cartItems.sessionId, sessionId) && 
+      .where(and(
+        eq(schema.cartItems.sessionId, sessionId),
         eq(schema.cartItems.productId, productId)
-      )
+      ))
       .get()
     
     if (existingItem) {
@@ -1059,6 +1084,195 @@ app.delete('/api/cart/clear/:sessionId', async (c) => {
     console.error('Clear cart error:', error)
     return c.json({ error: '清空购物车失败' }, 500)
   }
+})
+
+/** Brand store checkout: Stripe card payment or COD. */
+app.post('/api/store-checkout/session', async (c) => {
+  try {
+    const body = await c.req.json() as {
+      sessionId?: string
+      storeSlug?: string
+      method?: string
+      customerName?: string
+      customerEmail?: string
+      customerPhone?: string
+      shippingAddress?: string
+    }
+    const sessionId = String(body.sessionId || '').trim()
+    const storeSlug = String(body.storeSlug || '').trim().toLowerCase()
+    const method = String(body.method || 'stripe').toLowerCase() === 'cod' ? 'cod' : 'stripe'
+    const customerName = String(body.customerName || '').trim()
+    const customerEmail = String(body.customerEmail || '').trim()
+    const customerPhone = String(body.customerPhone || '').trim()
+    const shippingAddress = String(body.shippingAddress || '').trim()
+
+    if (!sessionId || !storeSlug) return c.json({ error: '缺少購物車或店舖資訊' }, 400)
+    if (!customerName || !customerPhone || !shippingAddress) {
+      return c.json({ error: '請填寫姓名、電話與地址' }, 400)
+    }
+
+    await ensureStoresTable(c.env.DB)
+    await ensureProductsStoreSlug(c.env.DB)
+    const store = await c.env.DB.prepare(
+      `SELECT id, slug, name, status FROM stores WHERE slug=? AND status='active'`
+    ).bind(storeSlug).first()
+    if (!store) return c.json({ error: '商店不存在' }, 404)
+
+    const db = drizzle(c.env.DB, { schema })
+    const cartItems = await db.select({
+      id: schema.cartItems.id,
+      productId: schema.cartItems.productId,
+      quantity: schema.cartItems.quantity,
+      product: {
+        id: schema.products.id,
+        name: schema.products.name,
+        price: schema.products.price,
+        imageUrl: schema.products.imageUrl,
+        storeSlug: schema.products.storeSlug,
+        stock: schema.products.stock,
+      },
+    })
+      .from(schema.cartItems)
+      .leftJoin(schema.products, eq(schema.cartItems.productId, schema.products.id))
+      .where(eq(schema.cartItems.sessionId, sessionId))
+
+    const storeItems = cartItems.filter((item) => item.product && (item.product as any).storeSlug === storeSlug)
+    if (storeItems.length === 0) return c.json({ error: '購物車是空的' }, 400)
+
+    for (const item of storeItems) {
+      const stock = Number((item.product as any)?.stock || 0)
+      if (stock < item.quantity) {
+        return c.json({ error: `「${(item.product as any)?.name || '商品'}」庫存不足` }, 400)
+      }
+    }
+
+    const totalAmount = storeItems.reduce((sum, item) => {
+      return sum + Number((item.product as any)?.price || 0) * item.quantity
+    }, 0)
+    if (totalAmount <= 0) return c.json({ error: '訂單金額無效' }, 400)
+
+    const shippingPayload = JSON.stringify({
+      name: customerName,
+      email: customerEmail,
+      phone: customerPhone,
+      address: shippingAddress,
+      storeSlug,
+      method,
+    })
+
+    const order = await db.insert(schema.orders).values({
+      totalAmount,
+      status: method === 'cod' ? 'cod' : 'pending',
+      shippingAddress: shippingPayload,
+    }).returning().get()
+
+    for (const item of storeItems) {
+      await db.insert(schema.orderItems).values({
+        orderId: order.id,
+        productId: item.productId,
+        quantity: item.quantity,
+        price: Number((item.product as any)?.price || 0),
+      })
+    }
+
+    const siteUrl = (c.env.SITE_URL || 'https://arvixai.com').replace(/\/$/, '')
+    const successPath = `${siteUrl}/s/shop?slug=${encodeURIComponent(storeSlug)}&paid=1&order=${order.id}`
+
+    if (method === 'cod') {
+      for (const item of storeItems) {
+        const product = item.product as any
+        if (product?.id != null) {
+          await c.env.DB.prepare(
+            `UPDATE products SET stock = CASE WHEN stock > ? THEN stock - ? ELSE 0 END, updated_at=datetime('now', '+8 hours') WHERE id=?`
+          ).bind(item.quantity, item.quantity, product.id).run().catch(() => {})
+        }
+      }
+      await db.delete(schema.cartItems).where(eq(schema.cartItems.sessionId, sessionId))
+      await c.env.DB.prepare(
+        `UPDATE stores SET payments_enabled=1, onboarding_stage='payments_setup', updated_at=datetime('now', '+8 hours') WHERE slug=?`
+      ).bind(storeSlug).run().catch(() => {})
+      return c.json({
+        ok: true,
+        method: 'cod',
+        orderId: order.id,
+        totalAmount,
+        redirectUrl: successPath,
+      })
+    }
+
+    if (!c.env.STRIPE_SECRET_KEY) {
+      return c.json({ error: '尚未設定信用卡金流，請改選貨到付款', orderId: order.id }, 503)
+    }
+
+    const params = new URLSearchParams({
+      mode: 'payment',
+      'payment_method_types[0]': 'card',
+      success_url: `${successPath}&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${siteUrl}/s/shop?slug=${encodeURIComponent(storeSlug)}&checkout=cancelled`,
+      'metadata[order_id]': String(order.id),
+      'metadata[store_slug]': storeSlug,
+      'metadata[cart_session_id]': sessionId,
+      'metadata[arvix_checkout]': 'store',
+    })
+    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) {
+      params.set('customer_email', customerEmail)
+    }
+
+    storeItems.forEach((item, index) => {
+      const product = item.product as any
+      const unit = Math.max(1, Math.round(Number(product.price || 0)))
+      params.set(`line_items[${index}][price_data][currency]`, 'twd')
+      params.set(`line_items[${index}][price_data][unit_amount]`, String(unit))
+      params.set(`line_items[${index}][price_data][product_data][name]`, String(product.name || '商品').slice(0, 120))
+      params.set(`line_items[${index}][quantity]`, String(item.quantity))
+    })
+
+    const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${c.env.STRIPE_SECRET_KEY}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params,
+    })
+    const result = await response.json<any>()
+    if (!response.ok || !result?.url) {
+      console.error('Store Stripe Checkout error', result?.error?.type, result?.error?.code, result?.error?.message)
+      await c.env.DB.prepare(`UPDATE orders SET status='failed' WHERE id=?`).bind(order.id).run().catch(() => {})
+      return c.json({
+        error: '信用卡付款暫時無法使用，請改選貨到付款',
+        orderId: order.id,
+        stripeCode: result?.error?.code || null,
+      }, 502)
+    }
+
+    const shippingWithSession = JSON.stringify({
+      ...JSON.parse(shippingPayload),
+      stripeSessionId: result.id,
+    })
+    await c.env.DB.prepare(`UPDATE orders SET shipping_address=? WHERE id=?`)
+      .bind(shippingWithSession, order.id).run().catch(() => {})
+
+    return c.json({
+      ok: true,
+      method: 'stripe',
+      orderId: order.id,
+      url: result.url,
+    })
+  } catch (error) {
+    console.error('Store checkout error:', error)
+    return c.json({ error: '結帳失敗，請稍後再試' }, 500)
+  }
+})
+
+app.get('/api/orders/:id', async (c) => {
+  const id = parseInt(c.req.param('id'))
+  if (!id) return c.json({ error: '無效訂單' }, 400)
+  const db = drizzle(c.env.DB, { schema })
+  const order = await db.select().from(schema.orders).where(eq(schema.orders.id, id)).get()
+  if (!order) return c.json({ error: '訂單不存在' }, 404)
+  const items = await db.select().from(schema.orderItems).where(eq(schema.orderItems.orderId, id))
+  return c.json({ ...order, items })
 })
 
 // 图片代理路由 - 通过Worker提供R2图片访问
