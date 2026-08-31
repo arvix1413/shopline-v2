@@ -39,6 +39,11 @@ function parseListPrice(description?: string): number | null {
   return Number.isFinite(v) ? v : null
 }
 
+/** Demo store hero banners (full-bleed). */
+const STORE_BANNERS: Record<string, string> = {
+  bennis: 'https://shopline-backend.arvix1413.workers.dev/images/products/1788146474810-bennis-banner.jpg',
+}
+
 export default function BrandStoreClient() {
   const params = useParams<{ slug: string }>()
   const [slug, setSlug] = useState('')
@@ -116,6 +121,8 @@ export default function BrandStoreClient() {
     return products.filter((p) => p.category === category)
   }, [products, category])
 
+  const bannerUrl = store ? STORE_BANNERS[store.slug] : undefined
+
   if (loading) {
     return (
       <main className="min-h-screen flex items-center justify-center" style={{ background: '#FAFBFA' }}>
@@ -154,6 +161,11 @@ export default function BrandStoreClient() {
         .store-rise-delay-3 { animation-delay: 0.24s; }
         .product-card:hover .product-img { transform: scale(1.04); }
         .product-img { transition: transform 0.45s ease; }
+        @keyframes banner-zoom {
+          from { transform: scale(1.06); }
+          to { transform: scale(1); }
+        }
+        .store-banner-img { animation: banner-zoom 8s ease-out both; }
       `}</style>
 
       <div className="bennis-store">
@@ -180,44 +192,69 @@ export default function BrandStoreClient() {
           </div>
         </header>
 
-        <section className="relative overflow-hidden">
+        <section className="relative overflow-hidden" style={{ minHeight: 'min(78vh, 720px)' }}>
+          {bannerUrl ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={bannerUrl}
+                alt=""
+                className="store-banner-img absolute inset-0 w-full h-full object-cover"
+              />
+              <div
+                className="absolute inset-0"
+                style={{
+                  background:
+                    'linear-gradient(90deg, rgba(17,24,39,0.62) 0%, rgba(17,24,39,0.38) 42%, rgba(17,24,39,0.12) 100%)',
+                }}
+              />
+            </>
+          ) : (
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  'radial-gradient(ellipse 70% 55% at 78% 18%, rgba(56,120,92,0.16), transparent 58%), linear-gradient(165deg, #EEF2EF 0%, #FAFBFA 42%, #E8F0EB 100%)',
+              }}
+            />
+          )}
           <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background:
-                'radial-gradient(ellipse 70% 55% at 78% 18%, rgba(56,120,92,0.16), transparent 58%), linear-gradient(165deg, #EEF2EF 0%, #FAFBFA 42%, #E8F0EB 100%)',
-            }}
-          />
-          <div className="relative z-10 max-w-6xl mx-auto px-5 pt-16 pb-14 md:pt-24 md:pb-20">
-            <p className="store-rise text-xs font-semibold tracking-[0.2em] uppercase mb-4" style={{ color: '#3F6B55' }}>
-              馬來西亞天然乳膠
-            </p>
+            className="relative z-10 max-w-6xl mx-auto px-5 flex flex-col justify-end"
+            style={{ minHeight: 'min(78vh, 720px)', paddingTop: '5rem', paddingBottom: '3.5rem' }}
+          >
             <h1
-              className="store-rise store-rise-delay-1 font-extrabold tracking-tight mb-5"
-              style={{ fontSize: 'clamp(2.35rem, 5.8vw, 4rem)', lineHeight: 1.05, maxWidth: '12ch' }}
+              className="store-rise font-extrabold tracking-tight mb-4"
+              style={{
+                fontSize: 'clamp(2.6rem, 7vw, 4.4rem)',
+                lineHeight: 1.05,
+                maxWidth: '10ch',
+                color: bannerUrl ? '#FAFBFA' : '#111827',
+              }}
             >
               {store.name}
             </h1>
             <p
-              className="store-rise store-rise-delay-2 text-base md:text-lg mb-8"
-              style={{ color: '#4B5563', maxWidth: 440, lineHeight: 1.65 }}
+              className="store-rise store-rise-delay-1 text-base md:text-lg mb-8"
+              style={{
+                color: bannerUrl ? 'rgba(250,251,250,0.88)' : '#4B5563',
+                maxWidth: 420,
+                lineHeight: 1.65,
+              }}
             >
               {store.tagline || '枕頭｜天然乳膠枕頭，選對枕頭，睡出好眠。'}
             </p>
-            <div className="store-rise store-rise-delay-3 flex flex-wrap gap-3">
+            <div className="store-rise store-rise-delay-2">
               <a
                 href="#products"
-                className="px-6 py-3 text-sm font-semibold"
-                style={{ background: '#111827', color: '#FAFBFA' }}
+                className="inline-block px-7 py-3 text-sm font-semibold"
+                style={
+                  bannerUrl
+                    ? { background: '#FAFBFA', color: '#111827' }
+                    : { background: '#111827', color: '#FAFBFA' }
+                }
               >
                 瀏覽全部商品
               </a>
-              <span
-                className="px-5 py-3 text-sm font-medium"
-                style={{ border: '1px solid rgba(17,24,39,0.12)', color: '#374151' }}
-              >
-                {products.length} 件上架中
-              </span>
             </div>
           </div>
         </section>
