@@ -89,6 +89,7 @@ export default function BrandStoreClient() {
   const [checkoutError, setCheckoutError] = useState('')
   const [paidNotice, setPaidNotice] = useState<{ orderId: string; method?: string } | null>(null)
   const [form, setForm] = useState({
+    shippingMethod: 'seven_eleven' as 'seven_eleven' | 'home',
     customerName: '',
     customerPhone: '',
     customerEmail: '',
@@ -229,6 +230,14 @@ export default function BrandStoreClient() {
 
   const checkout = async (method: 'stripe' | 'cod') => {
     if (!store || !sessionId) return
+    if (method === 'cod' && form.shippingMethod !== 'seven_eleven') {
+      setCheckoutError('貨到付款僅限 7-11 取貨')
+      return
+    }
+    if (!form.customerName.trim() || form.customerName.trim().length < 2) {
+      setCheckoutError('請填寫收貨人全名')
+      return
+    }
     setCheckingOut(true)
     setCheckoutError('')
     try {
@@ -239,7 +248,11 @@ export default function BrandStoreClient() {
           sessionId,
           storeSlug: store.slug,
           method,
-          ...form,
+          shippingMethod: form.shippingMethod,
+          customerName: form.customerName,
+          customerPhone: form.customerPhone,
+          customerEmail: form.customerEmail,
+          shippingAddress: form.shippingAddress,
         }),
       })
       const data = await res.json().catch(() => ({}))
@@ -601,9 +614,43 @@ export default function BrandStoreClient() {
                       <span>{formatPrice(cartTotal)}</span>
                     </div>
                     <div className="space-y-3">
+                      <div>
+                        <div className="text-xs font-semibold mb-2" style={{ color: '#4B5563' }}>配送方式</div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            className="px-3 py-2 text-sm font-semibold text-left"
+                            style={
+                              form.shippingMethod === 'seven_eleven'
+                                ? { background: '#111827', color: '#FAFBFA' }
+                                : { background: '#fff', border: '1px solid rgba(17,24,39,0.12)' }
+                            }
+                            onClick={() => setForm((f) => ({ ...f, shippingMethod: 'seven_eleven' }))}
+                          >
+                            7-11 取貨
+                          </button>
+                          <button
+                            type="button"
+                            className="px-3 py-2 text-sm font-semibold text-left"
+                            style={
+                              form.shippingMethod === 'home'
+                                ? { background: '#111827', color: '#FAFBFA' }
+                                : { background: '#fff', border: '1px solid rgba(17,24,39,0.12)' }
+                            }
+                            onClick={() => setForm((f) => ({ ...f, shippingMethod: 'home' }))}
+                          >
+                            宅配／其他
+                          </button>
+                        </div>
+                        <p className="text-[11px] mt-2 leading-relaxed" style={{ color: '#9CA3AF' }}>
+                          {form.shippingMethod === 'seven_eleven'
+                            ? '7-11：可刷卡或貨到付款；收貨人請留全名。'
+                            : '宅配／其他：僅接受信用卡付款。'}
+                        </p>
+                      </div>
                       <input
                         className="w-full px-3 py-2 text-sm border outline-none"
-                        placeholder="收件姓名 *"
+                        placeholder="收貨人全名 *"
                         value={form.customerName}
                         onChange={(e) => setForm((f) => ({ ...f, customerName: e.target.value }))}
                       />
@@ -622,7 +669,11 @@ export default function BrandStoreClient() {
                       <textarea
                         className="w-full px-3 py-2 text-sm border outline-none resize-none"
                         rows={3}
-                        placeholder="收件地址 *"
+                        placeholder={
+                          form.shippingMethod === 'seven_eleven'
+                            ? '7-11 門市名稱／店號 *'
+                            : '收件地址 *'
+                        }
                         value={form.shippingAddress}
                         onChange={(e) => setForm((f) => ({ ...f, shippingAddress: e.target.value }))}
                       />
@@ -640,17 +691,21 @@ export default function BrandStoreClient() {
                   >
                     {checkingOut ? '處理中...' : '信用卡付款'}
                   </button>
-                  <button
-                    type="button"
-                    disabled={checkingOut}
-                    className="w-full py-3 text-sm font-semibold disabled:opacity-60"
-                    style={{ border: '1px solid rgba(17,24,39,0.15)', background: '#fff' }}
-                    onClick={() => checkout('cod')}
-                  >
-                    貨到付款下單
-                  </button>
+                  {form.shippingMethod === 'seven_eleven' && (
+                    <button
+                      type="button"
+                      disabled={checkingOut}
+                      className="w-full py-3 text-sm font-semibold disabled:opacity-60"
+                      style={{ border: '1px solid rgba(17,24,39,0.15)', background: '#fff' }}
+                      onClick={() => checkout('cod')}
+                    >
+                      貨到付款下單
+                    </button>
+                  )}
                   <p className="text-[11px] leading-relaxed" style={{ color: '#9CA3AF' }}>
-                    信用卡走 Stripe；若金流尚未設定完成，可先用貨到付款完成整段下單流程。
+                    {form.shippingMethod === 'seven_eleven'
+                      ? '7-11 取貨可用刷卡或貨到付款；刷卡時收貨人請留全名。'
+                      : '此配送方式僅能刷信用卡付款。'}
                   </p>
                 </>
               )}

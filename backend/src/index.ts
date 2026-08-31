@@ -1086,13 +1086,14 @@ app.delete('/api/cart/clear/:sessionId', async (c) => {
   }
 })
 
-/** Brand store checkout: Stripe card payment or COD. */
+/** Brand store checkout: Stripe card payment or COD (7-11 only). */
 app.post('/api/store-checkout/session', async (c) => {
   try {
     const body = await c.req.json() as {
       sessionId?: string
       storeSlug?: string
       method?: string
+      shippingMethod?: string
       customerName?: string
       customerEmail?: string
       customerPhone?: string
@@ -1101,14 +1102,27 @@ app.post('/api/store-checkout/session', async (c) => {
     const sessionId = String(body.sessionId || '').trim()
     const storeSlug = String(body.storeSlug || '').trim().toLowerCase()
     const method = String(body.method || 'stripe').toLowerCase() === 'cod' ? 'cod' : 'stripe'
+    const shippingMethodRaw = String(body.shippingMethod || 'home').trim().toLowerCase()
+    const shippingMethod = shippingMethodRaw === 'seven_eleven' || shippingMethodRaw === '711'
+      ? 'seven_eleven'
+      : 'home'
     const customerName = String(body.customerName || '').trim()
     const customerEmail = String(body.customerEmail || '').trim()
     const customerPhone = String(body.customerPhone || '').trim()
     const shippingAddress = String(body.shippingAddress || '').trim()
 
     if (!sessionId || !storeSlug) return c.json({ error: '缺少購物車或店舖資訊' }, 400)
-    if (!customerName || !customerPhone || !shippingAddress) {
-      return c.json({ error: '請填寫姓名、電話與地址' }, 400)
+    if (!customerName || customerName.length < 2) {
+      return c.json({ error: '請填寫收貨人全名' }, 400)
+    }
+    if (!customerPhone) return c.json({ error: '請填寫手機號碼' }, 400)
+    if (!shippingAddress) {
+      return c.json({
+        error: shippingMethod === 'seven_eleven' ? '請填寫 7-11 門市名稱或店號' : '請填寫收件地址',
+      }, 400)
+    }
+    if (method === 'cod' && shippingMethod !== 'seven_eleven') {
+      return c.json({ error: '貨到付款僅限 7-11 取貨' }, 400)
     }
 
     await ensureStoresTable(c.env.DB)
@@ -1157,6 +1171,8 @@ app.post('/api/store-checkout/session', async (c) => {
       phone: customerPhone,
       address: shippingAddress,
       storeSlug,
+      shippingMethod,
+      shippingMethodLabel: shippingMethod === 'seven_eleven' ? '7-11 超商取貨' : '宅配／其他',
       method,
     })
 
@@ -1194,6 +1210,7 @@ app.post('/api/store-checkout/session', async (c) => {
       return c.json({
         ok: true,
         method: 'cod',
+        shippingMethod,
         orderId: order.id,
         totalAmount,
         redirectUrl: successPath,
