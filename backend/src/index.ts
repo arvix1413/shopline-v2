@@ -1229,6 +1229,7 @@ app.post('/api/store-checkout/session', async (c) => {
       'metadata[order_id]': String(order.id),
       'metadata[store_slug]': storeSlug,
       'metadata[cart_session_id]': sessionId,
+      'metadata[shipping_method]': shippingMethod,
       'metadata[arvix_checkout]': 'store',
     })
     if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) {
