@@ -163,7 +163,7 @@ def import_products(slug: str):
         desc_parts = []
         if p.get("listPrice"):
             desc_parts.append(f"原價 NT${int(p['listPrice'])}")
-        desc_parts.append("馬來西亞天然乳膠枕頭｜班尼斯示範商品")
+        desc_parts.append("馬來西亞天然乳膠枕頭")
         body = {
             "name": p["name"],
             "price": p["price"],

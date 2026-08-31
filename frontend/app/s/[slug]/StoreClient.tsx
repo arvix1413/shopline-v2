@@ -69,7 +69,7 @@ function ensureCartSession(storeSlug: string) {
 
 /** Demo store hero banners (full-bleed). */
 const STORE_BANNERS: Record<string, string> = {
-  bennis: 'https://shopline-backend.arvix1413.workers.dev/images/products/1788146474810-bennis-banner.jpg',
+  bennis: 'https://shopline-backend.arvix1413.workers.dev/images/products/1788148237227-bennis-banner-clean.jpg',
 }
 
 export default function BrandStoreClient() {
@@ -500,7 +500,7 @@ export default function BrandStoreClient() {
             <div className="px-6 py-12 md:px-12 md:py-14" style={{ background: '#111827', color: '#F9FAFB' }}>
               <h2 className="text-2xl md:text-3xl font-bold mb-3">關於品牌</h2>
               <p className="text-sm md:text-base max-w-xl leading-relaxed" style={{ color: 'rgba(249,250,251,0.78)' }}>
-                {store.tagline || '選對枕頭，睡出好眠。此為 ARVIX 店舖功能示範，商品資料來源於班尼斯枕頭分類。'}
+                {store.tagline || '選對枕頭，睡出好眠。馬來西亞天然乳膠，守護每一夜好眠。'}
               </p>
             </div>
           </div>
@@ -508,7 +508,7 @@ export default function BrandStoreClient() {
 
         <footer className="border-t py-8" style={{ borderColor: 'rgba(17,24,39,0.06)' }}>
           <div className="max-w-6xl mx-auto px-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs" style={{ color: '#9CA3AF' }}>
-            <span>{store.name} · Demo store on ARVIX</span>
+            <span>{store.name}</span>
             <Link href="/" className="hover:opacity-70 transition">arvixai.com</Link>
           </div>
         </footer>
