@@ -33,6 +33,7 @@ export const products = sqliteTable('products', {
   price: real('price').notNull(),
   imageUrl: text('image_url'),
   category: text('category'),
+  storeSlug: text('store_slug'),
   stock: integer('stock').default(0),
   featured: integer('featured', { mode: 'boolean' }).default(false),
   createdAt: text('created_at').default('CURRENT_TIMESTAMP'),

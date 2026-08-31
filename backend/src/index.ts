@@ -280,9 +280,20 @@ app.post('/api/init-admin', async (c) => {
   } catch (e: any) { return c.json({ error: String(e) }, 500) }
 })
 
+async function ensureProductsStoreSlug(db: D1Database) {
+  await db.prepare(`ALTER TABLE products ADD COLUMN store_slug TEXT`).run().catch(() => {})
+  await db.prepare(`CREATE INDEX IF NOT EXISTS idx_products_store_slug ON products(store_slug)`).run().catch(() => {})
+}
+
 // 商品相关路由
 app.get('/api/products', async (c) => {
+  await ensureProductsStoreSlug(c.env.DB)
+  const store = (c.req.query('store') || '').trim().toLowerCase()
   const db = drizzle(c.env.DB, { schema })
+  if (store) {
+    const products = await db.select().from(schema.products).where(eq(schema.products.storeSlug, store))
+    return c.json(products)
+  }
   const products = await db.select().from(schema.products)
   return c.json(products)
 })
@@ -302,6 +313,7 @@ app.get('/api/products/:id', async (c) => {
 app.post('/api/products', async (c) => {
   try {
     const body = await c.req.json()
+    await ensureProductsStoreSlug(c.env.DB)
     const db = drizzle(c.env.DB, { schema })
     
     // 验证必填字段
@@ -316,6 +328,8 @@ app.post('/api/products', async (c) => {
     if (!body.category) {
       return c.json({ error: '请选择商品分类' }, 400)
     }
+
+    const storeSlug = (body.storeSlug || body.store_slug || '').trim().toLowerCase() || null
     
     const newProduct = await db.insert(schema.products).values({
       name: body.name.trim(),
@@ -323,9 +337,21 @@ app.post('/api/products', async (c) => {
       price: Number(body.price),
       imageUrl: body.imageUrl || '',
       category: body.category,
+      storeSlug,
       stock: Number(body.stock) || 0,
       featured: Boolean(body.featured)
     }).returning().get()
+
+    if (storeSlug) {
+      const countRow = await c.env.DB.prepare(
+        `SELECT COUNT(*) as c FROM products WHERE store_slug = ?`
+      ).bind(storeSlug).first() as { c?: number } | null
+      const count = Number(countRow?.c || 0)
+      await c.env.DB.prepare(
+        `UPDATE stores SET product_count = ?, is_live = 1, onboarding_stage = 'products_added',
+         updated_at = datetime('now', '+8 hours') WHERE slug = ?`
+      ).bind(count, storeSlug).run().catch(() => {})
+    }
     
     return c.json(newProduct, 201)
   } catch (error) {
@@ -460,7 +486,7 @@ app.post('/api/init', async (c) => {
   const stmts = [
     `CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL UNIQUE, name TEXT NOT NULL, password_hash TEXT NOT NULL DEFAULT '', phone TEXT, address TEXT, is_admin INTEGER DEFAULT 0, created_at TEXT DEFAULT datetime('now', '+8 hours'), updated_at TEXT DEFAULT datetime('now', '+8 hours'))`,
     `CREATE TABLE IF NOT EXISTS categories (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT, image_url TEXT, created_at TEXT DEFAULT datetime('now', '+8 hours'))`,
-    `CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT, price REAL NOT NULL, image_url TEXT, category TEXT, stock INTEGER DEFAULT 0, featured INTEGER DEFAULT 0, created_at TEXT DEFAULT datetime('now', '+8 hours'), updated_at TEXT DEFAULT datetime('now', '+8 hours'))`,
+    `CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT, price REAL NOT NULL, image_url TEXT, category TEXT, store_slug TEXT, stock INTEGER DEFAULT 0, featured INTEGER DEFAULT 0, created_at TEXT DEFAULT datetime('now', '+8 hours'), updated_at TEXT DEFAULT datetime('now', '+8 hours'))`,
     `CREATE TABLE IF NOT EXISTS orders (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER REFERENCES users(id), total_amount REAL NOT NULL, status TEXT DEFAULT 'pending', shipping_address TEXT, created_at TEXT DEFAULT datetime('now', '+8 hours'), updated_at TEXT DEFAULT datetime('now', '+8 hours'))`,
     `CREATE TABLE IF NOT EXISTS order_items (id INTEGER PRIMARY KEY AUTOINCREMENT, order_id INTEGER REFERENCES orders(id), product_id INTEGER REFERENCES products(id), quantity INTEGER NOT NULL, price REAL NOT NULL, created_at TEXT DEFAULT datetime('now', '+8 hours'))`,
     `CREATE TABLE IF NOT EXISTS cart_items (id INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT NOT NULL, user_id INTEGER REFERENCES users(id), product_id INTEGER REFERENCES products(id) NOT NULL, quantity INTEGER NOT NULL DEFAULT 1, created_at TEXT DEFAULT datetime('now', '+8 hours'), updated_at TEXT DEFAULT datetime('now', '+8 hours'))`,
@@ -517,6 +543,7 @@ app.post('/api/init', async (c) => {
     // migration: add columns if missing
     try { await c.env.DB.prepare(`ALTER TABLE users ADD COLUMN password_hash TEXT NOT NULL DEFAULT ''`).run() } catch {}
     try { await c.env.DB.prepare(`ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0`).run() } catch {}
+    await ensureProductsStoreSlug(c.env.DB)
     await ensureStoresTable(c.env.DB)
     await ensureTrialSchema(c.env.DB)
     return c.json({ message: 'DB initialized' })
@@ -529,7 +556,7 @@ app.post('/api/init', async (c) => {
 // Auth 路由
 app.post('/api/auth/register', async (c) => {
   try {
-    const { email, password, name, phone, shopName, slug: requestedSlug, ref, utm_source, utm_medium, utm_campaign, utm_content, utm_term } = await c.req.json()
+    const { email, password, name, phone, shopName, slug: requestedSlug, tagline: requestedTagline, ref, utm_source, utm_medium, utm_campaign, utm_content, utm_term } = await c.req.json()
     if (!email || !password) return c.json({ error: '請填寫 Email 和密碼' }, 400)
     if (password.length < 6) return c.json({ error: '密碼至少 6 個字元' }, 400)
 
@@ -582,7 +609,7 @@ app.post('/api/auth/register', async (c) => {
     ).bind(trialStart, trialEnd, user.id).run()
     await c.env.DB.prepare(
       `INSERT INTO stores (user_id, slug, name, tagline, status, onboarding_stage, last_active_at) VALUES (?, ?, ?, ?, 'active', 'store_created', ?)`
-    ).bind(user.id, slug, storeName, '用 ARVIX 架起來的品牌電商', trialStart).run()
+    ).bind(user.id, slug, storeName, (requestedTagline || '用 ARVIX 架起來的品牌電商').trim().slice(0, 200), trialStart).run()
 
     // Funnel event
     await c.env.DB.prepare(

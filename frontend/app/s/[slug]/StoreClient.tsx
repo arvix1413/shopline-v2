@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { RESERVED_STORE_SLUGS } from '../../../lib/storeSlug'
@@ -16,12 +16,38 @@ type Store = {
   urlPath: string
 }
 
+type Product = {
+  id: number
+  name: string
+  description?: string
+  price: number
+  imageUrl?: string
+  category?: string
+  featured?: boolean
+  stock?: number
+}
+
+function formatPrice(n: number) {
+  return `NT$ ${Math.round(n).toLocaleString('zh-TW')}`
+}
+
+function parseListPrice(description?: string): number | null {
+  if (!description) return null
+  const m = description.match(/原價\s*NT\$?\s*([0-9,]+)/i)
+  if (!m) return null
+  const v = Number(m[1].replace(/,/g, ''))
+  return Number.isFinite(v) ? v : null
+}
+
 export default function BrandStoreClient() {
   const params = useParams<{ slug: string }>()
   const [slug, setSlug] = useState('')
   const [store, setStore] = useState<Store | null>(null)
+  const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [missing, setMissing] = useState(false)
+  const [category, setCategory] = useState('全部')
+  const [selected, setSelected] = useState<Product | null>(null)
 
   useEffect(() => {
     const q = new URLSearchParams(window.location.search).get('slug')
@@ -30,14 +56,12 @@ export default function BrandStoreClient() {
       return
     }
     const parts = window.location.pathname.split('/').filter(Boolean)
-    // /s/shop is only a shell — brand id must be ?slug= or /s/{brand}
     const fromPath = parts[0] === 's' ? parts[1] : parts[0]
     const resolved = (fromPath && fromPath !== '_' && fromPath !== 'shop'
       ? fromPath
       : ''
     ).toLowerCase()
     if (!resolved) {
-      // Bare /s/shop (no ?slug=) — send people back to marketing home
       window.location.replace('/')
       return
     }
@@ -45,9 +69,7 @@ export default function BrandStoreClient() {
   }, [params])
 
   useEffect(() => {
-    if (!slug) {
-      return
-    }
+    if (!slug) return
     if (RESERVED_STORE_SLUGS.has(slug)) {
       setMissing(true)
       setLoading(false)
@@ -58,13 +80,20 @@ export default function BrandStoreClient() {
     setMissing(false)
     ;(async () => {
       try {
-        const res = await fetch(`${API}/api/stores/${encodeURIComponent(slug)}`)
-        if (!res.ok) {
+        const [storeRes, productRes] = await Promise.all([
+          fetch(`${API}/api/stores/${encodeURIComponent(slug)}`),
+          fetch(`${API}/api/products?store=${encodeURIComponent(slug)}`),
+        ])
+        if (!storeRes.ok) {
           if (!cancelled) setMissing(true)
           return
         }
-        const data = await res.json()
-        if (!cancelled) setStore(data)
+        const storeData = await storeRes.json()
+        const productData = productRes.ok ? await productRes.json() : []
+        if (!cancelled) {
+          setStore(storeData)
+          setProducts(Array.isArray(productData) ? productData : [])
+        }
       } catch {
         if (!cancelled) setMissing(true)
       } finally {
@@ -74,20 +103,33 @@ export default function BrandStoreClient() {
     return () => { cancelled = true }
   }, [slug])
 
+  const categories = useMemo(() => {
+    const set = new Set<string>()
+    for (const p of products) {
+      if (p.category) set.add(p.category)
+    }
+    return ['全部', ...Array.from(set)]
+  }, [products])
+
+  const visible = useMemo(() => {
+    if (category === '全部') return products
+    return products.filter((p) => p.category === category)
+  }, [products, category])
+
   if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center" style={{ background: '#FFFFFF' }}>
-        <div className="text-sm" style={{ color: '#5C5F7A' }}>載入品牌店舖中...</div>
+      <main className="min-h-screen flex items-center justify-center" style={{ background: '#FAFBFA' }}>
+        <div className="text-sm tracking-wide" style={{ color: '#6B7280' }}>載入店舖中...</div>
       </main>
     )
   }
 
   if (missing || !store) {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center px-6" style={{ background: '#FFFFFF' }}>
+      <main className="min-h-screen flex flex-col items-center justify-center px-6" style={{ background: '#FAFBFA' }}>
         <p className="font-brand text-2xl font-extrabold brand-text mb-4">ARVIX</p>
-        <h1 className="text-2xl font-black mb-2" style={{ color: '#12131F' }}>找不到這間店</h1>
-        <p className="text-sm mb-8" style={{ color: '#5C5F7A' }}>
+        <h1 className="text-2xl font-black mb-2" style={{ color: '#111827' }}>找不到這間店</h1>
+        <p className="text-sm mb-8" style={{ color: '#6B7280' }}>
           網址 /{slug || '...'} 尚未開通，或品牌名稱有誤。
         </p>
         <Link href="/register" className="btn-brand btn-glow px-6 py-3 rounded-full text-sm font-bold">
@@ -97,72 +139,236 @@ export default function BrandStoreClient() {
     )
   }
 
-  const host = typeof window !== 'undefined' ? window.location.host : 'arvixai.com'
-  const publicUrl = `${host}/s/shop?slug=${store.slug}`
-  const brandPath = `/${store.slug}`
-
   return (
-    <main className="min-h-screen" style={{ background: '#FFFFFF', color: '#12131F' }}>
-      <header className="border-b" style={{ borderColor: 'rgba(18,19,31,0.08)' }}>
-        <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="font-brand text-xl font-extrabold brand-text">ARVIX</Link>
-          <div className="text-xs font-medium px-3 py-1.5 rounded-full" style={{ background: '#F0F1FE', color: '#5B5FF0' }}>
-            {publicUrl}
-          </div>
-        </div>
-      </header>
+    <main className="min-h-screen" style={{ background: '#FAFBFA', color: '#111827' }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
+        .bennis-store { font-family: 'Outfit', system-ui, sans-serif; }
+        @keyframes store-rise {
+          from { opacity: 0; transform: translateY(14px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .store-rise { animation: store-rise 0.65s ease both; }
+        .store-rise-delay-1 { animation-delay: 0.08s; }
+        .store-rise-delay-2 { animation-delay: 0.16s; }
+        .store-rise-delay-3 { animation-delay: 0.24s; }
+        .product-card:hover .product-img { transform: scale(1.04); }
+        .product-img { transition: transform 0.45s ease; }
+      `}</style>
 
-      <section className="relative overflow-hidden">
-        <div className="absolute pointer-events-none animate-aurora" style={{
-          width: 640, height: 640, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(91,95,240,0.16) 0%, transparent 68%)',
-          top: -220, left: '50%', transform: 'translateX(-50%)',
-        }} />
-        <div className="relative z-10 max-w-3xl mx-auto px-6 pt-24 pb-20 text-center">
-          <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: '#5B5FF0' }}>
-            Powered by ARVIX
-          </p>
-          <h1 className="font-black tracking-tight mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }}>
-            {store.name}
-          </h1>
-          <p className="text-base mb-8 mx-auto" style={{ color: '#5C5F7A', maxWidth: 480 }}>
-            {store.tagline || '這間品牌店已成功架起來，可以開始上架商品、開賣了。'}
-          </p>
-          <div className="inline-flex flex-col sm:flex-row gap-3 items-center justify-center">
-            <Link href="/online-store-setup" className="btn-brand btn-glow px-7 py-3 rounded-full text-sm font-bold">
-              繼續完善開店設定
-            </Link>
-            <Link href="/trial" className="px-7 py-3 rounded-full text-sm font-semibold"
-              style={{ border: '1px solid rgba(18,19,31,0.12)', color: '#3A3D55' }}>
-              進入試用系統
-            </Link>
+      <div className="bennis-store">
+        <header
+          className="sticky top-0 z-30 backdrop-blur-md"
+          style={{ background: 'rgba(250,251,250,0.9)', borderBottom: '1px solid rgba(17,24,39,0.06)' }}
+        >
+          <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between gap-4">
+            <div className="min-w-0">
+              <div className="text-xl font-bold tracking-tight truncate">{store.name}</div>
+              <div className="text-[11px] tracking-wide" style={{ color: '#9CA3AF' }}>Powered by ARVIX · Studio</div>
+            </div>
+            <nav className="hidden sm:flex items-center gap-6 text-sm font-medium" style={{ color: '#4B5563' }}>
+              <a href="#products" className="hover:opacity-70 transition">商品</a>
+              <a href="#about" className="hover:opacity-70 transition">品牌</a>
+            </nav>
+            <a
+              href="#products"
+              className="text-sm font-semibold px-4 py-2 transition hover:opacity-90"
+              style={{ background: '#111827', color: '#FAFBFA' }}
+            >
+              選購枕頭
+            </a>
           </div>
-        </div>
-      </section>
+        </header>
 
-      <section className="pb-24">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="rounded-2xl p-10 text-center" style={{ background: '#F6F7FB', border: '1px solid rgba(91,95,240,0.12)' }}>
-            <h2 className="text-xl font-black mb-3">商品區即將上線</h2>
-            <p className="text-sm mb-6" style={{ color: '#5C5F7A' }}>
-              你的商店已上線：<span className="font-semibold" style={{ color: '#5B5FF0' }}>{publicUrl}</span>
-              <br />品牌識別碼：<span className="font-semibold" style={{ color: '#5B5FF0' }}>{brandPath}</span>
+        <section className="relative overflow-hidden">
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                'radial-gradient(ellipse 70% 55% at 78% 18%, rgba(56,120,92,0.16), transparent 58%), linear-gradient(165deg, #EEF2EF 0%, #FAFBFA 42%, #E8F0EB 100%)',
+            }}
+          />
+          <div className="relative z-10 max-w-6xl mx-auto px-5 pt-16 pb-14 md:pt-24 md:pb-20">
+            <p className="store-rise text-xs font-semibold tracking-[0.2em] uppercase mb-4" style={{ color: '#3F6B55' }}>
+              馬來西亞天然乳膠
             </p>
-            <div className="grid sm:grid-cols-3 gap-4 text-left">
-              {[
-                { t: '品牌網址', d: publicUrl },
-                { t: '開店狀態', d: store.status === 'active' ? '已啟用' : store.status },
-                { t: '下一步', d: '上架第一件商品，開始接單' },
-              ].map((item) => (
-                <div key={item.t} className="rounded-xl p-5 bg-white" style={{ border: '1px solid rgba(18,19,31,0.06)' }}>
-                  <div className="text-xs font-bold mb-1" style={{ color: '#5B5FF0' }}>{item.t}</div>
-                  <div className="text-sm font-medium" style={{ color: '#12131F' }}>{item.d}</div>
-                </div>
-              ))}
+            <h1
+              className="store-rise store-rise-delay-1 font-extrabold tracking-tight mb-5"
+              style={{ fontSize: 'clamp(2.35rem, 5.8vw, 4rem)', lineHeight: 1.05, maxWidth: '12ch' }}
+            >
+              {store.name}
+            </h1>
+            <p
+              className="store-rise store-rise-delay-2 text-base md:text-lg mb-8"
+              style={{ color: '#4B5563', maxWidth: 440, lineHeight: 1.65 }}
+            >
+              {store.tagline || '枕頭｜天然乳膠枕頭，選對枕頭，睡出好眠。'}
+            </p>
+            <div className="store-rise store-rise-delay-3 flex flex-wrap gap-3">
+              <a
+                href="#products"
+                className="px-6 py-3 text-sm font-semibold"
+                style={{ background: '#111827', color: '#FAFBFA' }}
+              >
+                瀏覽全部商品
+              </a>
+              <span
+                className="px-5 py-3 text-sm font-medium"
+                style={{ border: '1px solid rgba(17,24,39,0.12)', color: '#374151' }}
+              >
+                {products.length} 件上架中
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <section id="products" className="pb-20 pt-4">
+          <div className="max-w-6xl mx-auto px-5">
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-bold mb-1">熱銷商品 Must-have</h2>
+                <p className="text-sm" style={{ color: '#6B7280' }}>乳膠枕頭系列</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {categories.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setCategory(c)}
+                    className="px-3.5 py-1.5 text-xs font-semibold transition"
+                    style={
+                      category === c
+                        ? { background: '#111827', color: '#FAFBFA' }
+                        : { background: 'rgba(17,24,39,0.05)', color: '#4B5563' }
+                    }
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {visible.length === 0 ? (
+              <div
+                className="px-6 py-16 text-center"
+                style={{ background: '#fff', border: '1px solid rgba(17,24,39,0.06)' }}
+              >
+                <p className="text-sm" style={{ color: '#6B7280' }}>此分類尚無商品</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                {visible.map((p, i) => {
+                  const list = parseListPrice(p.description)
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => setSelected(p)}
+                      className="product-card text-left group"
+                      style={{ animation: `store-rise 0.55s ease both`, animationDelay: `${Math.min(i, 8) * 0.04}s` }}
+                    >
+                      <div className="overflow-hidden mb-3 aspect-[4/5]" style={{ background: '#E5E7EB' }}>
+                        {p.imageUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={p.imageUrl}
+                            alt={p.name}
+                            className="product-img w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-xs" style={{ color: '#9CA3AF' }}>
+                            暫無圖片
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-[11px] font-semibold tracking-wide mb-1" style={{ color: '#3F6B55' }}>
+                        {p.category || '商品'}
+                      </div>
+                      <h3 className="text-sm font-semibold leading-snug mb-2 line-clamp-2 group-hover:opacity-80 transition">
+                        {p.name}
+                      </h3>
+                      <div className="flex items-baseline gap-2 flex-wrap">
+                        <span className="text-sm font-bold">{formatPrice(p.price)}</span>
+                        {list && list > p.price && (
+                          <span className="text-xs line-through" style={{ color: '#9CA3AF' }}>
+                            {formatPrice(list)}
+                          </span>
+                        )}
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        </section>
+
+        <section id="about" className="pb-24">
+          <div className="max-w-6xl mx-auto px-5">
+            <div className="px-6 py-12 md:px-12 md:py-14" style={{ background: '#111827', color: '#F9FAFB' }}>
+              <h2 className="text-2xl md:text-3xl font-bold mb-3">關於品牌</h2>
+              <p className="text-sm md:text-base max-w-xl leading-relaxed" style={{ color: 'rgba(249,250,251,0.78)' }}>
+                {store.tagline || '選對枕頭，睡出好眠。此為 ARVIX 店舖功能示範，商品資料來源於班尼斯枕頭分類。'}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <footer className="border-t py-8" style={{ borderColor: 'rgba(17,24,39,0.06)' }}>
+          <div className="max-w-6xl mx-auto px-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs" style={{ color: '#9CA3AF' }}>
+            <span>{store.name} · Demo store on ARVIX</span>
+            <Link href="/" className="hover:opacity-70 transition">arvixai.com</Link>
+          </div>
+        </footer>
+      </div>
+
+      {selected && (
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6"
+          style={{ background: 'rgba(17,24,39,0.5)' }}
+          onClick={() => setSelected(null)}
+        >
+          <div
+            className="w-full sm:max-w-lg max-h-[90vh] overflow-auto"
+            style={{ background: '#FAFBFA' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {selected.imageUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={selected.imageUrl} alt={selected.name} className="w-full aspect-[4/3] object-cover" />
+            )}
+            <div className="p-6">
+              <div className="text-[11px] font-semibold tracking-wide mb-2" style={{ color: '#3F6B55' }}>
+                {selected.category || '商品'}
+              </div>
+              <h3 className="text-xl font-bold mb-3">{selected.name}</h3>
+              <div className="flex items-baseline gap-2 mb-4">
+                <span className="text-lg font-bold">{formatPrice(selected.price)}</span>
+                {(() => {
+                  const list = parseListPrice(selected.description)
+                  return list && list > selected.price ? (
+                    <span className="text-sm line-through" style={{ color: '#9CA3AF' }}>{formatPrice(list)}</span>
+                  ) : null
+                })()}
+              </div>
+              {selected.description && (
+                <p className="text-sm mb-6 leading-relaxed" style={{ color: '#4B5563' }}>
+                  {selected.description.replace(/原價\s*NT\$?\s*[0-9,]+\s*/i, '').trim() || '天然乳膠枕頭'}
+                </p>
+              )}
+              <button
+                type="button"
+                className="w-full py-3 text-sm font-semibold"
+                style={{ background: '#111827', color: '#FAFBFA' }}
+                onClick={() => setSelected(null)}
+              >
+                關閉
+              </button>
             </div>
           </div>
         </div>
-      </section>
+      )}
     </main>
   )
 }
