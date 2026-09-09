@@ -58,6 +58,9 @@ export async function ensureStoresTable(db: D1Database) {
     `ALTER TABLE stores ADD COLUMN ecpay_logistics_subtype TEXT`,
     `ALTER TABLE stores ADD COLUMN ecpay_sender_name TEXT`,
     `ALTER TABLE stores ADD COLUMN ecpay_sender_phone TEXT`,
+    // 出貨市場：TW=台灣（可開 7-11）；INTL=其他地區（僅宅配＋刷卡）。
+    // 綁商店出貨能力，不綁買家語系或當下所在地（人在國外也可先訂、回台取貨）。
+    `ALTER TABLE stores ADD COLUMN market TEXT DEFAULT 'TW'`,
   ]
   for (const sql of extras) {
     await db.prepare(sql).run().catch(() => {})

@@ -1393,18 +1393,10 @@ app.post('/api/store-checkout/session', async (c) => {
     const sessionId = String(body.sessionId || '').trim()
     const storeSlug = String(body.storeSlug || '').trim().toLowerCase()
     const method = String(body.method || 'stripe').toLowerCase() === 'cod' ? 'cod' : 'stripe'
-    const market = String(body.market || 'TW').trim().toUpperCase() === 'INTL' ? 'INTL' : 'TW'
     const shippingMethodRaw = String(body.shippingMethod || 'home').trim().toLowerCase()
     let shippingMethod = shippingMethodRaw === 'seven_eleven' || shippingMethodRaw === '711'
       ? 'seven_eleven'
       : 'home'
-    // 7-11／貨到付款僅台灣市場
-    if (market !== 'TW') {
-      shippingMethod = 'home'
-      if (method === 'cod') {
-        return c.json({ error: '此市場不支援貨到付款' }, 400)
-      }
-    }
     const customerName = String(body.customerName || '').trim()
     const customerEmail = String(body.customerEmail || '').trim()
     const customerPhone = String(body.customerPhone || '').trim()
@@ -1434,12 +1426,21 @@ app.post('/api/store-checkout/session', async (c) => {
     await ensureStoresTable(c.env.DB)
     await ensureProductsStoreSlug(c.env.DB)
     const store = await c.env.DB.prepare(
-      `SELECT id, slug, name, status, user_id,
+      `SELECT id, slug, name, status, user_id, market,
               ecpay_merchant_id, ecpay_hash_key, ecpay_hash_iv, ecpay_logistics_mode,
               ecpay_logistics_subtype, ecpay_sender_name, ecpay_sender_phone
        FROM stores WHERE slug=? AND status='active'`
     ).bind(storeSlug).first<any>()
     if (!store) return c.json({ error: '商店不存在' }, 404)
+
+    // 以商店出貨市場為準（不看買家語系／所在地／前端傳的 market）
+    const market = String(store.market || 'TW').trim().toUpperCase() === 'INTL' ? 'INTL' : 'TW'
+    if (market !== 'TW') {
+      shippingMethod = 'home'
+      if (method === 'cod') {
+        return c.json({ error: '此商店不支援貨到付款' }, 400)
+      }
+    }
 
     const { resolveEcpayEnv, ecpayConfigured, ecpayCreateReady, createCvsLogisticsOrder } = await import('./ecpayLogistics')
     const ecpayEnv = resolveEcpayEnv(c.env, store)
@@ -2995,7 +2996,7 @@ app.get('/api/stores/:slug', async (c) => {
     const { RESERVED_STORE_SLUGS } = await import('./stores')
     if (RESERVED_STORE_SLUGS.has(slug)) return c.json({ error: '商店不存在' }, 404)
     const store = await c.env.DB.prepare(
-      `SELECT id, user_id, slug, name, tagline, status, layout_json, pages_json, created_at as createdAt FROM stores WHERE slug = ? AND status = 'active'`
+      `SELECT id, user_id, slug, name, tagline, status, market, layout_json, pages_json, created_at as createdAt FROM stores WHERE slug = ? AND status = 'active'`
     ).bind(slug).first<any>()
     if (!store) return c.json({ error: '商店不存在' }, 404)
 
@@ -3015,9 +3016,11 @@ app.get('/api/stores/:slug', async (c) => {
       pagesRaw = null
     }
     const pages = parseStorePages(pagesRaw, store.name).filter((p) => p.published)
-    const { user_id: _uid, layout_json: _lj, pages_json: _pj, ...publicStore } = store
+    const market = String(store.market || 'TW').trim().toUpperCase() === 'INTL' ? 'INTL' : 'TW'
+    const { user_id: _uid, layout_json: _lj, pages_json: _pj, market: _m, ...publicStore } = store
     return c.json({
       ...publicStore,
+      market,
       layout,
       pages,
       urlPath: `/s/shop?slug=${slug}`,

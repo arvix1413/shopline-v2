@@ -8,15 +8,13 @@ import StoreLayoutView from '../../components/StoreLayoutView'
 import { parseStoreLayout, type StoreLayout } from '../../../lib/storeLayout'
 import { findStorePage, parseStorePages, type StorePage } from '../../../lib/storePages'
 import { storeHomeUrl } from '../../../lib/storefrontUrl'
-import { useI18n } from '../../../contexts/I18nContext'
-import type { Locale } from '../../../lib/i18n'
-
-/** 7-11 超商取貨／貨到付款僅台灣市場（繁中）；其他語系只宅配＋刷卡 */
-function isTaiwanCheckoutMarket(locale: Locale) {
-  return locale === 'zh-TW'
-}
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://shopline-backend.arvix1413.workers.dev'
+
+/** 7-11／貨到付款綁商店出貨市場（TW），與買家語系、所在地無關 */
+function isTaiwanStoreMarket(market?: string | null) {
+  return String(market || 'TW').trim().toUpperCase() !== 'INTL'
+}
 
 type Store = {
   id: number
@@ -24,6 +22,7 @@ type Store = {
   name: string
   tagline?: string
   status: string
+  market?: string
   urlPath: string
   suspended?: boolean
   suspendReason?: string | null
@@ -109,10 +108,9 @@ export default function BrandStoreClient({
   pageKey?: string
 }) {
   const params = useParams<{ slug: string }>()
-  const { locale } = useI18n()
-  const taiwanMarket = isTaiwanCheckoutMarket(locale)
   const [slug, setSlug] = useState('')
   const [store, setStore] = useState<Store | null>(null)
+  const taiwanMarket = Boolean(store && isTaiwanStoreMarket(store.market))
   const [pages, setPages] = useState<StorePage[]>([])
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
@@ -144,7 +142,7 @@ export default function BrandStoreClient({
   })
   const [ecpayMapReady, setEcpayMapReady] = useState(false)
 
-  // 非台灣語系強制宅配，不出現 7-11／貨到付款
+  // 非台灣出貨市場強制宅配，不出現 7-11／貨到付款（與買家語系／所在地無關）
   useEffect(() => {
     if (!taiwanMarket) {
       setForm((f) => (f.shippingMethod === 'home' ? f : { ...f, shippingMethod: 'home' }))
@@ -670,7 +668,7 @@ export default function BrandStoreClient({
                         <div>
                           <div className="text-xs font-semibold mb-2" style={{ color: '#4B5563' }}>Shipping</div>
                           <p className="text-[11px] leading-relaxed" style={{ color: '#9CA3AF' }}>
-                            Delivery address + card payment only. Convenience-store COD is available in the Taiwan (繁體中文) checkout.
+                            Delivery address + card payment only. This store does not offer Taiwan 7-11 pickup.
                           </p>
                         </div>
                       )}

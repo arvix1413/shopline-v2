@@ -51,8 +51,8 @@ const zhTW: FaqCopy = {
       title: '金、物流服務',
       desc: 'ARVIX 提供哪些金流、物流服務？我可以提供哪些付款、送貨方式給顧客呢？',
       faqs: [
-        { q: '支援哪些金流方式？', a: '商店結帳可支援信用卡付款；台灣繁中結帳另可提供 7-11 貨到付款（須店家自行開通綠界物流後由 ARVIX 協助串接）。' },
-        { q: '支援哪些物流方式？', a: '目前商店可設定宅配，以及台灣繁中結帳的 7-11 超商取貨。7-11 須店家向綠界申請物流後，來信 arvix1413@gmail.com 請我們協助串接。' },
+        { q: '支援哪些金流方式？', a: '商店結帳可支援信用卡付款；台灣出貨商店另可提供 7-11 貨到付款（須店家自行開通綠界物流後由 ARVIX 協助串接）。' },
+        { q: '支援哪些物流方式？', a: '台灣出貨商店可設定宅配與 7-11 超商取貨。7-11 須店家向綠界申請物流後，來信 arvix1413@gmail.com 請我們協助串接。' },
         { q: '客服信箱是？', a: '請寄至 arvix1413@gmail.com，我們會盡快回覆。' },
       ],
     },
@@ -129,6 +129,19 @@ const zhCN: FaqCopy = {
   ctaTitle: '使用有疑问？欢迎与我们联系！',
   ctaSubtitle: '服务时间 星期一至五 上午 10 点至晚上 7 点',
   contactUs: '联系我们',
+  categories: zhTW.categories.map((cat) =>
+    cat.title === '金、物流服務'
+      ? {
+          title: '金、物流服务',
+          desc: 'ARVIX 提供哪些金流、物流服务？我可以提供哪些付款、送货方式给顾客呢？',
+          faqs: [
+            { q: '支持哪些金流方式？', a: '商店结账可支持信用卡付款。' },
+            { q: '支持哪些物流方式？', a: '支持宅配。其他取货方式视商店物流设定而定。' },
+            { q: '客服邮箱是？', a: '请寄至 arvix1413@gmail.com，我们会尽快回复。' },
+          ],
+        }
+      : cat
+  ),
 }
 
 const en: FaqCopy = {
@@ -161,8 +174,9 @@ const en: FaqCopy = {
       title: 'Payments & logistics',
       desc: 'Supported payment and shipping options for your customers',
       faqs: [
-        { q: 'Which payments are supported?', a: 'ARVIX Payments supports cards, ATM, Apple Pay, Google Pay, LINE Pay, and more.' },
-        { q: 'Which logistics partners?', a: 'Major carriers and convenience-store pickup are integrated, plus custom shipping methods.' },
+        { q: 'Which payments are supported?', a: 'Checkout supports card payments.' },
+        { q: 'Which logistics partners?', a: 'Home delivery is supported. Additional local pickup options depend on the store’s shipping setup.' },
+        { q: 'What is the support email?', a: 'Email arvix1413@gmail.com and we will get back to you.' },
       ],
     },
     {
@@ -228,17 +242,102 @@ const en: FaqCopy = {
   ],
 }
 
+type PaymentsCategory = FaqCopy['categories'][number]
+
+const paymentsByLocale: Record<Locale, PaymentsCategory> = {
+  'zh-TW': zhTW.categories.find((c) => c.title === '金、物流服務')!,
+  'zh-CN': zhCN.categories.find((c) => c.title === '金、物流服务')!,
+  en: en.categories.find((c) => c.title === 'Payments & logistics')!,
+  ko: {
+    title: '결제 및 물류',
+    desc: '고객에게 제공할 수 있는 결제·배송 옵션',
+    faqs: [
+      { q: '어떤 결제를 지원하나요?', a: '체크아웃은 카드 결제를 지원합니다.' },
+      { q: '어떤 물류를 지원하나요?', a: '택배(자택 배송)를 지원합니다. 추가 픽업 옵션은 스토어 배송 설정에 따라 다릅니다.' },
+      { q: '고객센터 이메일은?', a: 'arvix1413@gmail.com 으로 보내주시면 빠르게 답변드리겠습니다.' },
+    ],
+  },
+  ja: {
+    title: '決済・物流',
+    desc: 'お客様向けの決済・配送オプション',
+    faqs: [
+      { q: '対応している決済は？', a: 'チェックアウトはカード決済に対応しています。' },
+      { q: '対応している物流は？', a: '宅配に対応しています。その他の受け取り方法は店舗の配送設定によります。' },
+      { q: 'サポートメールは？', a: 'arvix1413@gmail.com までご連絡ください。順次ご返信します。' },
+    ],
+  },
+  vi: {
+    title: 'Thanh toán & vận chuyển',
+    desc: 'Các tùy chọn thanh toán và giao hàng cho khách hàng',
+    faqs: [
+      { q: 'Hỗ trợ thanh toán nào?', a: 'Checkout hỗ trợ thanh toán bằng thẻ.' },
+      { q: 'Hỗ trợ vận chuyển nào?', a: 'Hỗ trợ giao tận nhà. Tùy chọn nhận hàng khác tùy theo thiết lập vận chuyển của cửa hàng.' },
+      { q: 'Email hỗ trợ là gì?', a: 'Gửi email tới arvix1413@gmail.com, chúng tôi sẽ phản hồi sớm.' },
+    ],
+  },
+  es: {
+    title: 'Pagos y logística',
+    desc: 'Opciones de pago y envío para tus clientes',
+    faqs: [
+      { q: '¿Qué pagos se admiten?', a: 'El checkout admite pagos con tarjeta.' },
+      { q: '¿Qué logística se admite?', a: 'Se admite entrega a domicilio. Otras opciones de recogida dependen de la configuración de envío de la tienda.' },
+      { q: '¿Cuál es el correo de soporte?', a: 'Escribe a arvix1413@gmail.com y te responderemos pronto.' },
+    ],
+  },
+  pt: {
+    title: 'Pagamentos e logística',
+    desc: 'Opções de pagamento e envio para seus clientes',
+    faqs: [
+      { q: 'Quais pagamentos são aceitos?', a: 'O checkout aceita pagamento com cartão.' },
+      { q: 'Quais opções de logística?', a: 'Entrega em domicílio é suportada. Outras opções de retirada dependem da configuração de frete da loja.' },
+      { q: 'Qual é o e-mail de suporte?', a: 'Envie para arvix1413@gmail.com e responderemos em breve.' },
+    ],
+  },
+  de: {
+    title: 'Zahlungen & Logistik',
+    desc: 'Zahlungs- und Versandoptionen für Ihre Kunden',
+    faqs: [
+      { q: 'Welche Zahlungen werden unterstützt?', a: 'Der Checkout unterstützt Kartenzahlungen.' },
+      { q: 'Welche Logistik wird unterstützt?', a: 'Lieferung nach Hause wird unterstützt. Weitere Abholoptionen hängen von den Versandeinstellungen des Shops ab.' },
+      { q: 'Wie lautet die Support-E-Mail?', a: 'Schreiben Sie an arvix1413@gmail.com — wir antworten zeitnah.' },
+    ],
+  },
+  fr: {
+    title: 'Paiements et logistique',
+    desc: 'Options de paiement et de livraison pour vos clients',
+    faqs: [
+      { q: 'Quels paiements sont pris en charge ?', a: 'Le paiement prend en charge les cartes.' },
+      { q: 'Quelles options logistiques ?', a: 'La livraison à domicile est prise en charge. Les autres options de retrait dépendent de la configuration d’expédition de la boutique.' },
+      { q: 'Quel est l’e-mail du support ?', a: 'Écrivez à arvix1413@gmail.com — nous vous répondrons rapidement.' },
+    ],
+  },
+}
+
+function withPaymentsLocale(base: FaqCopy, locale: Locale): FaqCopy {
+  const payments = paymentsByLocale[locale]
+  return {
+    ...base,
+    categories: base.categories.map((cat) =>
+      cat.title === 'Payments & logistics' ||
+      cat.title === '金、物流服務' ||
+      cat.title === '金、物流服务'
+        ? payments
+        : cat
+    ),
+  }
+}
+
 const copy: Partial<Record<Locale, FaqCopy>> & { 'zh-TW': FaqCopy; en: FaqCopy } = {
   'zh-TW': zhTW,
   'zh-CN': zhCN,
   en,
-  ko: en,
-  ja: en,
-  vi: en,
-  es: en,
-  pt: en,
-  de: en,
-  fr: en,
+  ko: withPaymentsLocale(en, 'ko'),
+  ja: withPaymentsLocale(en, 'ja'),
+  vi: withPaymentsLocale(en, 'vi'),
+  es: withPaymentsLocale(en, 'es'),
+  pt: withPaymentsLocale(en, 'pt'),
+  de: withPaymentsLocale(en, 'de'),
+  fr: withPaymentsLocale(en, 'fr'),
 }
 
 export default function FaqPage() {
