@@ -1,4 +1,4 @@
-import Client from './Client'
+import StoreCustomPageClient from './Client'
 
 export function generateStaticParams() {
   return [
@@ -10,6 +10,6 @@ export function generateStaticParams() {
   ]
 }
 
-export default function StoreCustomPage({ params }: { params: { pageKey: string } }) {
-  return <Client pageKey={params.pageKey} />
+export default function StoreCustomPage() {
+  return <StoreCustomPageClient />
 }
