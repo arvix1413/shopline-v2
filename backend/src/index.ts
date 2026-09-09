@@ -5,7 +5,6 @@ import { and, eq } from 'drizzle-orm'
 import * as schema from './schema'
 import { hashPassword, verifyPassword, signToken, verifyToken } from './auth'
 import { allocateUniqueSlug, ensureStoresTable } from './stores'
-import { ensureStorefrontSchema, syncStoreProductCount } from './storefront'
 import {
   TRIAL_DAYS,
   ONBOARDING_STAGES,
@@ -241,7 +240,7 @@ app.post('/api/stripe/webhook', async (c) => {
   await c.env.DB.prepare(`
     CREATE TABLE IF NOT EXISTS stripe_events (
       id TEXT PRIMARY KEY, type TEXT NOT NULL, livemode INTEGER NOT NULL DEFAULT 0,
-      payload TEXT NOT NULL, received_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+      payload TEXT NOT NULL, received_at TEXT NOT NULL DEFAULT (datetime('now', '+8 hours'))
     )
   `).run()
   await c.env.DB.prepare('INSERT OR IGNORE INTO stripe_events (id, type, livemode, payload) VALUES (?, ?, ?, ?)')
@@ -523,8 +522,8 @@ app.post('/api/init', async (c) => {
     `CREATE TABLE IF NOT EXISTS operation_types (id TEXT PRIMARY KEY, category TEXT NOT NULL, action TEXT NOT NULL, description TEXT, risk_level INTEGER DEFAULT 1)`,
     `CREATE TABLE IF NOT EXISTS audit_systems (id TEXT PRIMARY KEY, name TEXT NOT NULL, display_name TEXT NOT NULL, url TEXT, color TEXT DEFAULT '#3B82F6', active BOOLEAN DEFAULT 1)`,
     // Affiliate & traffic tracking
-    `CREATE TABLE IF NOT EXISTS affiliates (id INTEGER PRIMARY KEY AUTOINCREMENT, code TEXT NOT NULL UNIQUE, name TEXT NOT NULL, email TEXT, commission_rate REAL NOT NULL DEFAULT 0.1, total_clicks INTEGER DEFAULT 0, total_conversions INTEGER DEFAULT 0, total_revenue REAL DEFAULT 0, total_commission REAL DEFAULT 0, active INTEGER DEFAULT 1, created_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
-    `CREATE TABLE IF NOT EXISTS affiliate_conversions (id INTEGER PRIMARY KEY AUTOINCREMENT, affiliate_code TEXT NOT NULL, user_id INTEGER, event TEXT NOT NULL, revenue REAL DEFAULT 0, commission REAL DEFAULT 0, created_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
+    `CREATE TABLE IF NOT EXISTS affiliates (id INTEGER PRIMARY KEY AUTOINCREMENT, code TEXT NOT NULL UNIQUE, name TEXT NOT NULL, email TEXT, commission_rate REAL NOT NULL DEFAULT 0.1, total_clicks INTEGER DEFAULT 0, total_conversions INTEGER DEFAULT 0, total_revenue REAL DEFAULT 0, total_commission REAL DEFAULT 0, active INTEGER DEFAULT 1, created_at TEXT DEFAULT datetime('now', '+8 hours'))`,
+    `CREATE TABLE IF NOT EXISTS affiliate_conversions (id INTEGER PRIMARY KEY AUTOINCREMENT, affiliate_code TEXT NOT NULL, user_id INTEGER, event TEXT NOT NULL, revenue REAL DEFAULT 0, commission REAL DEFAULT 0, created_at TEXT DEFAULT datetime('now', '+8 hours'))`,
   ]
   try {
     for (const sql of stmts) {
@@ -572,7 +571,6 @@ app.post('/api/init', async (c) => {
     await ensureProductsStoreSlug(c.env.DB)
     await ensureStoresTable(c.env.DB)
     await ensureTrialSchema(c.env.DB)
-    await ensureStorefrontSchema(c.env.DB)
     return c.json({ message: 'DB initialized' })
   } catch (error) {
     console.error('Init error:', error)
@@ -2041,7 +2039,7 @@ app.get('/api/admin/traffic', requireAdmin, async (c) => {
 // ── Site Settings (SEO & Content) ────────────────────────────────────────────
 app.get('/api/site-settings', async (c) => {
   try {
-    await c.env.DB.prepare(`CREATE TABLE IF NOT EXISTS site_settings (key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TEXT DEFAULT CURRENT_TIMESTAMP)`).run()
+    await c.env.DB.prepare(`CREATE TABLE IF NOT EXISTS site_settings (key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TEXT DEFAULT (datetime('now', '+8 hours')))`).run()
     const rows = await c.env.DB.prepare(`SELECT key, value FROM site_settings`).all()
     const settings: Record<string, string> = {}
     for (const r of rows.results as any[]) settings[r.key] = r.value
@@ -2051,7 +2049,7 @@ app.get('/api/site-settings', async (c) => {
 
 app.put('/api/site-settings', requireAdmin, async (c) => {
   try {
-    await c.env.DB.prepare(`CREATE TABLE IF NOT EXISTS site_settings (key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TEXT DEFAULT CURRENT_TIMESTAMP)`).run()
+    await c.env.DB.prepare(`CREATE TABLE IF NOT EXISTS site_settings (key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TEXT DEFAULT (datetime('now', '+8 hours')))`).run()
     const body = await c.req.json()
     for (const [key, value] of Object.entries(body)) {
       await c.env.DB.prepare(`INSERT INTO site_settings (key, value, updated_at) VALUES (?,?,datetime('now','+8 hours')) ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_at=excluded.updated_at`).bind(key, String(value)).run()
@@ -2121,273 +2119,17 @@ app.get('/api/stores/me', async (c) => {
   }
 })
 
-// Merchant: list / create products for own store
-app.get('/api/stores/me/products', requireUser, async (c) => {
-  try {
-    await ensureStorefrontSchema(c.env.DB)
-    const payload = c.get('userPayload')
-    const store = await c.env.DB.prepare(
-      `SELECT id FROM stores WHERE user_id = ? ORDER BY id ASC LIMIT 1`
-    ).bind(payload.userId).first<{ id: number }>()
-    if (!store) return c.json({ error: '尚未建立商店' }, 404)
-    const rows = await c.env.DB.prepare(
-      `SELECT id, name, description, price, image_url as imageUrl, category, stock, featured,
-              COALESCE(status, 'active') as status, store_id as storeId, created_at as createdAt
-       FROM products WHERE store_id = ? ORDER BY id DESC`
-    ).bind(store.id).all()
-    return c.json(rows.results || [])
-  } catch (e: any) {
-    return c.json({ error: String(e) }, 500)
-  }
-})
-
-app.post('/api/stores/me/products', requireUser, async (c) => {
-  try {
-    await ensureStorefrontSchema(c.env.DB)
-    const payload = c.get('userPayload')
-    const store = await c.env.DB.prepare(
-      `SELECT id FROM stores WHERE user_id = ? ORDER BY id ASC LIMIT 1`
-    ).bind(payload.userId).first<{ id: number }>()
-    if (!store) return c.json({ error: '尚未建立商店' }, 404)
-    const body = await c.req.json()
-    const name = String(body.name || '').trim()
-    const price = Number(body.price)
-    if (!name) return c.json({ error: '商品名稱不能為空' }, 400)
-    if (!(price > 0)) return c.json({ error: '請輸入有效價格' }, 400)
-    const result = await c.env.DB.prepare(
-      `INSERT INTO products (name, description, price, image_url, category, stock, featured, store_id, status, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active', datetime('now', '+8 hours'), datetime('now', '+8 hours'))`
-    ).bind(
-      name,
-      String(body.description || '').trim(),
-      price,
-      String(body.imageUrl || ''),
-      String(body.category || '一般').trim() || '一般',
-      Number(body.stock) || 0,
-      body.featured ? 1 : 0,
-      store.id,
-    ).run()
-    await syncStoreProductCount(c.env.DB, store.id)
-    // bump onboarding if first products
-    await c.env.DB.prepare(
-      `UPDATE stores SET onboarding_stage = CASE
-         WHEN onboarding_stage IN ('registered','store_created') THEN 'products_added'
-         ELSE onboarding_stage END,
-         last_active_at = datetime('now', '+8 hours')
-       WHERE id = ?`
-    ).bind(store.id).run()
-    const id = result.meta.last_row_id
-    const product = await c.env.DB.prepare(
-      `SELECT id, name, description, price, image_url as imageUrl, category, stock, featured, status, store_id as storeId
-       FROM products WHERE id = ?`
-    ).bind(id).first()
-    return c.json(product, 201)
-  } catch (e: any) {
-    return c.json({ error: String(e) }, 500)
-  }
-})
-
-app.put('/api/stores/me/products/:id', requireUser, async (c) => {
-  try {
-    await ensureStorefrontSchema(c.env.DB)
-    const payload = c.get('userPayload')
-    const productId = Number(c.req.param('id'))
-    const store = await c.env.DB.prepare(
-      `SELECT id FROM stores WHERE user_id = ? ORDER BY id ASC LIMIT 1`
-    ).bind(payload.userId).first<{ id: number }>()
-    if (!store) return c.json({ error: '尚未建立商店' }, 404)
-    const existing = await c.env.DB.prepare(
-      `SELECT id FROM products WHERE id = ? AND store_id = ?`
-    ).bind(productId, store.id).first()
-    if (!existing) return c.json({ error: '商品不存在' }, 404)
-    const body = await c.req.json()
-    const name = String(body.name || '').trim()
-    const price = Number(body.price)
-    if (!name) return c.json({ error: '商品名稱不能為空' }, 400)
-    if (!(price > 0)) return c.json({ error: '請輸入有效價格' }, 400)
-    await c.env.DB.prepare(
-      `UPDATE products SET name=?, description=?, price=?, image_url=?, category=?, stock=?, featured=?,
-         status=?, updated_at=datetime('now', '+8 hours')
-       WHERE id=? AND store_id=?`
-    ).bind(
-      name,
-      String(body.description || '').trim(),
-      price,
-      String(body.imageUrl || ''),
-      String(body.category || '一般').trim() || '一般',
-      Number(body.stock) || 0,
-      body.featured ? 1 : 0,
-      body.status === 'archived' ? 'archived' : 'active',
-      productId,
-      store.id,
-    ).run()
-    await syncStoreProductCount(c.env.DB, store.id)
-    const product = await c.env.DB.prepare(
-      `SELECT id, name, description, price, image_url as imageUrl, category, stock, featured, status, store_id as storeId
-       FROM products WHERE id = ?`
-    ).bind(productId).first()
-    return c.json(product)
-  } catch (e: any) {
-    return c.json({ error: String(e) }, 500)
-  }
-})
-
-app.delete('/api/stores/me/products/:id', requireUser, async (c) => {
-  try {
-    await ensureStorefrontSchema(c.env.DB)
-    const payload = c.get('userPayload')
-    const productId = Number(c.req.param('id'))
-    const store = await c.env.DB.prepare(
-      `SELECT id FROM stores WHERE user_id = ? ORDER BY id ASC LIMIT 1`
-    ).bind(payload.userId).first<{ id: number }>()
-    if (!store) return c.json({ error: '尚未建立商店' }, 404)
-    const existing = await c.env.DB.prepare(
-      `SELECT id FROM products WHERE id = ? AND store_id = ?`
-    ).bind(productId, store.id).first()
-    if (!existing) return c.json({ error: '商品不存在' }, 404)
-    await c.env.DB.prepare(`DELETE FROM products WHERE id = ? AND store_id = ?`).bind(productId, store.id).run()
-    await syncStoreProductCount(c.env.DB, store.id)
-    return c.json({ ok: true })
-  } catch (e: any) {
-    return c.json({ error: String(e) }, 500)
-  }
-})
-
 app.get('/api/stores/:slug', async (c) => {
   try {
-    await ensureStorefrontSchema(c.env.DB)
+    await ensureStoresTable(c.env.DB)
     const slug = c.req.param('slug').toLowerCase()
     const { RESERVED_STORE_SLUGS } = await import('./stores')
     if (RESERVED_STORE_SLUGS.has(slug)) return c.json({ error: '商店不存在' }, 404)
     const store = await c.env.DB.prepare(
-      `SELECT id, slug, name, tagline, status,
-              payments_enabled as paymentsEnabled, is_live as isLive,
-              product_count as productCount, created_at as createdAt
-       FROM stores WHERE slug = ? AND status = 'active'`
+      `SELECT id, slug, name, tagline, status, created_at as createdAt FROM stores WHERE slug = ? AND status = 'active'`
     ).bind(slug).first()
     if (!store) return c.json({ error: '商店不存在' }, 404)
     return c.json({ ...store, urlPath: `/s/shop?slug=${slug}` })
-  } catch (e: any) {
-    return c.json({ error: String(e) }, 500)
-  }
-})
-
-app.get('/api/stores/:slug/products', async (c) => {
-  try {
-    await ensureStorefrontSchema(c.env.DB)
-    const slug = c.req.param('slug').toLowerCase()
-    const store = await c.env.DB.prepare(
-      `SELECT id FROM stores WHERE slug = ? AND status = 'active'`
-    ).bind(slug).first<{ id: number }>()
-    if (!store) return c.json({ error: '商店不存在' }, 404)
-    const rows = await c.env.DB.prepare(
-      `SELECT id, name, description, price, image_url as imageUrl, category, stock, featured
-       FROM products
-       WHERE store_id = ? AND COALESCE(status, 'active') = 'active'
-       ORDER BY featured DESC, id DESC`
-    ).bind(store.id).all()
-    return c.json(rows.results || [])
-  } catch (e: any) {
-    return c.json({ error: String(e) }, 500)
-  }
-})
-
-app.post('/api/stores/:slug/orders', async (c) => {
-  try {
-    await ensureStorefrontSchema(c.env.DB)
-    const slug = c.req.param('slug').toLowerCase()
-    const store = await c.env.DB.prepare(
-      `SELECT id, name, payments_enabled as paymentsEnabled FROM stores WHERE slug = ? AND status = 'active'`
-    ).bind(slug).first<{ id: number; name: string; paymentsEnabled: number }>()
-    if (!store) return c.json({ error: '商店不存在' }, 404)
-
-    const body = await c.req.json()
-    const items = Array.isArray(body.items) ? body.items : []
-    if (items.length === 0) return c.json({ error: '購物車是空的' }, 400)
-
-    const customerName = String(body.customerName || '').trim()
-    const customerEmail = String(body.customerEmail || '').trim()
-    const customerPhone = String(body.customerPhone || '').trim()
-    const shippingAddress = String(body.shippingAddress || '').trim()
-    const note = String(body.note || '').trim()
-    const paymentMethod = String(body.paymentMethod || 'card').trim() || 'card'
-
-    if (!customerName) return c.json({ error: '請填寫收件人姓名' }, 400)
-    if (!customerPhone) return c.json({ error: '請填寫聯絡電話' }, 400)
-    if (!shippingAddress) return c.json({ error: '請填寫收件地址' }, 400)
-
-    let total = 0
-    const resolved: { productId: number; quantity: number; price: number; name: string }[] = []
-    for (const raw of items) {
-      const productId = Number(raw.productId)
-      const quantity = Math.max(1, Number(raw.quantity) || 1)
-      const product = await c.env.DB.prepare(
-        `SELECT id, name, price, stock FROM products
-         WHERE id = ? AND store_id = ? AND COALESCE(status, 'active') = 'active'`
-      ).bind(productId, store.id).first<{ id: number; name: string; price: number; stock: number }>()
-      if (!product) return c.json({ error: `商品不存在 (#${productId})` }, 400)
-      if (product.stock > 0 && product.stock < quantity) {
-        return c.json({ error: `「${product.name}」庫存不足` }, 400)
-      }
-      total += product.price * quantity
-      resolved.push({ productId: product.id, quantity, price: product.price, name: product.name })
-    }
-
-    // Card checkout shell: accept order as awaiting_payment until Connect is wired
-    const paymentStatus = paymentMethod === 'card' ? 'awaiting_payment' : 'unpaid'
-    const orderStatus = paymentMethod === 'card' ? 'pending_payment' : 'pending'
-
-    const orderResult = await c.env.DB.prepare(
-      `INSERT INTO orders
-        (user_id, store_id, total_amount, status, shipping_address, payment_status, payment_method,
-         customer_name, customer_email, customer_phone, note, created_at, updated_at)
-       VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', '+8 hours'), datetime('now', '+8 hours'))`
-    ).bind(
-      store.id,
-      total,
-      orderStatus,
-      shippingAddress,
-      paymentStatus,
-      paymentMethod,
-      customerName,
-      customerEmail,
-      customerPhone,
-      note,
-    ).run()
-
-    const orderId = orderResult.meta.last_row_id
-    for (const item of resolved) {
-      await c.env.DB.prepare(
-        `INSERT INTO order_items (order_id, product_id, quantity, price, created_at)
-         VALUES (?, ?, ?, ?, datetime('now', '+8 hours'))`
-      ).bind(orderId, item.productId, item.quantity, item.price).run()
-      // decrement stock when tracked
-      await c.env.DB.prepare(
-        `UPDATE products SET stock = CASE WHEN stock >= ? THEN stock - ? ELSE stock END
-         WHERE id = ?`
-      ).bind(item.quantity, item.quantity, item.productId).run().catch(() => {})
-    }
-
-    await c.env.DB.prepare(
-      `UPDATE stores SET last_active_at = datetime('now', '+8 hours') WHERE id = ?`
-    ).bind(store.id).run()
-
-    return c.json({
-      id: orderId,
-      storeId: store.id,
-      storeName: store.name,
-      totalAmount: total,
-      status: orderStatus,
-      paymentStatus,
-      paymentMethod,
-      paymentsEnabled: !!store.paymentsEnabled,
-      items: resolved,
-      message: paymentMethod === 'card'
-        ? (store.paymentsEnabled
-          ? '訂單已建立，刷卡金流串接後將自動向客人收款。'
-          : '訂單已建立。店家尚未完成金流開通，目前為待付款狀態。')
-        : '訂單已建立，店家將與你聯繫確認付款。',
-    }, 201)
   } catch (e: any) {
     return c.json({ error: String(e) }, 500)
   }
