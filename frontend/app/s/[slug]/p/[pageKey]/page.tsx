@@ -1,13 +1,8 @@
 import StoreCustomPageClient from './Client'
 
 export function generateStaticParams() {
-  return [
-    { pageKey: 'contact' },
-    { pageKey: 'shipping' },
-    { pageKey: 'returns' },
-    { pageKey: 'privacy' },
-    { pageKey: 'faq' },
-  ]
+  const pageKeys = ['contact', 'shipping', 'returns', 'privacy', 'faq']
+  return pageKeys.map((pageKey) => ({ slug: 'shop', pageKey }))
 }
 
 export default function StoreCustomPage() {
