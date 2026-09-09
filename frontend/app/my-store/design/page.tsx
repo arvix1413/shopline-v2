@@ -23,8 +23,7 @@ import {
 } from '../../../lib/storeLayout'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://shopline-backend.arvix1413.workers.dev'
-/** 設計預覽一律打線上商品庫，避免本機空庫／假資料害你以為商品被洗掉 */
-const PRODUCT_API = 'https://shopline-backend.arvix1413.workers.dev'
+const PRODUCT_API = process.env.NEXT_PUBLIC_API_URL || API
 
 const ADDABLE: SectionType[] = ['hero', 'products', 'richtext', 'features', 'cta']
 

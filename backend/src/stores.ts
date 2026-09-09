@@ -49,6 +49,7 @@ export async function ensureStoresTable(db: D1Database) {
     `ALTER TABLE stores ADD COLUMN product_count INTEGER DEFAULT 0`,
     `ALTER TABLE stores ADD COLUMN last_active_at TEXT`,
     `ALTER TABLE stores ADD COLUMN layout_json TEXT`,
+    `ALTER TABLE stores ADD COLUMN pages_json TEXT`,
   ]
   for (const sql of extras) {
     await db.prepare(sql).run().catch(() => {})

@@ -10,7 +10,7 @@ interface TrialButtonProps {
 
 export default function TrialButton({ label = '立即免費試用', className = '', style }: TrialButtonProps) {
   const { user, isLoading } = useAuth()
-  const href = !isLoading && user ? '/trial' : '/register'
+  const href = !isLoading && user ? '/my-store' : '/register'
 
   return (
     <a href={href} className={className} style={style}>

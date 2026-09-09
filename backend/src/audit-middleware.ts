@@ -87,12 +87,12 @@ export async function createAuditMiddleware(systemName: string) {
           response_time: responseTime
         }
         
-        // 异步上报到 shopline 审计中心
+        // 异步上报到 ARVIX 审计中心
         fetch('https://shopline-backend.arvix1413.workers.dev/api/admin/audit-cross-system', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-System-Source': systemName.toLowerCase()
+            'X-System-Source': systemName.toLowerCase(),
           },
           body: JSON.stringify(auditPayload)
         }).catch(e => {
@@ -181,7 +181,8 @@ function parseOperation(path: string, method: string, systemName: string): { ope
 
 // 预定义系统名称常量
 export const SYSTEM_NAMES = {
-  SHOPLINE: 'SHOPLINE',
+  SHOPLINE: 'ARVIX',
+  ARVIX: 'ARVIX',
   TINYWEAR: 'Tiny Wearhouse',
   IMS: 'IMS',
   DAF_SHOES: 'DAF Shoes',

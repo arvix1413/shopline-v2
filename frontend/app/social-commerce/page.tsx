@@ -110,7 +110,7 @@ export default function SocialCommercePage() {
           <div className="flex-1">
             <h1 className="text-4xl md:text-5xl font-black mb-6 leading-tight whitespace-pre-line" style={{ color: '#00142D' }}>{c.title}</h1>
             <p className="text-lg mb-8" style={{ color: '#3D4A5C' }}>{c.subtitle}</p>
-            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>
+            <a href="/register" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>
               {c.cta}
             </a>
           </div>
@@ -163,7 +163,7 @@ export default function SocialCommercePage() {
         <div className="max-w-2xl mx-auto px-4 sm:px-6">
           <h2 className="text-3xl font-black mb-4" style={{ color: '#00142D' }}>{c.ctaTitle}</h2>
           <p className="mb-8" style={{ color: '#3D4A5C' }}>{c.ctaSubtitle}</p>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
+          <a href="/register" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             {c.cta}
           </a>
         </div>

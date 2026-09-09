@@ -96,7 +96,7 @@ export default function Growth() {
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6">
           <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: '#9B9EF8' }}>{t.growth.ctaEyebrow}</p>
           <h2 className="font-black mb-8 text-3xl md:text-4xl" style={{ color: '#fff' }}>{t.growth.ctaTitle}</h2>
-          <a href="/trial-redirect"
+          <a href="/register"
             className="inline-block font-bold transition-all btn-glow btn-brand"
             style={{ borderRadius: 30, fontSize: 17, fontWeight: 700, padding: '14px 52px' }}>
             {t.growth.ctaCta}

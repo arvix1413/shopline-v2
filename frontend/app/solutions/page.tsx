@@ -229,7 +229,7 @@ export default function SolutionsPage() {
           <div className="flex-1">
             <h1 className="text-4xl md:text-5xl font-black mb-6 text-white whitespace-pre-line">{c.title}</h1>
             <p className="text-lg mb-8" style={{ color: 'rgba(255,255,255,0.75)' }}>{c.subtitle}</p>
-            <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>{c.cta}</a>
+            <a href="/register" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>{c.cta}</a>
           </div>
           <div className="flex-1">
             <img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80" alt="ARVIX solutions" className="w-full rounded-2xl" />
@@ -303,7 +303,7 @@ export default function SolutionsPage() {
         <div className="max-w-2xl mx-auto px-4 sm:px-6">
           <h2 className="text-3xl font-black text-white mb-4">{c.ctaTitle}</h2>
           <p className="text-white/70 mb-8">{c.ctaSubtitle}</p>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>{c.cta}</a>
+          <a href="/register" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>{c.cta}</a>
         </div>
       </section>
 
@@ -311,7 +311,7 @@ export default function SolutionsPage() {
         <div className="max-w-2xl mx-auto px-4 sm:px-6">
           <h2 className="text-2xl font-black mb-4" style={{ color: '#00142D' }}>{c.questionsTitle}</h2>
           <p className="mb-6" style={{ color: '#687280' }}>{c.questionsSubtitle}</p>
-          <a href="/trial-redirect" className="inline-block text-white font-bold px-8 py-3 rounded-full hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>{c.bookConsult}</a>
+          <a href="/register" className="inline-block text-white font-bold px-8 py-3 rounded-full hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>{c.bookConsult}</a>
         </div>
       </section>
     </main>

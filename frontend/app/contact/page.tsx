@@ -198,7 +198,7 @@ export default function ContactPage() {
           <h2 className="text-3xl font-black text-white mb-3">{c.ctaTitle}</h2>
           <p className="text-white/85 mb-8">{c.ctaSubtitle}</p>
           <a
-            href="/trial-redirect"
+            href="/register"
             className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity"
             style={{ color: '#5B5FF0' }}
           >

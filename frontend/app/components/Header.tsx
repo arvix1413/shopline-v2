@@ -357,7 +357,7 @@ export default function Header() {
                     style={{ color: '#5C5F7A' }}>
                     {t.nav.login}
                   </a>
-                  <a href="/trial-redirect"
+                  <a href="/register"
                     className="text-white text-sm font-bold px-6 py-2 rounded-full transition-all btn-glow btn-brand">
                     {t.nav.freeTrial}
                   </a>
@@ -439,7 +439,7 @@ export default function Header() {
 
               <div className="pt-3 flex flex-col gap-3" style={{ borderTop: '1px solid rgba(18,19,31,0.08)' }}>
                 <a href="/login" className="text-sm font-medium" style={{ color: '#5C5F7A' }}>{t.nav.login}</a>
-                <a href="/trial-redirect" className="text-white text-sm font-semibold px-5 py-2.5 rounded-lg text-center btn-brand">
+                <a href="/register" className="text-white text-sm font-semibold px-5 py-2.5 rounded-lg text-center btn-brand">
                   {t.nav.freeTrial}
                 </a>
               </div>

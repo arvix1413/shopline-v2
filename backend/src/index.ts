@@ -151,7 +151,7 @@ app.use('/api/*', async (c, next) => {
         auditId,
         userId,
         `session_${Date.now()}`,
-        'SHOPLINE',
+        'ARVIX',
         operationType,
         operationDetail,
         c.req.header('CF-Connecting-IP') || '',
@@ -171,7 +171,7 @@ app.use('/api/*', async (c, next) => {
 
 // 健康检查
 app.get('/', (c) => {
-  return c.json({ message: 'SHOPLINE Clone API is running!' })
+  return c.json({ message: 'ARVIX API is running' })
 })
 
 /** TWD is zero-decimal on Stripe — unitAmount is NT$ major units. */
@@ -330,12 +330,16 @@ async function getAuthUser(c: any) {
   return verifyToken(authHeader.slice(7), c.env.JWT_SECRET)
 }
 
-// Init admin account
+// Init admin — disabled unless INIT_ADMIN_SECRET header matches
 app.post('/api/init-admin', async (c) => {
+  const secret = (c.env as any).INIT_ADMIN_SECRET
+  if (!secret || c.req.header('X-Init-Secret') !== secret) {
+    return c.json({ error: '此端點已停用' }, 403)
+  }
   const passwordHash = await hashPassword('admin123')
   try {
-    await c.env.DB.prepare(`INSERT OR REPLACE INTO users (email, password_hash, name, is_admin) VALUES ('admin@admin.com', '${passwordHash}', 'Admin', 1)`).run()
-    return c.json({ ok: true, email: 'admin@admin.com', password: 'admin123' })
+    await c.env.DB.prepare(`INSERT OR REPLACE INTO users (email, password_hash, name, is_admin) VALUES ('admin@admin.com', ?, 'Admin', 1)`).bind(passwordHash).run()
+    return c.json({ ok: true, email: 'admin@admin.com' })
   } catch (e: any) { return c.json({ error: String(e) }, 500) }
 })
 
@@ -369,7 +373,7 @@ app.get('/api/products/:id', async (c) => {
   return c.json(product)
 })
 
-app.post('/api/products', async (c) => {
+app.post('/api/products', requireAdmin, async (c) => {
   try {
     const body = await c.req.json()
     await ensureProductsStoreSlug(c.env.DB)
@@ -420,7 +424,7 @@ app.post('/api/products', async (c) => {
 })
 
 // 更新商品信息
-app.put('/api/products/:id', async (c) => {
+app.put('/api/products/:id', requireAdmin, async (c) => {
   const id = parseInt(c.req.param('id'))
   
   try {
@@ -467,7 +471,7 @@ app.put('/api/products/:id', async (c) => {
 })
 
 // 删除商品
-app.delete('/api/products/:id', async (c) => {
+app.delete('/api/products/:id', requireAdmin, async (c) => {
   const id = parseInt(c.req.param('id'))
   
   try {
@@ -494,8 +498,8 @@ app.delete('/api/products/:id', async (c) => {
   }
 })
 
-// 图片上传到 R2
-app.post('/api/upload', async (c) => {
+// 图片上传到 R2（需登入：商家或管理員）
+app.post('/api/upload', requireUser, async (c) => {
   try {
     const formData = await c.req.formData()
     const file = formData.get('file') as File
@@ -567,7 +571,7 @@ app.post('/api/init', async (c) => {
     // 插入初始化数据
     const initData = [
       `INSERT OR IGNORE INTO audit_systems (id, name, display_name, url, color) VALUES 
-        ('shopline', 'shopline', 'SHOPLINE 主系统', 'https://shopline-frontend.pages.dev', '#3B82F6'),
+        ('arvix', 'arvix', 'ARVIX 主系統', 'https://arvixai.com', '#5B5FF0'),
         ('daf-shoes', 'daf-shoes', 'DAF Shoes', 'https://daf-shoes.pages.dev', '#10B981'),
         ('molava', 'molava', 'XYN Shop', 'https://xyn-shop.pages.dev', '#8B5CF6'),
         ('ims', 'ims', 'IMS 系统', 'https://ims.pages.dev', '#F59E0B'),
@@ -743,7 +747,8 @@ app.post('/api/auth/forgot-password', async (c) => {
 
     await c.env.DB.prepare(`UPDATE users SET reset_token = ?, reset_token_exp = ? WHERE id = ?`).bind(resetToken, exp, user.id).run()
 
-    const resetUrl = `https://shopline-frontend.pages.dev/reset-password?token=${resetToken}`
+    const siteUrl = ((c.env as any).SITE_URL || 'https://arvixai.com').replace(/\/$/, '')
+    const resetUrl = `${siteUrl}/reset-password?token=${resetToken}`
     const resendKey = (c.env as any).RESEND_API_KEY
     const brevoKey = (c.env as any).BREVO_API_KEY
 
@@ -758,7 +763,7 @@ app.post('/api/auth/forgot-password', async (c) => {
         <tr><td align="center" style="padding-bottom:32px">
           <div style="display:inline-flex;align-items:center;gap:8px">
             <div style="width:36px;height:36px;background:#3b82f6;border-radius:8px;display:inline-block;text-align:center;line-height:36px;font-size:18px;font-weight:900;color:#fff">S</div>
-            <span style="font-size:22px;font-weight:900;color:#fff;letter-spacing:-0.5px">SHOPLINE</span>
+            <span style="font-size:22px;font-weight:900;color:#fff;letter-spacing:-0.5px">ARVIX</span>
           </div>
         </td></tr>
         <!-- Card -->
@@ -792,7 +797,7 @@ app.post('/api/auth/forgot-password', async (c) => {
         </td></tr>
         <!-- Footer -->
         <tr><td style="padding:24px 0;text-align:center">
-          <p style="margin:0;font-size:12px;color:#475569">© 2026 SHOPLINE · ARVIX Limited</p>
+          <p style="margin:0;font-size:12px;color:#475569">© 2026 ARVIX</p>
           <p style="margin:4px 0 0;font-size:11px;color:#334155">此郵件由系統自動發送，請勿直接回覆</p>
         </td></tr>
       </table>
@@ -806,9 +811,9 @@ app.post('/api/auth/forgot-password', async (c) => {
         method: 'POST',
         headers: { 'api-key': brevoKey, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          sender: { name: 'SHOPLINE', email: 'wxfaigl@gmail.com' },
+          sender: { name: 'ARVIX', email: 'wxfaigl@gmail.com' },
           to: [{ email }],
-          subject: '【SHOPLINE】重置你的密碼',
+          subject: '【ARVIX】重置你的密碼',
           htmlContent: emailHtml,
         }),
       })
@@ -817,9 +822,9 @@ app.post('/api/auth/forgot-password', async (c) => {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          from: 'SHOPLINE <onboarding@resend.dev>',
+          from: 'ARVIX <onboarding@resend.dev>',
           to: [email],
-          subject: '【SHOPLINE】重置你的密碼',
+          subject: '【ARVIX】重置你的密碼',
           html: emailHtml,
         }),
       })
@@ -1836,6 +1841,14 @@ app.get('/api/admin/customers/search', requireAdmin, async (c) => {
 // 跨系统审计事件上报接口（供 tinywear/ims 调用）
 app.post('/api/admin/audit-cross-system', async (c) => {
   try {
+    const expected = (c.env as any).AUDIT_INGEST_SECRET as string | undefined
+    if (expected) {
+      const provided = c.req.header('X-Audit-Secret') || ''
+      if (provided !== expected) return c.json({ error: '未授權' }, 401)
+    } else if (!c.req.header('X-System-Source')) {
+      // 未設定 AUDIT_INGEST_SECRET 時至少要求系統來源標頭，避免完全公開寫入
+      return c.json({ error: '未授權' }, 401)
+    }
     const systemSourceHeader = c.req.header('X-System-Source') // 'tinywear' | 'ims'
     
     const {
@@ -2152,6 +2165,7 @@ app.get('/api/stores/me', async (c) => {
               onboarding_stage as onboardingStage, payments_enabled as paymentsEnabled,
               is_live as isLive, product_count as productCount,
               layout_json as layoutJson,
+              pages_json as pagesJson,
               created_at as createdAt
        FROM stores WHERE user_id = ? ORDER BY id ASC LIMIT 1`
     ).bind(payload.userId).first()
@@ -2163,10 +2177,19 @@ app.get('/api/stores/me', async (c) => {
     } catch {
       layout = null
     }
-    const { layoutJson: _lj, ...rest } = store as any
+    const { parseStorePages } = await import('./storePages')
+    let pagesRaw = null
+    try {
+      pagesRaw = (store as any).pagesJson ? JSON.parse((store as any).pagesJson) : null
+    } catch {
+      pagesRaw = null
+    }
+    const pages = parseStorePages(pagesRaw, (store as any).name)
+    const { layoutJson: _lj, pagesJson: _pj, ...rest } = store as any
     return c.json({
       ...rest,
       layout,
+      pages,
       urlPath: `/s/shop?slug=${(store as any).slug}`,
       trial,
       canOperate: merchantCanOperate(trial),
@@ -2217,6 +2240,51 @@ app.put('/api/stores/me/layout', requireUser, async (c) => {
       `UPDATE stores SET layout_json=?, updated_at=?, last_active_at=? WHERE id=?`
     ).bind(json, nowIso(), nowIso(), store.id).run()
     return c.json({ ok: true, layout })
+  } catch (e: any) {
+    return c.json({ error: String(e) }, 500)
+  }
+})
+
+app.get('/api/stores/me/pages', requireUser, async (c) => {
+  try {
+    const payload = c.get('userPayload')
+    await ensureStoresTable(c.env.DB)
+    const store = await getOwnedStore(c, payload.userId)
+    if (!store) return c.json({ error: '尚未建立商店' }, 404)
+    const row = await c.env.DB.prepare(`SELECT pages_json, name FROM stores WHERE id=?`).bind(store.id).first<any>()
+    const { parseStorePages } = await import('./storePages')
+    let pagesRaw = null
+    try {
+      pagesRaw = row?.pages_json ? JSON.parse(row.pages_json) : null
+    } catch {
+      pagesRaw = null
+    }
+    return c.json({ pages: parseStorePages(pagesRaw, row?.name || store.name) })
+  } catch (e: any) {
+    return c.json({ error: String(e) }, 500)
+  }
+})
+
+app.put('/api/stores/me/pages', requireUser, async (c) => {
+  try {
+    const payload = c.get('userPayload')
+    const trial = await loadAndSyncTrial(c.env.DB, payload.userId)
+    if (!merchantCanOperate(trial)) {
+      return c.json({ error: '試用已結束，請先開通方案才能編輯頁面', code: 'TRIAL_EXPIRED' }, 402)
+    }
+    const store = await getOwnedStore(c, payload.userId)
+    if (!store) return c.json({ error: '尚未建立商店' }, 404)
+    const body = await c.req.json().catch(() => ({}))
+    const { normalizePagesInput } = await import('./storePages')
+    const pages = normalizePagesInput(body.pages)
+    if (!pages || pages.length === 0) return c.json({ error: '頁面資料格式錯誤' }, 400)
+    const json = JSON.stringify(pages)
+    if (json.length > 400_000) return c.json({ error: '頁面資料過大' }, 400)
+    await ensureStoresTable(c.env.DB)
+    await c.env.DB.prepare(
+      `UPDATE stores SET pages_json=?, updated_at=?, last_active_at=? WHERE id=?`
+    ).bind(json, nowIso(), nowIso(), store.id).run()
+    return c.json({ ok: true, pages })
   } catch (e: any) {
     return c.json({ error: String(e) }, 500)
   }
@@ -2373,7 +2441,7 @@ app.get('/api/stores/:slug', async (c) => {
     const { RESERVED_STORE_SLUGS } = await import('./stores')
     if (RESERVED_STORE_SLUGS.has(slug)) return c.json({ error: '商店不存在' }, 404)
     const store = await c.env.DB.prepare(
-      `SELECT id, user_id, slug, name, tagline, status, layout_json, created_at as createdAt FROM stores WHERE slug = ? AND status = 'active'`
+      `SELECT id, user_id, slug, name, tagline, status, layout_json, pages_json, created_at as createdAt FROM stores WHERE slug = ? AND status = 'active'`
     ).bind(slug).first<any>()
     if (!store) return c.json({ error: '商店不存在' }, 404)
 
@@ -2385,10 +2453,19 @@ app.get('/api/stores/:slug', async (c) => {
     } catch {
       layout = null
     }
-    const { user_id: _uid, layout_json: _lj, ...publicStore } = store
+    const { parseStorePages } = await import('./storePages')
+    let pagesRaw = null
+    try {
+      pagesRaw = store.pages_json ? JSON.parse(store.pages_json) : null
+    } catch {
+      pagesRaw = null
+    }
+    const pages = parseStorePages(pagesRaw, store.name).filter((p) => p.published)
+    const { user_id: _uid, layout_json: _lj, pages_json: _pj, ...publicStore } = store
     return c.json({
       ...publicStore,
       layout,
+      pages,
       urlPath: `/s/shop?slug=${slug}`,
       suspended,
       suspendReason: suspended ? 'trial_expired' : null,
@@ -2497,8 +2574,8 @@ app.post('/api/me/activate', requireUser, async (c) => {
     const body = await c.req.json().catch(() => ({}))
     const plan = (body.plan || 'standard').toString()
 
-    // Prefer real Stripe Checkout when configured
-    if (c.env.STRIPE_SECRET_KEY && !body.forceDemo) {
+    // Prefer real Stripe Checkout when configured (no free bypass)
+    if (c.env.STRIPE_SECRET_KEY) {
       const siteUrl = (c.env.SITE_URL || 'https://arvixai.com').replace(/\/$/, '')
       const planKey = String(plan).toLowerCase() as keyof typeof stripePlans
       const stripePlan = stripePlans[planKey] || stripePlans.standard
@@ -2532,8 +2609,46 @@ app.post('/api/me/activate', requireUser, async (c) => {
       return c.json({ error: '無法建立付款頁面，請稍後再試' }, 502)
     }
 
+    // Stripe 未設定時才允許本機／演示開通（不可用 forceDemo 繞過已設定的金流）
     await markUserPaid(c.env.DB, payload.userId, plan)
     return c.json({ ok: true, planStatus: 'paid', plan, demo: true })
+  } catch (e: any) {
+    return c.json({ error: String(e) }, 500)
+  }
+})
+
+/** Confirm Stripe Checkout session after redirect (?paid=1&session_id=…) when webhook is slow/missing. */
+app.post('/api/me/confirm-subscription', requireUser, async (c) => {
+  try {
+    await ensureTrialSchema(c.env.DB)
+    const payload = await getAuthUser(c)
+    if (!payload) return c.json({ error: '未授權' }, 401)
+    if (!c.env.STRIPE_SECRET_KEY) return c.json({ error: '金流未設定' }, 503)
+    const body = await c.req.json().catch(() => ({}))
+    const sessionId = String(body.sessionId || body.session_id || '').trim()
+    if (!sessionId) return c.json({ error: '缺少 session_id' }, 400)
+
+    const response = await fetch(`https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}`, {
+      headers: { Authorization: `Bearer ${c.env.STRIPE_SECRET_KEY}` },
+    })
+    const session = await response.json<any>()
+    if (!response.ok) return c.json({ error: '無法驗證付款' }, 502)
+
+    const metaUser = Number(session.metadata?.user_id || session.client_reference_id || 0)
+    if (metaUser && metaUser !== payload.userId) {
+      return c.json({ error: '付款與帳號不符' }, 403)
+    }
+    const paid =
+      session.payment_status === 'paid' ||
+      session.status === 'complete' ||
+      session.payment_status === 'no_charge'
+    if (!paid && session.mode === 'subscription' && session.status !== 'complete') {
+      return c.json({ error: '付款尚未完成', status: session.status, payment_status: session.payment_status }, 402)
+    }
+
+    const plan = String(session.metadata?.arvix_plan || 'standard')
+    await markUserPaid(c.env.DB, payload.userId, plan)
+    return c.json({ ok: true, planStatus: 'paid', plan })
   } catch (e: any) {
     return c.json({ error: String(e) }, 500)
   }

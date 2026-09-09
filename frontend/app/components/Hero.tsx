@@ -62,7 +62,7 @@ export default function Hero() {
             </p>
             <div className="rise-in rise-in-delay-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3 sm:gap-4 max-w-sm sm:max-w-none mx-auto lg:mx-0">
             <a
-              href="/trial-redirect"
+              href="/register"
               className="inline-block text-center font-bold btn-glow btn-brand"
               style={{ borderRadius: 999, fontSize: 16, padding: '14px 40px' }}
             >

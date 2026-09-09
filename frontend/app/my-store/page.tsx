@@ -191,6 +191,12 @@ export default function MyStorePage() {
                 拖拉設計店面
               </Link>
               <Link
+                href="/my-store/pages"
+                className="inline-flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-bold border"
+              >
+                商店頁面
+              </Link>
+              <Link
                 href={shopUrl}
                 className="inline-flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-bold text-white"
                 style={{ background: '#5B5FF0' }}

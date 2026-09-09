@@ -11,7 +11,7 @@ import { useI18n } from '../../contexts/I18nContext'
 import { pickCopy } from '../../lib/i18n/pageCopy'
 import type { Locale } from '../../lib/i18n'
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8787'
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://shopline-backend.arvix1413.workers.dev'
 
 interface TrialSystem {
   id: number; name: string; desc: string; url: string
@@ -29,27 +29,27 @@ type TrialCopy = {
 
 const zhTW: TrialCopy = {
   loading: '載入中...',
-  badge: '系統試用中心',
+  badge: '系統試用中心（管理員）',
   title: '選擇你想試用的系統',
-  subtitle: '點擊任一系統即可立即體驗，所有系統均為完整功能展示',
+  subtitle: '此頁僅管理員可用。一般商家請使用「我的商店」。',
   empty: '目前尚無可用的試用系統，請稍後再試',
   tryNow: '立即體驗',
 }
 
 const zhCN: TrialCopy = {
   loading: '加载中...',
-  badge: '系统试用中心',
+  badge: '系统试用中心（管理员）',
   title: '选择你想试用的系统',
-  subtitle: '点击任一系统即可立即体验，所有系统均为完整功能展示',
+  subtitle: '此页仅管理员可用。一般商家请使用「我的商店」。',
   empty: '目前尚无可用的试用系统，请稍后再试',
   tryNow: '立即体验',
 }
 
 const en: TrialCopy = {
   loading: 'Loading...',
-  badge: 'Trial systems hub',
+  badge: 'Trial systems hub (admin)',
   title: 'Choose a system to try',
-  subtitle: 'Click any system to explore — full feature demos',
+  subtitle: 'Admin only. Merchants should use My Store.',
   empty: 'No trial systems available yet. Please check back later.',
   tryNow: 'Try now',
 }
@@ -76,12 +76,20 @@ export default function TrialPage() {
   const [fetching, setFetching] = useState(true)
   const [ssoToken, setSsoToken] = useState<string | null>(null)
 
+  // Merchants never stay on this old multi-system hub
   useEffect(() => {
-    if (!isLoading && !user) router.push('/login')
+    if (isLoading) return
+    if (!user) {
+      router.replace('/login?next=/my-store')
+      return
+    }
+    if (user.isAdmin !== 1) {
+      router.replace('/my-store')
+    }
   }, [user, isLoading, router])
 
   useEffect(() => {
-    if (!token) return
+    if (!token || user?.isAdmin !== 1) return
     fetch(`${API}/api/auth/sso-token`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
@@ -89,10 +97,10 @@ export default function TrialPage() {
       .then(r => r.json())
       .then(data => { if (data.ssoToken) setSsoToken(data.ssoToken) })
       .catch(() => {})
-  }, [token])
+  }, [token, user])
 
   useEffect(() => {
-    if (!user) return
+    if (!user || user.isAdmin !== 1) return
     fetch(`${API}/api/trial-systems`)
       .then(r => r.json())
       .then(data => setSystems(Array.isArray(data) ? data.filter((s: any) => s.active) : []))
@@ -100,13 +108,21 @@ export default function TrialPage() {
       .finally(() => setFetching(false))
   }, [user])
 
-  if (isLoading || fetching || !ssoToken) return (
-    <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#07071A' }}>
-      <div className="text-white/40 text-sm">{c.loading}</div>
-    </main>
-  )
+  if (isLoading || !user || user.isAdmin !== 1) {
+    return (
+      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#07071A' }}>
+        <div className="text-white/40 text-sm">{c.loading}</div>
+      </main>
+    )
+  }
 
-  if (!user) return null
+  if (fetching || !ssoToken) {
+    return (
+      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#07071A' }}>
+        <div className="text-white/40 text-sm">{c.loading}</div>
+      </main>
+    )
+  }
 
   return (
     <main className="min-h-screen" style={{ backgroundColor: '#07071A', color: '#fff' }}>

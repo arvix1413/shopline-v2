@@ -6,9 +6,9 @@ import SocialIcons from './SocialIcons'
 
 const colHrefs = [
   ['/online-store', '/about/pricing', '/templates', '/about/pricing', '/showcase'],
-  ['/trial-redirect', '/trial-redirect', '/trial-redirect'],
-  ['/trial-redirect', '/trial-redirect', '/trial-redirect'],
-  ['/trial-redirect', '/about/pricing', '/consultation'],
+  ['/register', '/register', '/register'],
+  ['/register', '/register', '/register'],
+  ['/register', '/about/pricing', '/consultation'],
   ['/apps', '/faq/overview', '/faq/overview', '/faq/overview', 'https://line.me/R/ti/p/@kxh0647n'],
   ['/changelog', '/faq/overview'],
   ['/cooperate', '/cooperate', '/about', '/contact'],
@@ -42,7 +42,7 @@ export default function Footer() {
             <div className="font-brand text-3xl font-extrabold tracking-tight mb-3">ARVIX</div>
             <p className="text-sm max-w-md leading-relaxed" style={{ color: '#8F91A8' }}>Commerce, retail and business operations — connected in one platform.</p>
           </div>
-          <a href="/trial-redirect" className="hidden md:inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold btn-brand transition-transform hover:-translate-y-0.5">{t.nav?.freeTrial ?? '免費開店'} <span>→</span></a>
+          <a href="/register" className="hidden md:inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold btn-brand transition-transform hover:-translate-y-0.5">{t.nav?.freeTrial ?? '免費開店'} <span>→</span></a>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-6 sm:gap-8 mb-12">
           {t.footer.cols.map((col, ci) => (

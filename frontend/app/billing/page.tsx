@@ -68,6 +68,21 @@ export default function BillingPage() {
     const params = new URLSearchParams(window.location.search)
     if (params.get('paid') === '1') {
       setMsg('付款成功！方案開通中，若狀態未更新請重新整理。')
+      const sessionId = params.get('session_id')
+      if (sessionId && token) {
+        fetch(`${API}/api/me/confirm-subscription`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId }),
+        })
+          .then(async (res) => {
+            if (res.ok) {
+              setMsg('付款成功！方案已開通。')
+              await refreshTrial(token)
+            }
+          })
+          .catch(() => {})
+      }
     } else if (params.get('checkout') === 'cancelled') {
       setMsg('已取消付款，可稍後再選擇方案。')
     }

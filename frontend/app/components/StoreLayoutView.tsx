@@ -1,8 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type ReactNode } from 'react'
 import type { LayoutStyle, StoreLayout, StoreSection, StoreTheme } from '../../lib/storeLayout'
 import { SECTION_LABELS, parseHeroImages, DEFAULT_STYLE } from '../../lib/storeLayout'
+import { storeHomeUrl, storePageUrl, storeProductsUrl } from '../../lib/storefrontUrl'
+import type { StorePage } from '../../lib/storePages'
 
 type Product = {
   id: number
@@ -50,6 +52,9 @@ function contrastOn(primary: string, background: string) {
 type Props = {
   layout: StoreLayout
   storeName: string
+  /** When set, header nav uses real multi-page links. */
+  storeSlug?: string
+  pages?: StorePage[]
   products: Product[]
   category: string
   onCategory: (c: string) => void
@@ -62,11 +67,16 @@ type Props = {
   onReorderSection?: (from: number, to: number) => void
   /** Freeze interactions / carousel for gallery thumbnails */
   staticPreview?: boolean
+  /** Hide homepage sections; chrome only (used on content pages). */
+  chromeOnly?: boolean
+  children?: ReactNode
 }
 
 export default function StoreLayoutView({
   layout,
   storeName,
+  storeSlug,
+  pages = [],
   products,
   category,
   onCategory,
@@ -78,6 +88,8 @@ export default function StoreLayoutView({
   onSelectSection,
   onReorderSection,
   staticPreview = false,
+  chromeOnly = false,
+  children,
 }: Props) {
   const { theme, sections } = layout
   const style = layout.style || DEFAULT_STYLE
@@ -103,12 +115,38 @@ export default function StoreLayoutView({
       >
         <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between gap-4">
           <div className="min-w-0">
-            <div className="text-xl font-bold tracking-tight truncate">{storeName}</div>
+            {storeSlug && !editing && !staticPreview ? (
+              <a href={storeHomeUrl(storeSlug)} className="text-xl font-bold tracking-tight truncate block hover:opacity-80">
+                {storeName}
+              </a>
+            ) : (
+              <div className="text-xl font-bold tracking-tight truncate">{storeName}</div>
+            )}
             <div className="text-[11px] tracking-wide" style={{ color: theme.muted }}>Powered by ARVIX</div>
           </div>
-          <nav className="hidden sm:flex items-center gap-6 text-sm font-medium" style={{ color: theme.muted }}>
-            <a href="#products" className="hover:opacity-70 transition" onClick={(e) => (editing || staticPreview) && e.preventDefault()}>商品</a>
-            <a href="#about" className="hover:opacity-70 transition" onClick={(e) => (editing || staticPreview) && e.preventDefault()}>品牌</a>
+          <nav className="flex items-center gap-4 sm:gap-6 text-sm font-medium overflow-x-auto max-w-[55%] sm:max-w-none" style={{ color: theme.muted }}>
+            {storeSlug && !editing && !staticPreview ? (
+              <>
+                <a href={storeHomeUrl(storeSlug)} className="hover:opacity-70 transition whitespace-nowrap">首頁</a>
+                <a href={storeProductsUrl(storeSlug)} className="hover:opacity-70 transition whitespace-nowrap">全部商品</a>
+                {(pages.length
+                  ? pages
+                  : [{ key: 'about', title: '關於我們', body: '', published: true }]
+                )
+                  .filter((p) => p.published)
+                  .slice(0, 5)
+                  .map((p) => (
+                    <a key={p.key} href={storePageUrl(storeSlug, p.key)} className="hover:opacity-70 transition whitespace-nowrap">
+                      {p.title}
+                    </a>
+                  ))}
+              </>
+            ) : (
+              <>
+                <a href="#products" className="hover:opacity-70 transition whitespace-nowrap" onClick={(e) => (editing || staticPreview) && e.preventDefault()}>商品</a>
+                <a href="#about" className="hover:opacity-70 transition whitespace-nowrap" onClick={(e) => (editing || staticPreview) && e.preventDefault()}>關於我們</a>
+              </>
+            )}
           </nav>
           <button
             type="button"
@@ -121,7 +159,7 @@ export default function StoreLayoutView({
         </div>
       </header>
 
-      {sections.map((section, index) => {
+      {!chromeOnly && sections.map((section, index) => {
         const selected = editing && selectedSectionId === section.id
         return (
           <div
@@ -165,7 +203,18 @@ export default function StoreLayoutView({
         )
       })}
 
+      {children}
+
       <footer className="py-10 text-center text-xs" style={{ color: theme.muted, borderTop: `1px solid ${theme.text}12` }}>
+        {storeSlug && !editing && !staticPreview && pages.filter((p) => p.published).length > 0 && (
+          <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 mb-4 text-sm">
+            {pages.filter((p) => p.published).map((p) => (
+              <a key={p.key} href={storePageUrl(storeSlug, p.key)} className="hover:opacity-70 transition">
+                {p.title}
+              </a>
+            ))}
+          </div>
+        )}
         © {storeName} · Powered by ARVIX
       </footer>
     </div>

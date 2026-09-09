@@ -97,9 +97,9 @@ export default function AppsPage() {
 
   const getTrialUrl = (_sys: TrialSystem) => {
     if (user && token) {
-      return `/trial`
+      return `/my-store`
     }
-    return `/trial-redirect`
+    return `/register`
   }
 
   const ctaLabel = user ? c.ctaLoggedIn : c.ctaGuest
@@ -110,7 +110,7 @@ export default function AppsPage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <h1 className="text-4xl md:text-5xl font-black mb-4" style={{ color: '#00142D' }}>{c.title}</h1>
           <p className="text-lg mb-6" style={{ color: '#687280' }}>{c.subtitle}</p>
-          <a href="/trial-redirect"
+          <a href="/register"
             className="inline-block text-white font-bold px-8 py-3 rounded-full text-base hover:opacity-90 transition-opacity"
             style={{ backgroundColor: '#5B5FF0' }}>
             {ctaLabel}
@@ -187,7 +187,7 @@ export default function AppsPage() {
         <div className="max-w-2xl mx-auto px-4 sm:px-6">
           <h2 className="text-3xl font-black text-white mb-4">{c.ctaTitle}</h2>
           <p className="text-white/70 mb-8">{c.ctaSubtitle}</p>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
+          <a href="/register" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             {ctaLabel}
           </a>
         </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
@@ -13,7 +13,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://shopline-backend.ar
 
 export default function RegisterPage() {
   const router = useRouter()
-  const { login } = useAuth()
+  const { login, user, isLoading } = useAuth()
   const { t } = useI18n()
   const [form, setForm] = useState({ email: '', password: '', phone: '', shopName: '' })
   const [error, setError] = useState('')
@@ -22,6 +22,10 @@ export default function RegisterPage() {
   const previewSlug = useMemo(() => {
     return slugifyBrand(form.shopName) || slugifyBrand(form.email.split('@')[0] || '') || 'your-brand'
   }, [form.shopName, form.email])
+
+  useEffect(() => {
+    if (!isLoading && user) router.replace('/my-store')
+  }, [isLoading, user, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

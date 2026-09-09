@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { RESERVED_STORE_SLUGS } from '../../../lib/storeSlug'
 import StoreLayoutView from '../../components/StoreLayoutView'
 import { parseStoreLayout, type StoreLayout } from '../../../lib/storeLayout'
+import { findStorePage, parseStorePages, type StorePage } from '../../../lib/storePages'
+import { storeHomeUrl } from '../../../lib/storefrontUrl'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://shopline-backend.arvix1413.workers.dev'
 
@@ -19,6 +21,7 @@ type Store = {
   suspended?: boolean
   suspendReason?: string | null
   layout?: StoreLayout | null
+  pages?: StorePage[]
 }
 
 type Product = {
@@ -91,10 +94,17 @@ function resolveLayout(store: Store): StoreLayout {
   return layout
 }
 
-export default function BrandStoreClient() {
+export default function BrandStoreClient({
+  view = 'home',
+  pageKey,
+}: {
+  view?: 'home' | 'products' | 'page'
+  pageKey?: string
+}) {
   const params = useParams<{ slug: string }>()
   const [slug, setSlug] = useState('')
   const [store, setStore] = useState<Store | null>(null)
+  const [pages, setPages] = useState<StorePage[]>([])
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [missing, setMissing] = useState(false)
@@ -164,6 +174,7 @@ export default function BrandStoreClient() {
         const productData = productRes.ok ? await productRes.json() : []
         if (!cancelled) {
           setStore(storeData)
+          setPages(parseStorePages(storeData.pages, storeData.name || ''))
           setProducts(Array.isArray(productData) ? productData : [])
           const sid = ensureCartSession(slug)
           setSessionId(sid)
@@ -193,6 +204,7 @@ export default function BrandStoreClient() {
   const layout = store ? resolveLayout(store) : null
   const cartCount = cartItems.reduce((n, i) => n + i.quantity, 0)
   const cartTotal = cartItems.reduce((n, i) => n + i.product.price * i.quantity, 0)
+  const activePage = view === 'page' ? findStorePage(pages, pageKey || 'about') : null
 
   const addToCart = async (product: Product) => {
     if (!sessionId) return
@@ -335,13 +347,89 @@ export default function BrandStoreClient() {
         <StoreLayoutView
           layout={layout}
           storeName={store.name}
+          storeSlug={store.slug}
+          pages={pages}
           products={products}
           category={category}
           onCategory={setCategory}
           onSelectProduct={setSelected}
           cartCount={cartCount}
           onOpenCart={() => setCartOpen(true)}
-        />
+          chromeOnly={view !== 'home'}
+        >
+          {view === 'products' && (
+            <section className="max-w-6xl mx-auto px-5 py-12">
+              <h1 className="text-3xl font-bold mb-2">全部商品</h1>
+              <p className="text-sm mb-8" style={{ color: layout.theme.muted }}>
+                共 {products.length} 件商品
+              </p>
+              <div className="flex flex-wrap gap-2 mb-8">
+                {['全部', ...Array.from(new Set(products.map((p) => p.category).filter(Boolean) as string[]))].map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setCategory(c)}
+                    className="px-3 py-1.5 text-sm border"
+                    style={{
+                      borderColor: category === c ? layout.theme.primary : `${layout.theme.text}22`,
+                      background: category === c ? layout.theme.primary : 'transparent',
+                      color: category === c ? layout.theme.background : layout.theme.text,
+                    }}
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                {(category === '全部' ? products : products.filter((p) => p.category === category)).map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    className="text-left group"
+                    onClick={() => setSelected(p)}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={p.imageUrl || ''}
+                      alt=""
+                      className="w-full aspect-square object-cover mb-3"
+                      style={{ background: `${layout.theme.text}10` }}
+                    />
+                    <div className="text-sm font-semibold line-clamp-2 mb-1 group-hover:opacity-70">{p.name}</div>
+                    <div className="text-sm font-bold">{formatPrice(p.price)}</div>
+                  </button>
+                ))}
+              </div>
+              {products.length === 0 && (
+                <p className="text-sm text-center py-16" style={{ color: layout.theme.muted }}>尚未上架商品</p>
+              )}
+            </section>
+          )}
+
+          {view === 'page' && (
+            <section className="max-w-3xl mx-auto px-5 py-14">
+              {activePage ? (
+                <>
+                  <p className="text-xs font-semibold tracking-widest mb-3" style={{ color: layout.theme.muted }}>
+                    <a href={storeHomeUrl(store.slug)} className="hover:opacity-70">首頁</a>
+                    <span className="mx-2">/</span>
+                    {activePage.title}
+                  </p>
+                  <h1 className="text-3xl sm:text-4xl font-bold mb-6">{activePage.title}</h1>
+                  <div className="text-base leading-relaxed whitespace-pre-wrap" style={{ color: layout.theme.muted }}>
+                    {activePage.body}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h1 className="text-2xl font-bold mb-3">找不到此頁面</h1>
+                  <p className="text-sm mb-6" style={{ color: layout.theme.muted }}>此頁尚未發佈或不存在。</p>
+                  <a href={storeHomeUrl(store.slug)} className="text-sm font-semibold underline">回首頁</a>
+                </>
+              )}
+            </section>
+          )}
+        </StoreLayoutView>
       )}
 
       {selected && (
@@ -373,9 +461,9 @@ export default function BrandStoreClient() {
                   ) : null
                 })()}
               </div>
-              {selected.description && (
+                  {selected.description && (
                 <p className="text-sm mb-6 leading-relaxed" style={{ color: '#4B5563' }}>
-                  {selected.description.replace(/原價\s*NT\$?\s*[0-9,]+\s*/i, '').trim() || '天然乳膠枕頭'}
+                  {selected.description.replace(/原價\s*NT\$?\s*[0-9,]+\s*/i, '').trim()}
                 </p>
               )}
               {checkoutError && <p className="text-sm mb-3" style={{ color: '#B91C1C' }}>{checkoutError}</p>}

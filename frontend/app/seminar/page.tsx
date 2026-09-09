@@ -124,7 +124,7 @@ export default function SeminarPage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <h1 className="text-4xl md:text-5xl font-black mb-6 leading-tight" style={{ color: '#00142D' }}>{c.title}</h1>
           <p className="text-lg mb-10" style={{ color: '#687280' }}>{c.subtitle}</p>
-          <a href="/trial-redirect" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>
+          <a href="/register" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>
             {c.cta}
           </a>
         </div>
@@ -178,7 +178,7 @@ export default function SeminarPage() {
       <section className="py-20 text-center" style={{ background: 'linear-gradient(270.52deg, rgb(0, 79, 209) 0%, rgb(37, 124, 255) 100%)' }}>
         <div className="max-w-2xl mx-auto px-4 sm:px-6">
           <h2 className="text-3xl font-black text-white mb-4 whitespace-pre-line">{c.ctaTitle}</h2>
-          <a href="/trial-redirect" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
+          <a href="/register" className="inline-block bg-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ color: '#5B5FF0' }}>
             {c.cta}
           </a>
         </div>
