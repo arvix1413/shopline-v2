@@ -24,14 +24,14 @@ type OnlineStoreCopy = {
 
 const zhTW: OnlineStoreCopy = {
   title: '網路開店超簡單\n立即開始你的網路生意',
-  subtitle: '想開網路商店？開店一切所需都在 ARVIX，從商品上架、金物流串接到行銷推廣，一站就能輕鬆搞定。',
+  subtitle: '想開網路商店？開店一切所需都在 ARVIX，從商品上架、信用卡結帳、出貨設定到行銷推廣，一站就能輕鬆搞定。',
   cta: '立即免費試用',
   noCodeTitle: '免寫程式也能打造品牌官網',
   noCodeSubtitle: '直覺式介面，讓你輕鬆建立專業品牌網站，不需要任何程式知識。',
   noCodeItems: [
     { title: '拖曳方式編輯', desc: '透過拖曳排列方式，輕鬆完成網店頁面建置，無需任何程式語法。' },
     { title: '多樣設計主題', desc: '多款精美版型主題，一鍵套用，快速打造高質感品牌網店。' },
-    { title: 'ARVIX Payments', desc: '內建金流服務，支援信用卡、電子支付等多元收款方式，安全便利。' },
+    { title: 'ARVIX Payments', desc: '內建信用卡結帳；台灣出貨商店可再開通 7-11 貨到付款。' },
   ],
   onePageTitle: '實現高轉單率\n用一頁商店衝刺業績',
   onePageSubtitle: '3 步驟打造超強導購一頁商店，讓顧客快速完成購買，大幅提升轉換率。',
@@ -49,14 +49,14 @@ const zhTW: OnlineStoreCopy = {
 
 const zhCN: OnlineStoreCopy = {
   title: '网络开店超简单\n立即开始你的网络生意',
-  subtitle: '想开网络商店？开店一切所需都在 ARVIX，从商品上架、金物流对接到营销推广，一站就能轻松搞定。',
+  subtitle: '想开网络商店？开店一切所需都在 ARVIX，从商品上架、信用卡结账、出货设定到营销推广，一站就能轻松搞定。',
   cta: '立即免费试用',
   noCodeTitle: '免写程序也能打造品牌官网',
   noCodeSubtitle: '直觉式界面，让你轻松建立专业品牌网站，不需要任何程序知识。',
   noCodeItems: [
     { title: '拖曳方式编辑', desc: '通过拖曳排列方式，轻松完成网店页面建置，无需任何程序语法。' },
     { title: '多样设计主题', desc: '多款精美版型主题，一键套用，快速打造高质感品牌网店。' },
-    { title: 'ARVIX Payments', desc: '内建支付服务，支持信用卡、电子支付等多元收款方式，安全便利。' },
+    { title: 'ARVIX Payments', desc: '内建信用卡结账，安全便利。' },
   ],
   onePageTitle: '实现高转单率\n用一页商店冲刺业绩',
   onePageSubtitle: '3 步骤打造超强导购一页商店，让顾客快速完成购买，大幅提升转化率。',
@@ -74,14 +74,14 @@ const zhCN: OnlineStoreCopy = {
 
 const en: OnlineStoreCopy = {
   title: 'Launch online. Keep it simple.\nStart selling today.',
-  subtitle: 'Everything you need to open an online store — catalog, payments, logistics, and marketing — in one ARVIX hub.',
+  subtitle: 'Everything you need to open an online store — catalog, card checkout, shipping setup, and marketing — in one ARVIX hub.',
   cta: 'Start free trial',
   noCodeTitle: 'Build a brand site without code',
   noCodeSubtitle: 'An intuitive builder so anyone can launch a professional brand storefront.',
   noCodeItems: [
     { title: 'Drag-and-drop editing', desc: 'Arrange pages visually — no programming required.' },
     { title: 'Curated themes', desc: 'Apply polished themes in one click for a premium look.' },
-    { title: 'ARVIX Payments', desc: 'Built-in payments for cards and e-wallets — secure and simple.' },
+    { title: 'ARVIX Payments', desc: 'Built-in card checkout — secure and simple.' },
   ],
   onePageTitle: 'Higher conversion\nwith one-page stores',
   onePageSubtitle: 'Launch a high-converting landing store in three steps.',

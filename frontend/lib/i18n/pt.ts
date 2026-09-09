@@ -87,7 +87,7 @@ const pt: Translations = {
   features: {
     eyebrow: 'Empreenda com nível profissional',
     title: 'Do primeiro pedido à escala de marca',
-    subtitle: 'Construtor drag-and-drop, pagamentos e logística em um clique, memberships e marketing prontos — você vende, o sistema sustenta a loja',
+    subtitle: 'Construtor drag-and-drop, pagamento com cartão e frete, memberships e marketing prontos — você vende, o sistema sustenta a loja',
     learnMore: 'Ver todos os planos',
     items: [
       {

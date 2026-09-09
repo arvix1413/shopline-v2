@@ -87,7 +87,7 @@ const de: Translations = {
   features: {
     eyebrow: 'Gründen auf Profi-Niveau',
     title: 'Vom ersten Auftrag zur Markenskala',
-    subtitle: 'Drag-and-Drop-Builder, Zahlungen & Logistik mit einem Klick, Memberships und Marketing ready — Sie verkaufen, das System trägt den Shop',
+    subtitle: 'Drag-and-Drop-Builder, Kartenzahlung und Versand, Memberships und Marketing ready — Sie verkaufen, das System trägt den Shop',
     learnMore: 'Alle Pläne ansehen',
     items: [
       {

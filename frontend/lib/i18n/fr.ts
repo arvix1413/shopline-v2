@@ -87,7 +87,7 @@ const fr: Translations = {
   features: {
     eyebrow: 'Entreprendre avec un niveau pro',
     title: 'De la première commande à l’échelle de marque',
-    subtitle: 'Constructeur drag-and-drop, paiements et logistique en un clic, memberships et marketing prêts — vous vendez, le système porte la boutique',
+    subtitle: 'Constructeur drag-and-drop, paiement par carte et livraison, memberships et marketing prêts — vous vendez, le système porte la boutique',
     learnMore: 'Voir tous les forfaits',
     items: [
       {

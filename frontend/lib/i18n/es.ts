@@ -87,7 +87,7 @@ const es: Translations = {
   features: {
     eyebrow: 'Emprende con nivel profesional',
     title: 'Del primer pedido a la escala de marca',
-    subtitle: 'Constructor drag-and-drop, pagos y logística en un clic, membresías y marketing listos — tú vendes, el sistema sostiene la tienda',
+    subtitle: 'Constructor drag-and-drop, pago con tarjeta y envíos, membresías y marketing listos — tú vendes, el sistema sostiene la tienda',
     learnMore: 'Ver todos los planes',
     items: [
       {

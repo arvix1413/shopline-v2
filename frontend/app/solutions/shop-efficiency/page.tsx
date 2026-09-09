@@ -28,7 +28,7 @@ const zhTW: ShopEfficiencyCopy = {
   ],
   expertTitle: '最全方位的零售整合專家，完整提升商家營運效率！',
   sections: [
-    { title: '品牌開店前置作業', items: ['多元金物流整合', '多元網頁活動頁面', '大量批次管理及 Open API'], img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'ARVIX 一站完成品牌開店前置作業' },
+    { title: '品牌開店前置作業', items: ['信用卡結帳與出貨設定', '多元網頁活動頁面', '大量批次管理及 Open API'], img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'ARVIX 一站完成品牌開店前置作業' },
     { title: '銷售與訂單管理', items: ['多元銷售管道管理', '商品管理', '訂單管理', '庫存管理'], img: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=1200&q=80', alt: 'ARVIX 整合多元銷售通路，並提供完整的後台商品、訂單及庫存管理' },
     { title: '出貨及售後服務', items: ['訊息中心', '電子發票服務', '對帳管理工具'], img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80', alt: 'ARVIX 提供品牌完整的出貨及售後服務' },
   ],
@@ -48,7 +48,7 @@ const zhCN: ShopEfficiencyCopy = {
   ],
   expertTitle: '最全方位的零售整合专家，完整提升商家运营效率！',
   sections: [
-    { title: '品牌开店前置作业', items: ['多元金物流整合', '多元网页活动页面', '大量批次管理及 Open API'], img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'ARVIX 一站完成品牌开店前置作业' },
+    { title: '品牌开店前置作业', items: ['信用卡结账与出货设定', '多元网页活动页面', '大量批次管理及 Open API'], img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'ARVIX 一站完成品牌开店前置作业' },
     { title: '销售与订单管理', items: ['多元销售管道管理', '商品管理', '订单管理', '库存管理'], img: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=1200&q=80', alt: 'ARVIX 整合多元销售渠道' },
     { title: '出货及售后服务', items: ['消息中心', '电子发票服务', '对账管理工具'], img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80', alt: 'ARVIX 提供品牌完整的出货及售后服务' },
   ],
@@ -68,7 +68,7 @@ const en: ShopEfficiencyCopy = {
   ],
   expertTitle: 'Full-stack retail integration to lift operating efficiency',
   sections: [
-    { title: 'Pre-launch brand setup', items: ['Payments & logistics integrations', 'Campaign landing pages', 'Bulk tools & Open API'], img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'Brand storefront prep' },
+    { title: 'Pre-launch brand setup', items: ['Card checkout & shipping setup', 'Campaign landing pages', 'Bulk tools & Open API'], img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'Brand storefront prep' },
     { title: 'Sales & order management', items: ['Multi-channel selling', 'Products', 'Orders', 'Inventory'], img: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=1200&q=80', alt: 'Sales and inventory ops' },
     { title: 'Fulfillment & after-sales', items: ['Message center', 'E-invoicing', 'Reconciliation tools'], img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80', alt: 'Fulfillment and support' },
   ],

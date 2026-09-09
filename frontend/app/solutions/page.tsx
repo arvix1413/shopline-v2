@@ -78,7 +78,7 @@ const zhTW: SolutionsCopy = {
       items: [
         { title: '品牌開店前置作業', desc: '協助商家在大量商品管理、金物流串接及多通路銷售等，一站搞定所有流程，省時又省力。' },
         { title: '銷售與訂單管理', desc: '色塊化區分訂單類別，讓訂單管理更直覺高效，未完成購物車自動提醒，提升結帳轉換率。' },
-        { title: '出貨及售後服務', desc: '整合多家物流商，自動化出貨流程，售後服務一站管理，提升顧客滿意度。' },
+        { title: '出貨及售後服務', desc: '支援宅配出貨；台灣出貨商店可串接 7-11。售後服務一站管理，提升顧客滿意度。' },
       ],
       href: '/solutions/shop-efficiency',
       img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80',
