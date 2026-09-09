@@ -176,3 +176,42 @@ export function stageRank(stage?: string | null): number {
 export function maxStage(a?: string | null, b?: string | null): OnboardingStage {
   return stageRank(a) >= stageRank(b) ? ((a as OnboardingStage) || 'registered') : ((b as OnboardingStage) || 'registered')
 }
+
+/** Load user trial row and auto-mark expired when needed. */
+export async function loadAndSyncTrial(db: D1Database, userId: number) {
+  await ensureTrialSchema(db)
+  const row = await db.prepare(
+    `SELECT id, is_admin, trial_started_at, trial_ends_at, plan_status FROM users WHERE id = ?`
+  ).bind(userId).first<{
+    id: number
+    is_admin: number | null
+    trial_started_at: string | null
+    trial_ends_at: string | null
+    plan_status: string | null
+  }>()
+  if (!row) return null
+  const trial = computeTrial(row)
+  if (trial.expired && row.plan_status === 'trialing') {
+    await db.prepare(`UPDATE users SET plan_status='expired' WHERE id=?`).bind(userId).run()
+  }
+  return trial
+}
+
+/** Whether the merchant may sell / manage products (paid or still in trial). */
+export function merchantCanOperate(trial: ReturnType<typeof computeTrial> | null | undefined) {
+  if (!trial) return false
+  return !trial.expired && !trial.showPaywall
+}
+
+export async function markUserPaid(db: D1Database, userId: number, plan?: string) {
+  await ensureTrialSchema(db)
+  await db.prepare(
+    `UPDATE users SET plan_status='paid', follow_up_status='won', follow_up_updated_at=?, updated_at=? WHERE id=?`
+  ).bind(nowIso(), nowIso(), userId).run()
+  await db.prepare(
+    `UPDATE stores SET onboarding_stage='paid', updated_at=?, last_active_at=? WHERE user_id=?`
+  ).bind(nowIso(), nowIso(), userId).run().catch(() => {})
+  await db.prepare(
+    `INSERT INTO events (anonymous_id, user_id, event, properties, created_at) VALUES (?, ?, 'plan_purchased', ?, datetime('now', '+8 hours'))`
+  ).bind(`user_${userId}`, userId, JSON.stringify({ plan: plan || 'standard' })).run().catch(() => {})
+}

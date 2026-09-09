@@ -5,6 +5,7 @@ import { and, eq } from 'drizzle-orm'
 import * as schema from './schema'
 import { hashPassword, verifyPassword, signToken, verifyToken } from './auth'
 import { allocateUniqueSlug, ensureStoresTable } from './stores'
+import { ensureStorefrontSchema } from './storefront'
 import {
   TRIAL_DAYS,
   ONBOARDING_STAGES,
@@ -15,6 +16,9 @@ import {
   computeTrial,
   ensureTrialSchema,
   maxStage,
+  loadAndSyncTrial,
+  merchantCanOperate,
+  markUserPaid,
   type OnboardingStage,
   type FollowUpStatus,
 } from './trial'
@@ -57,7 +61,11 @@ app.use('*', cors({
     'https://arvixai.com',
     'https://www.arvixai.com',
     'http://localhost:3000',
-    'http://localhost:3001'
+    'http://localhost:3001',
+    'http://localhost:3010',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:3001',
+    'http://127.0.0.1:3010',
   ],
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization', 'X-System-Source'],
@@ -166,10 +174,13 @@ app.get('/', (c) => {
   return c.json({ message: 'SHOPLINE Clone API is running!' })
 })
 
+/** TWD is zero-decimal on Stripe — unitAmount is NT$ major units. */
 const stripePlans = {
-  starter: { name: 'ARVIX 網店探索者', unitAmount: 99000 },
-  growth: { name: 'ARVIX 電商戰略家', unitAmount: 199000 },
-  omo: { name: 'ARVIX OMO 大師', unitAmount: 399000 },
+  starter: { name: 'ARVIX 入門方案', unitAmount: 990 },
+  standard: { name: 'ARVIX 成長方案', unitAmount: 2490 },
+  growth: { name: 'ARVIX 成長方案', unitAmount: 2490 },
+  pro: { name: 'ARVIX 專業方案', unitAmount: 4990 },
+  omo: { name: 'ARVIX 專業方案', unitAmount: 4990 },
 } as const
 
 const secureCompare = (left: string, right: string) => {
@@ -193,7 +204,15 @@ app.post('/api/checkout/session', async (c) => {
   const plan = stripePlans[planKey]
   if (!plan) return c.json({ error: '無效的訂閱方案' }, 400)
 
+  const auth = await getAuthUser(c)
   const siteUrl = (c.env.SITE_URL || 'https://arvixai.com').replace(/\/$/, '')
+  const successUrl = auth?.userId
+    ? `${siteUrl}/billing?paid=1&session_id={CHECKOUT_SESSION_ID}`
+    : `${siteUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`
+  const cancelUrl = auth?.userId
+    ? `${siteUrl}/billing?checkout=cancelled`
+    : `${siteUrl}/about/pricing?checkout=cancelled`
+
   const params = new URLSearchParams({
     mode: 'subscription',
     'line_items[0][price_data][currency]': 'twd',
@@ -203,10 +222,17 @@ app.post('/api/checkout/session', async (c) => {
     'line_items[0][quantity]': '1',
     allow_promotion_codes: 'true',
     'subscription_data[metadata][arvix_plan]': planKey,
-    success_url: `${siteUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${siteUrl}/about/pricing?checkout=cancelled`,
+    'metadata[arvix_plan]': planKey,
+    'metadata[arvix_checkout]': 'subscription',
+    success_url: successUrl,
+    cancel_url: cancelUrl,
   })
-  const email = String(body.email || '').trim()
+  if (auth?.userId) {
+    params.set('client_reference_id', String(auth.userId))
+    params.set('metadata[user_id]', String(auth.userId))
+    params.set('subscription_data[metadata][user_id]', String(auth.userId))
+  }
+  const email = String(body.email || auth?.email || '').trim()
   if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) params.set('customer_email', email)
 
   const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
@@ -263,6 +289,14 @@ app.post('/api/stripe/webhook', async (c) => {
       await c.env.DB.prepare(
         `UPDATE stores SET payments_enabled=1, onboarding_stage='payments_setup', updated_at=datetime('now', '+8 hours') WHERE slug=?`
       ).bind(storeSlug).run().catch(() => {})
+    }
+
+    // Merchant SaaS subscription → unlock store after trial
+    const checkoutType = String(session.metadata?.arvix_checkout || '')
+    const userId = Number(session.metadata?.user_id || session.client_reference_id || 0)
+    const plan = String(session.metadata?.arvix_plan || session.subscription_data?.metadata?.arvix_plan || 'standard')
+    if (userId > 0 && (checkoutType === 'subscription' || session.mode === 'subscription')) {
+      await markUserPaid(c.env.DB, userId, plan)
     }
   }
 
@@ -571,6 +605,7 @@ app.post('/api/init', async (c) => {
     await ensureProductsStoreSlug(c.env.DB)
     await ensureStoresTable(c.env.DB)
     await ensureTrialSchema(c.env.DB)
+    await ensureStorefrontSchema(c.env.DB)
     return c.json({ message: 'DB initialized' })
   } catch (error) {
     console.error('Init error:', error)
@@ -1145,9 +1180,16 @@ app.post('/api/store-checkout/session', async (c) => {
     await ensureStoresTable(c.env.DB)
     await ensureProductsStoreSlug(c.env.DB)
     const store = await c.env.DB.prepare(
-      `SELECT id, slug, name, status FROM stores WHERE slug=? AND status='active'`
-    ).bind(storeSlug).first()
+      `SELECT id, slug, name, status, user_id FROM stores WHERE slug=? AND status='active'`
+    ).bind(storeSlug).first<any>()
     if (!store) return c.json({ error: '商店不存在' }, 404)
+
+    if (store.user_id) {
+      const trial = await loadAndSyncTrial(c.env.DB, store.user_id)
+      if (!merchantCanOperate(trial)) {
+        return c.json({ error: '此商店試用已結束，暫時無法結帳', code: 'STORE_SUSPENDED' }, 403)
+      }
+    }
 
     const db = drizzle(c.env.DB, { schema })
     const cartItems = await db.select({
@@ -2109,11 +2151,216 @@ app.get('/api/stores/me', async (c) => {
       `SELECT id, user_id as userId, slug, name, tagline, status,
               onboarding_stage as onboardingStage, payments_enabled as paymentsEnabled,
               is_live as isLive, product_count as productCount,
+              layout_json as layoutJson,
               created_at as createdAt
        FROM stores WHERE user_id = ? ORDER BY id ASC LIMIT 1`
     ).bind(payload.userId).first()
     if (!store) return c.json({ error: '尚未建立商店' }, 404)
-    return c.json({ ...store, urlPath: `/s/shop?slug=${(store as any).slug}` })
+    const trial = await loadAndSyncTrial(c.env.DB, payload.userId)
+    let layout = null
+    try {
+      layout = (store as any).layoutJson ? JSON.parse((store as any).layoutJson) : null
+    } catch {
+      layout = null
+    }
+    const { layoutJson: _lj, ...rest } = store as any
+    return c.json({
+      ...rest,
+      layout,
+      urlPath: `/s/shop?slug=${(store as any).slug}`,
+      trial,
+      canOperate: merchantCanOperate(trial),
+    })
+  } catch (e: any) {
+    return c.json({ error: String(e) }, 500)
+  }
+})
+
+app.get('/api/stores/me/layout', requireUser, async (c) => {
+  try {
+    const payload = c.get('userPayload')
+    await ensureStoresTable(c.env.DB)
+    const store = await getOwnedStore(c, payload.userId)
+    if (!store) return c.json({ error: '尚未建立商店' }, 404)
+    const row = await c.env.DB.prepare(`SELECT layout_json, name, tagline FROM stores WHERE id=?`).bind(store.id).first<any>()
+    let layout = null
+    try {
+      layout = row?.layout_json ? JSON.parse(row.layout_json) : null
+    } catch {
+      layout = null
+    }
+    return c.json({ layout, storeName: row?.name, tagline: row?.tagline || '' })
+  } catch (e: any) {
+    return c.json({ error: String(e) }, 500)
+  }
+})
+
+app.put('/api/stores/me/layout', requireUser, async (c) => {
+  try {
+    const payload = c.get('userPayload')
+    const trial = await loadAndSyncTrial(c.env.DB, payload.userId)
+    if (!merchantCanOperate(trial)) {
+      return c.json({ error: '試用已結束，請先開通方案才能改版型', code: 'TRIAL_EXPIRED' }, 402)
+    }
+    const store = await getOwnedStore(c, payload.userId)
+    if (!store) return c.json({ error: '尚未建立商店' }, 404)
+    const body = await c.req.json().catch(() => ({}))
+    const layout = body.layout
+    if (!layout || typeof layout !== 'object' || !Array.isArray(layout.sections)) {
+      return c.json({ error: '版型資料格式錯誤' }, 400)
+    }
+    if (layout.sections.length > 20) return c.json({ error: '區塊過多（最多 20）' }, 400)
+    const json = JSON.stringify(layout)
+    if (json.length > 200_000) return c.json({ error: '版型資料過大' }, 400)
+    await ensureStoresTable(c.env.DB)
+    await c.env.DB.prepare(
+      `UPDATE stores SET layout_json=?, updated_at=?, last_active_at=? WHERE id=?`
+    ).bind(json, nowIso(), nowIso(), store.id).run()
+    return c.json({ ok: true, layout })
+  } catch (e: any) {
+    return c.json({ error: String(e) }, 500)
+  }
+})
+
+function mapMerchantProduct(p: any) {
+  return {
+    id: p.id,
+    name: p.name,
+    description: p.description || '',
+    price: Number(p.price || 0),
+    imageUrl: p.imageUrl ?? p.image_url ?? '',
+    category: p.category || '一般',
+    stock: Number(p.stock ?? 0),
+    status: 'active',
+    storeSlug: p.storeSlug ?? p.store_slug ?? null,
+  }
+}
+
+async function getOwnedStore(c: any, userId: number) {
+  await ensureStoresTable(c.env.DB)
+  return c.env.DB.prepare(
+    `SELECT id, slug, name, status FROM stores WHERE user_id = ? ORDER BY id ASC LIMIT 1`
+  ).bind(userId).first<{ id: number; slug: string; name: string; status: string }>()
+}
+
+app.get('/api/stores/me/products', requireUser, async (c) => {
+  try {
+    const payload = c.get('userPayload')
+    await ensureProductsStoreSlug(c.env.DB)
+    const store = await getOwnedStore(c, payload.userId)
+    if (!store) return c.json({ error: '尚未建立商店' }, 404)
+    const db = drizzle(c.env.DB, { schema })
+    const rows = await db.select().from(schema.products).where(eq(schema.products.storeSlug, store.slug))
+    return c.json(rows.map(mapMerchantProduct))
+  } catch (e: any) {
+    return c.json({ error: String(e) }, 500)
+  }
+})
+
+app.post('/api/stores/me/products', requireUser, async (c) => {
+  try {
+    const payload = c.get('userPayload')
+    const trial = await loadAndSyncTrial(c.env.DB, payload.userId)
+    if (!merchantCanOperate(trial)) {
+      return c.json({ error: '試用已結束，請先開通方案才能上架', code: 'TRIAL_EXPIRED' }, 402)
+    }
+    const store = await getOwnedStore(c, payload.userId)
+    if (!store) return c.json({ error: '尚未建立商店' }, 404)
+
+    const body = await c.req.json()
+    if (!body.name || !String(body.name).trim()) return c.json({ error: '商品名稱不能為空' }, 400)
+    if (!body.price || Number(body.price) <= 0) return c.json({ error: '請輸入有效的商品價格' }, 400)
+
+    await ensureProductsStoreSlug(c.env.DB)
+    const db = drizzle(c.env.DB, { schema })
+    const created = await db.insert(schema.products).values({
+      name: String(body.name).trim(),
+      description: String(body.description || '').trim(),
+      price: Number(body.price),
+      imageUrl: String(body.imageUrl || ''),
+      category: String(body.category || '一般').trim() || '一般',
+      storeSlug: store.slug,
+      stock: Number(body.stock) || 0,
+      featured: false,
+    }).returning().get()
+
+    const countRow = await c.env.DB.prepare(
+      `SELECT COUNT(*) as c FROM products WHERE store_slug = ?`
+    ).bind(store.slug).first() as { c?: number } | null
+    await c.env.DB.prepare(
+      `UPDATE stores SET product_count = ?, is_live = 1, onboarding_stage = 'products_added',
+       last_active_at = ?, updated_at = ? WHERE id = ?`
+    ).bind(Number(countRow?.c || 0), nowIso(), nowIso(), store.id).run().catch(() => {})
+
+    return c.json(mapMerchantProduct(created), 201)
+  } catch (e: any) {
+    return c.json({ error: String(e) }, 500)
+  }
+})
+
+app.put('/api/stores/me/products/:id', requireUser, async (c) => {
+  try {
+    const payload = c.get('userPayload')
+    const trial = await loadAndSyncTrial(c.env.DB, payload.userId)
+    if (!merchantCanOperate(trial)) {
+      return c.json({ error: '試用已結束，請先開通方案才能編輯', code: 'TRIAL_EXPIRED' }, 402)
+    }
+    const store = await getOwnedStore(c, payload.userId)
+    if (!store) return c.json({ error: '尚未建立商店' }, 404)
+    const id = parseInt(c.req.param('id'))
+    const body = await c.req.json()
+    if (!body.name || !String(body.name).trim()) return c.json({ error: '商品名稱不能為空' }, 400)
+    if (!body.price || Number(body.price) <= 0) return c.json({ error: '請輸入有效的商品價格' }, 400)
+
+    await ensureProductsStoreSlug(c.env.DB)
+    const db = drizzle(c.env.DB, { schema })
+    const existing = await db.select().from(schema.products).where(eq(schema.products.id, id)).get()
+    if (!existing || existing.storeSlug !== store.slug) return c.json({ error: '商品不存在' }, 404)
+
+    const updated = await db.update(schema.products)
+      .set({
+        name: String(body.name).trim(),
+        description: String(body.description || '').trim(),
+        price: Number(body.price),
+        imageUrl: String(body.imageUrl || ''),
+        category: String(body.category || '一般').trim() || '一般',
+        stock: Number(body.stock) || 0,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(schema.products.id, id))
+      .returning()
+      .get()
+
+    return c.json(mapMerchantProduct(updated))
+  } catch (e: any) {
+    return c.json({ error: String(e) }, 500)
+  }
+})
+
+app.delete('/api/stores/me/products/:id', requireUser, async (c) => {
+  try {
+    const payload = c.get('userPayload')
+    const trial = await loadAndSyncTrial(c.env.DB, payload.userId)
+    if (!merchantCanOperate(trial)) {
+      return c.json({ error: '試用已結束，請先開通方案', code: 'TRIAL_EXPIRED' }, 402)
+    }
+    const store = await getOwnedStore(c, payload.userId)
+    if (!store) return c.json({ error: '尚未建立商店' }, 404)
+    const id = parseInt(c.req.param('id'))
+    await ensureProductsStoreSlug(c.env.DB)
+    const db = drizzle(c.env.DB, { schema })
+    const existing = await db.select().from(schema.products).where(eq(schema.products.id, id)).get()
+    if (!existing || existing.storeSlug !== store.slug) return c.json({ error: '商品不存在' }, 404)
+    await db.delete(schema.products).where(eq(schema.products.id, id))
+
+    const countRow = await c.env.DB.prepare(
+      `SELECT COUNT(*) as c FROM products WHERE store_slug = ?`
+    ).bind(store.slug).first() as { c?: number } | null
+    await c.env.DB.prepare(
+      `UPDATE stores SET product_count = ?, updated_at = ? WHERE id = ?`
+    ).bind(Number(countRow?.c || 0), nowIso(), store.id).run().catch(() => {})
+
+    return c.json({ ok: true })
   } catch (e: any) {
     return c.json({ error: String(e) }, 500)
   }
@@ -2126,10 +2373,26 @@ app.get('/api/stores/:slug', async (c) => {
     const { RESERVED_STORE_SLUGS } = await import('./stores')
     if (RESERVED_STORE_SLUGS.has(slug)) return c.json({ error: '商店不存在' }, 404)
     const store = await c.env.DB.prepare(
-      `SELECT id, slug, name, tagline, status, created_at as createdAt FROM stores WHERE slug = ? AND status = 'active'`
-    ).bind(slug).first()
+      `SELECT id, user_id, slug, name, tagline, status, layout_json, created_at as createdAt FROM stores WHERE slug = ? AND status = 'active'`
+    ).bind(slug).first<any>()
     if (!store) return c.json({ error: '商店不存在' }, 404)
-    return c.json({ ...store, urlPath: `/s/shop?slug=${slug}` })
+
+    const trial = store.user_id ? await loadAndSyncTrial(c.env.DB, store.user_id) : null
+    const suspended = !!(trial && trial.expired)
+    let layout = null
+    try {
+      layout = store.layout_json ? JSON.parse(store.layout_json) : null
+    } catch {
+      layout = null
+    }
+    const { user_id: _uid, layout_json: _lj, ...publicStore } = store
+    return c.json({
+      ...publicStore,
+      layout,
+      urlPath: `/s/shop?slug=${slug}`,
+      suspended,
+      suspendReason: suspended ? 'trial_expired' : null,
+    })
   } catch (e: any) {
     return c.json({ error: String(e) }, 500)
   }
@@ -2224,7 +2487,7 @@ app.post('/api/me/onboarding', requireUser, async (c) => {
   }
 })
 
-/** Activate paid plan (manual / placeholder checkout). Wire payment provider later. */
+/** Activate paid plan after Stripe (or demo fallback when Stripe not configured). */
 app.post('/api/me/activate', requireUser, async (c) => {
   try {
     await ensureTrialSchema(c.env.DB)
@@ -2234,19 +2497,43 @@ app.post('/api/me/activate', requireUser, async (c) => {
     const body = await c.req.json().catch(() => ({}))
     const plan = (body.plan || 'standard').toString()
 
-    await c.env.DB.prepare(
-      `UPDATE users SET plan_status='paid', follow_up_status='won', follow_up_updated_at=?, updated_at=? WHERE id=?`
-    ).bind(nowIso(), nowIso(), payload.userId).run()
+    // Prefer real Stripe Checkout when configured
+    if (c.env.STRIPE_SECRET_KEY && !body.forceDemo) {
+      const siteUrl = (c.env.SITE_URL || 'https://arvixai.com').replace(/\/$/, '')
+      const planKey = String(plan).toLowerCase() as keyof typeof stripePlans
+      const stripePlan = stripePlans[planKey] || stripePlans.standard
+      const resolvedKey = stripePlans[planKey] ? planKey : 'standard'
+      const params = new URLSearchParams({
+        mode: 'subscription',
+        'line_items[0][price_data][currency]': 'twd',
+        'line_items[0][price_data][unit_amount]': String(stripePlan.unitAmount),
+        'line_items[0][price_data][recurring][interval]': 'month',
+        'line_items[0][price_data][product_data][name]': stripePlan.name,
+        'line_items[0][quantity]': '1',
+        allow_promotion_codes: 'true',
+        client_reference_id: String(payload.userId),
+        'metadata[user_id]': String(payload.userId),
+        'metadata[arvix_plan]': resolvedKey,
+        'metadata[arvix_checkout]': 'subscription',
+        'subscription_data[metadata][user_id]': String(payload.userId),
+        'subscription_data[metadata][arvix_plan]': resolvedKey,
+        success_url: `${siteUrl}/billing?paid=1&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${siteUrl}/billing?checkout=cancelled`,
+      })
+      if (payload.email) params.set('customer_email', payload.email)
+      const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${c.env.STRIPE_SECRET_KEY}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params,
+      })
+      const result = await response.json<any>()
+      if (response.ok && result?.url) return c.json({ url: result.url, checkout: true })
+      console.error('Stripe activate checkout failed', result?.error)
+      return c.json({ error: '無法建立付款頁面，請稍後再試' }, 502)
+    }
 
-    await c.env.DB.prepare(
-      `UPDATE stores SET onboarding_stage='paid', updated_at=?, last_active_at=? WHERE user_id=?`
-    ).bind(nowIso(), nowIso(), payload.userId).run()
-
-    await c.env.DB.prepare(
-      `INSERT INTO events (anonymous_id, user_id, event, properties, created_at) VALUES (?, ?, 'plan_purchased', ?, datetime('now', '+8 hours'))`
-    ).bind(`user_${payload.userId}`, payload.userId, JSON.stringify({ plan })).run().catch(() => {})
-
-    return c.json({ ok: true, planStatus: 'paid', plan })
+    await markUserPaid(c.env.DB, payload.userId, plan)
+    return c.json({ ok: true, planStatus: 'paid', plan, demo: true })
   } catch (e: any) {
     return c.json({ error: String(e) }, 500)
   }

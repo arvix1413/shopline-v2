@@ -16,7 +16,7 @@ const PLANS = [
     price: 'NT$990',
     period: '/月',
     desc: '適合一人創業、剛開始上架',
-    features: ['網路商店', '基礎金物流', '14 天開通後續約', 'Email 支援'],
+    features: ['網路商店', '商品上架', '客人刷卡結帳', '14 天試用後續約'],
   },
   {
     id: 'standard',
@@ -43,7 +43,6 @@ type TrialInfo = {
   expired: boolean
   stage?: string
   stageLabel?: string
-  stages?: { id: string; label: string }[]
   store?: { slug?: string; onboardingStage?: string } | null
 }
 
@@ -55,16 +54,24 @@ export default function BillingPage() {
   const [msg, setMsg] = useState('')
   const [selected, setSelected] = useState('standard')
 
+  const refreshTrial = async (authToken: string) => {
+    const res = await fetch(`${API}/api/me/trial`, { headers: { Authorization: `Bearer ${authToken}` } })
+    if (res.ok) setTrial(await res.json())
+  }
+
   useEffect(() => {
     if (isLoading) return
     if (!user || !token) {
       router.replace('/login')
       return
     }
-    fetch(`${API}/api/me/trial`, { headers: { Authorization: `Bearer ${token}` } })
-      .then((r) => r.json())
-      .then(setTrial)
-      .catch(() => {})
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('paid') === '1') {
+      setMsg('付款成功！方案開通中，若狀態未更新請重新整理。')
+    } else if (params.get('checkout') === 'cancelled') {
+      setMsg('已取消付款，可稍後再選擇方案。')
+    }
+    refreshTrial(token).catch(() => {})
   }, [user, token, isLoading, router])
 
   const activate = async () => {
@@ -79,6 +86,10 @@ export default function BillingPage() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || '開通失敗')
+      if (data.url) {
+        window.location.href = data.url
+        return
+      }
       setMsg('開通成功！你的方案已啟用。')
       setTrial((t) => (t ? { ...t, planStatus: 'paid', expired: false } : t))
     } catch (e: any) {
@@ -86,17 +97,6 @@ export default function BillingPage() {
     } finally {
       setLoading(false)
     }
-  }
-
-  const markStage = async (stage: string) => {
-    if (!token) return
-    await fetch(`${API}/api/me/onboarding`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ stage }),
-    })
-    const res = await fetch(`${API}/api/me/trial`, { headers: { Authorization: `Bearer ${token}` } })
-    if (res.ok) setTrial(await res.json())
   }
 
   return (
@@ -110,14 +110,14 @@ export default function BillingPage() {
             {trial?.planStatus === 'paid'
               ? '你已完成付款開通，可持續使用完整功能。'
               : trial?.expired
-              ? '試用已結束，選擇方案後即可重新開通。'
+              ? '試用已結束，選擇方案並刷卡後即可繼續營業。'
               : `試用剩餘 ${trial?.daysLeft ?? '—'} 天 · 目前進度：${trial?.stageLabel || '—'}`}
           </p>
         </div>
 
         {msg && (
           <div className="mb-6 text-center text-sm font-medium px-4 py-3 rounded-xl"
-            style={{ background: msg.includes('成功') ? '#ECFDF5' : '#FEF2F2', color: msg.includes('成功') ? '#047857' : '#B91C1C' }}>
+            style={{ background: msg.includes('成功') || msg.includes('付款成功') ? '#ECFDF5' : '#FEF2F2', color: msg.includes('成功') || msg.includes('付款成功') ? '#047857' : '#B91C1C' }}>
             {msg}
           </div>
         )}
@@ -161,45 +161,27 @@ export default function BillingPage() {
               onClick={activate}
               className="btn-brand text-white font-bold px-10 py-3.5 rounded-full disabled:opacity-60"
             >
-              {loading ? '處理中…' : '確認開通（測試付款）'}
+              {loading ? '處理中…' : '刷卡開通方案'}
             </button>
             <p className="mt-3 text-xs" style={{ color: '#8A8DA8' }}>
-              目前為內部開通流程，之後可串接金流（信用卡／發票）。開通後會通知業務團隊。
+              將導向安全付款頁完成訂閱。開通後商店即可繼續營業。
             </p>
           </div>
         )}
 
-        <div className="rounded-2xl p-6 sm:p-8" style={{ background: '#fff', border: '1px solid rgba(18,19,31,0.08)' }}>
-          <h2 className="text-lg font-black mb-2" style={{ color: '#12131F' }}>開店進度自助更新</h2>
-          <p className="text-sm mb-5" style={{ color: '#5C5F7A' }}>
-            完成後點一下，方便我們掌握你的進度並提供協助。
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {[
-              { id: 'products_added', label: '我已上架商品' },
-              { id: 'payments_setup', label: '我已設定金流' },
-              { id: 'live', label: '商店已上線' },
-            ].map((s) => (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => markStage(s.id)}
-                className="text-sm font-semibold px-4 py-2 rounded-full"
-                style={{ background: '#F0F1FE', color: '#5B5FF0' }}
-              >
-                {s.label}
-              </button>
-            ))}
-            {trial?.store?.slug && (
-              <Link
-                href={`/s/shop?slug=${trial.store.slug}`}
-                className="text-sm font-semibold px-4 py-2 rounded-full"
-                style={{ background: '#15162A', color: '#fff' }}
-              >
-                查看我的商店
-              </Link>
-            )}
-          </div>
+        <div className="flex flex-wrap gap-3 justify-center">
+          <Link href="/my-store" className="text-sm font-semibold px-5 py-2.5 rounded-full text-white" style={{ background: '#5B5FF0' }}>
+            回我的商店
+          </Link>
+          {trial?.store?.slug && (
+            <Link
+              href={`/s/shop?slug=${trial.store.slug}`}
+              className="text-sm font-semibold px-5 py-2.5 rounded-full"
+              style={{ background: '#15162A', color: '#fff' }}
+            >
+              查看公開商店
+            </Link>
+          )}
         </div>
       </div>
       <Footer />

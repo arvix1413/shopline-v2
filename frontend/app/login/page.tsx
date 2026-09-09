@@ -28,7 +28,9 @@ export default function LoginPage() {
       if (!res.ok) { setError(data.error || t.auth.loginCta); return }
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
-      window.location.href = data.user?.isAdmin ? '/admin' : '/trial'
+      const next = new URLSearchParams(window.location.search).get('next') || ''
+      const safeNext = next.startsWith('/') && !next.startsWith('//') ? next : ''
+      window.location.href = data.user?.isAdmin ? '/admin' : (safeNext || '/my-store')
     } catch {
       setError('Network error')
     } finally {

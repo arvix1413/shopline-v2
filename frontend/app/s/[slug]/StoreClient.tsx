@@ -1,9 +1,11 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { RESERVED_STORE_SLUGS } from '../../../lib/storeSlug'
+import StoreLayoutView from '../../components/StoreLayoutView'
+import { parseStoreLayout, type StoreLayout } from '../../../lib/storeLayout'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://shopline-backend.arvix1413.workers.dev'
 
@@ -14,6 +16,9 @@ type Store = {
   tagline?: string
   status: string
   urlPath: string
+  suspended?: boolean
+  suspendReason?: string | null
+  layout?: StoreLayout | null
 }
 
 type Product = {
@@ -67,9 +72,23 @@ function ensureCartSession(storeSlug: string) {
   return sid
 }
 
-/** Demo store hero banners (full-bleed). */
+/** Demo store hero banners (full-bleed) — seeded into default layout when no custom layout. */
 const STORE_BANNERS: Record<string, string> = {
   bennis: 'https://shopline-backend.arvix1413.workers.dev/images/products/1788148237227-bennis-banner-clean.jpg',
+}
+
+function resolveLayout(store: Store): StoreLayout {
+  const layout = parseStoreLayout(store.layout, store.name, store.tagline || '')
+  const banner = STORE_BANNERS[store.slug]
+  if (banner && !store.layout) {
+    return {
+      ...layout,
+      sections: layout.sections.map((s) =>
+        s.type === 'hero' ? { ...s, props: { ...s.props, image: banner } } : s
+      ),
+    }
+  }
+  return layout
 }
 
 export default function BrandStoreClient() {
@@ -171,25 +190,16 @@ export default function BrandStoreClient() {
     }
   }
 
-  const categories = useMemo(() => {
-    const set = new Set<string>()
-    for (const p of products) {
-      if (p.category) set.add(p.category)
-    }
-    return ['全部', ...Array.from(set)]
-  }, [products])
-
-  const visible = useMemo(() => {
-    if (category === '全部') return products
-    return products.filter((p) => p.category === category)
-  }, [products, category])
-
-  const bannerUrl = store ? STORE_BANNERS[store.slug] : undefined
+  const layout = store ? resolveLayout(store) : null
   const cartCount = cartItems.reduce((n, i) => n + i.quantity, 0)
   const cartTotal = cartItems.reduce((n, i) => n + i.product.price * i.quantity, 0)
 
   const addToCart = async (product: Product) => {
     if (!sessionId) return
+    if (store?.suspended) {
+      setCheckoutError('此商店試用已結束，暫時無法購買')
+      return
+    }
     setAdding(true)
     setCheckoutError('')
     try {
@@ -302,217 +312,37 @@ export default function BrandStoreClient() {
   }
 
   return (
-    <main className="min-h-screen" style={{ background: '#FAFBFA', color: '#111827' }}>
+    <main className="min-h-screen" style={{ background: layout?.theme.background || '#FAFBFA', color: layout?.theme.text || '#111827' }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
-        .bennis-store { font-family: 'Outfit', system-ui, sans-serif; }
-        @keyframes store-rise {
-          from { opacity: 0; transform: translateY(14px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .store-rise { animation: store-rise 0.65s ease both; }
-        .store-rise-delay-1 { animation-delay: 0.08s; }
-        .store-rise-delay-2 { animation-delay: 0.16s; }
-        .product-card:hover .product-img { transform: scale(1.04); }
-        .product-img { transition: transform 0.45s ease; }
-        @keyframes banner-zoom {
-          from { transform: scale(1.06); }
-          to { transform: scale(1); }
-        }
-        .store-banner-img { animation: banner-zoom 8s ease-out both; }
       `}</style>
 
-      <div className="bennis-store">
-        <header
-          className="sticky top-0 z-30 backdrop-blur-md"
-          style={{ background: 'rgba(250,251,250,0.9)', borderBottom: '1px solid rgba(17,24,39,0.06)' }}
-        >
-          <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between gap-4">
-            <div className="min-w-0">
-              <div className="text-xl font-bold tracking-tight truncate">{store.name}</div>
-              <div className="text-[11px] tracking-wide" style={{ color: '#9CA3AF' }}>Powered by ARVIX · Studio</div>
-            </div>
-            <nav className="hidden sm:flex items-center gap-6 text-sm font-medium" style={{ color: '#4B5563' }}>
-              <a href="#products" className="hover:opacity-70 transition">商品</a>
-              <a href="#about" className="hover:opacity-70 transition">品牌</a>
-            </nav>
-            <button
-              type="button"
-              onClick={() => setCartOpen(true)}
-              className="relative text-sm font-semibold px-4 py-2 transition hover:opacity-90"
-              style={{ background: '#111827', color: '#FAFBFA' }}
-            >
-              購物車{cartCount > 0 ? ` (${cartCount})` : ''}
-            </button>
-          </div>
-        </header>
+      {paidNotice && (
+        <div className="px-5 py-3 text-sm text-center" style={{ background: '#ECFDF5', color: '#065F46' }}>
+          訂單 #{paidNotice.orderId} 已成立
+          {paidNotice.method === 'stripe' ? '（信用卡付款）' : '（貨到付款）'}。感謝購買！
+          <button type="button" className="ml-3 underline" onClick={() => setPaidNotice(null)}>關閉</button>
+        </div>
+      )}
 
-        {paidNotice && (
-          <div className="px-5 py-3 text-sm text-center" style={{ background: '#ECFDF5', color: '#065F46' }}>
-            訂單 #{paidNotice.orderId} 已成立
-            {paidNotice.method === 'stripe' ? '（信用卡付款）' : '（貨到付款）'}。感謝購買！
-            <button type="button" className="ml-3 underline" onClick={() => setPaidNotice(null)}>關閉</button>
-          </div>
-        )}
+      {store.suspended && (
+        <div className="px-5 py-3 text-sm text-center" style={{ background: '#FEF2F2', color: '#B91C1C' }}>
+          此商店試用已結束，暫時無法下單。店家開通方案後即可恢復購買。
+        </div>
+      )}
 
-        <section className="relative overflow-hidden" style={{ minHeight: 'min(78vh, 720px)' }}>
-          {bannerUrl ? (
-            <>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={bannerUrl}
-                alt=""
-                className="store-banner-img absolute inset-0 w-full h-full object-cover"
-              />
-              <div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    'linear-gradient(90deg, rgba(17,24,39,0.62) 0%, rgba(17,24,39,0.38) 42%, rgba(17,24,39,0.12) 100%)',
-                }}
-              />
-            </>
-          ) : (
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  'radial-gradient(ellipse 70% 55% at 78% 18%, rgba(56,120,92,0.16), transparent 58%), linear-gradient(165deg, #EEF2EF 0%, #FAFBFA 42%, #E8F0EB 100%)',
-              }}
-            />
-          )}
-          <div
-            className="relative z-10 max-w-6xl mx-auto px-5 flex flex-col justify-end"
-            style={{ minHeight: 'min(78vh, 720px)', paddingTop: '5rem', paddingBottom: '3.5rem' }}
-          >
-            <h1
-              className="store-rise font-extrabold tracking-tight mb-4"
-              style={{
-                fontSize: 'clamp(2.6rem, 7vw, 4.4rem)',
-                lineHeight: 1.05,
-                maxWidth: '10ch',
-                color: bannerUrl ? '#FAFBFA' : '#111827',
-              }}
-            >
-              {store.name}
-            </h1>
-            <p
-              className="store-rise store-rise-delay-1 text-base md:text-lg mb-8"
-              style={{
-                color: bannerUrl ? 'rgba(250,251,250,0.88)' : '#4B5563',
-                maxWidth: 420,
-                lineHeight: 1.65,
-              }}
-            >
-              {store.tagline || '枕頭｜天然乳膠枕頭，選對枕頭，睡出好眠。'}
-            </p>
-            <div className="store-rise store-rise-delay-2">
-              <a
-                href="#products"
-                className="inline-block px-7 py-3 text-sm font-semibold"
-                style={
-                  bannerUrl
-                    ? { background: '#FAFBFA', color: '#111827' }
-                    : { background: '#111827', color: '#FAFBFA' }
-                }
-              >
-                瀏覽全部商品
-              </a>
-            </div>
-          </div>
-        </section>
-
-        <section id="products" className="pb-20 pt-4">
-          <div className="max-w-6xl mx-auto px-5">
-            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
-              <div>
-                <h2 className="text-2xl md:text-3xl font-bold mb-1">熱銷商品 Must-have</h2>
-                <p className="text-sm" style={{ color: '#6B7280' }}>乳膠枕頭系列</p>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {categories.map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    onClick={() => setCategory(c)}
-                    className="px-3.5 py-1.5 text-xs font-semibold transition"
-                    style={
-                      category === c
-                        ? { background: '#111827', color: '#FAFBFA' }
-                        : { background: 'rgba(17,24,39,0.05)', color: '#4B5563' }
-                    }
-                  >
-                    {c}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-              {visible.map((p, i) => {
-                const list = parseListPrice(p.description)
-                return (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => setSelected(p)}
-                    className="product-card text-left group"
-                    style={{ animation: `store-rise 0.55s ease both`, animationDelay: `${Math.min(i, 8) * 0.04}s` }}
-                  >
-                    <div className="overflow-hidden mb-3 aspect-[4/5]" style={{ background: '#E5E7EB' }}>
-                      {p.imageUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={p.imageUrl}
-                          alt={p.name}
-                          className="product-img w-full h-full object-cover"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-xs" style={{ color: '#9CA3AF' }}>
-                          暫無圖片
-                        </div>
-                      )}
-                    </div>
-                    <div className="text-[11px] font-semibold tracking-wide mb-1" style={{ color: '#3F6B55' }}>
-                      {p.category || '商品'}
-                    </div>
-                    <h3 className="text-sm font-semibold leading-snug mb-2 line-clamp-2 group-hover:opacity-80 transition">
-                      {p.name}
-                    </h3>
-                    <div className="flex items-baseline gap-2 flex-wrap">
-                      <span className="text-sm font-bold">{formatPrice(p.price)}</span>
-                      {list && list > p.price && (
-                        <span className="text-xs line-through" style={{ color: '#9CA3AF' }}>
-                          {formatPrice(list)}
-                        </span>
-                      )}
-                    </div>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-        </section>
-
-        <section id="about" className="pb-24">
-          <div className="max-w-6xl mx-auto px-5">
-            <div className="px-6 py-12 md:px-12 md:py-14" style={{ background: '#111827', color: '#F9FAFB' }}>
-              <h2 className="text-2xl md:text-3xl font-bold mb-3">關於品牌</h2>
-              <p className="text-sm md:text-base max-w-xl leading-relaxed" style={{ color: 'rgba(249,250,251,0.78)' }}>
-                {store.tagline || '選對枕頭，睡出好眠。馬來西亞天然乳膠，守護每一夜好眠。'}
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <footer className="border-t py-8" style={{ borderColor: 'rgba(17,24,39,0.06)' }}>
-          <div className="max-w-6xl mx-auto px-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs" style={{ color: '#9CA3AF' }}>
-            <span>{store.name}</span>
-            <Link href="/" className="hover:opacity-70 transition">arvixai.com</Link>
-          </div>
-        </footer>
-      </div>
+      {layout && (
+        <StoreLayoutView
+          layout={layout}
+          storeName={store.name}
+          products={products}
+          category={category}
+          onCategory={setCategory}
+          onSelectProduct={setSelected}
+          cartCount={cartCount}
+          onOpenCart={() => setCartOpen(true)}
+        />
+      )}
 
       {selected && (
         <div

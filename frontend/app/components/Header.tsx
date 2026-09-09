@@ -319,6 +319,16 @@ export default function Header() {
                         style={{ color: '#3A3D55' }}>
                         <User size={14} /> {t.common.profile}
                       </Link>
+                      <Link href="/my-store" onClick={() => setShowUserMenu(false)}
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors hover:bg-[#F0F1FE]"
+                        style={{ color: '#3A3D55' }}>
+                        <span style={{ fontSize: 14 }}>🏪</span> 我的商店
+                      </Link>
+                      <Link href="/billing" onClick={() => setShowUserMenu(false)}
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors hover:bg-[#F0F1FE]"
+                        style={{ color: '#3A3D55' }}>
+                        <span style={{ fontSize: 14 }}>💳</span> 方案與試用
+                      </Link>
                       <Link href="/settings" onClick={() => setShowUserMenu(false)}
                         className="flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors hover:bg-[#F0F1FE]"
                         style={{ color: '#3A3D55' }}>

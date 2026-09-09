@@ -8,7 +8,7 @@ export const RESERVED_STORE_SLUGS = new Set([
   'selectedpartners', 'seminar', 'settings', 'shoplytics', 'shopper-app',
   'showcase', 'smart-omo', 'social-commerce', 'solutions', 'targeted-marketing',
   'templates', 'trial', 'trial-redirect', 'billing', 's', 'store', 'stores', 'www', 'shop',
-  'static', 'assets', 'favicon.ico', 'robots.txt', 'sitemap.xml', '_next',
+  'my-store', 'static', 'assets', 'favicon.ico', 'robots.txt', 'sitemap.xml', '_next',
 ])
 
 export function slugifyBrand(input: string): string {
@@ -48,6 +48,7 @@ export async function ensureStoresTable(db: D1Database) {
     `ALTER TABLE stores ADD COLUMN is_live INTEGER DEFAULT 0`,
     `ALTER TABLE stores ADD COLUMN product_count INTEGER DEFAULT 0`,
     `ALTER TABLE stores ADD COLUMN last_active_at TEXT`,
+    `ALTER TABLE stores ADD COLUMN layout_json TEXT`,
   ]
   for (const sql of extras) {
     await db.prepare(sql).run().catch(() => {})

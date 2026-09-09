@@ -12,7 +12,7 @@ export default function TrialRedirectPage() {
 
   useEffect(() => {
     if (isLoading) return
-    router.replace(user ? '/trial' : '/register')
+    router.replace(user ? '/my-store' : '/register')
   }, [user, isLoading, router])
 
   return (

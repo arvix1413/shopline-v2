@@ -45,8 +45,7 @@ export default function RegisterPage() {
       login(data.token, data.user)
       track('sign_up_complete', { email: form.email, slug: data.store?.slug }, data.user.id)
       bindUser(data.user.id)
-      const path = data.store?.slug ? `/s/shop?slug=${encodeURIComponent(data.store.slug)}` : '/'
-      router.push(path)
+      router.push('/my-store')
     } catch {
       setError('Network error')
     } finally {
