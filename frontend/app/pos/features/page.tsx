@@ -38,7 +38,7 @@ const zhTW: PosFeaturesCopy = {
       features: [
       { name: '完整收銀紀錄', desc: '從顧客拿著商品到櫃檯結帳那刻起，清楚保留所有資訊：代入會員、結帳店員、通路選擇、折扣與付款方式等。' },
       { name: '智慧收銀結帳介面', desc: '視覺化的商品呈現、可調整商品排序、即時查看商品庫存等資訊，簡單又好上手的介面設計。' },
-      { name: '實體金流串接', desc: 'ARVIX Payments 提供完整的 OMO 金流服務，線下同步串接 POS 刷卡機、LINE Pay，一站整合全通路金流帳務。' },
+      { name: '實體金流串接', desc: 'ARVIX Payments 可串接門市收款場景，協助線上線下帳務整合。' },
       { name: '流暢的購物車', desc: '在顧客挑選時先替顧客將已挑選的商品加入購物車，並先設定會員、優惠等資訊，有效節省結帳時間。' },
       { name: '多樣化折扣與變價設定', desc: '靈活設定商品折扣，從單樣商品折扣、整單優惠折扣都能輕鬆應變，也可設定現金折扣或折數折扣。' },
       { name: '多種付款情境與收款方式', desc: '預定單、未付款留貨、單筆拆不同方式付款及退換貨等付款情境都能聰明應對，系統自動更新庫存、營收。' },
@@ -124,7 +124,7 @@ const zhCN: PosFeaturesCopy = {
       features: [
       { name: '完整收银记录', desc: '从顾客拿着商品到柜台结账那刻起，清楚保留所有信息：代入会员、结账店员、渠道选择、折扣与付款方式等。' },
       { name: '智慧收银结账界面', desc: '视觉化的商品呈现、可调整商品排序、即时查看商品库存等信息，简单又好上手的界面设计。' },
-      { name: '实体金流串接', desc: 'ARVIX Payments 提供完整的 OMO 金流服务，线下同步串接 POS 刷卡机、LINE Pay，一站整合全渠道金流账务。' },
+      { name: '实体金流串接', desc: 'ARVIX Payments 可串接门店收款场景，协助线上线下账务整合。' },
       { name: '流畅的购物车', desc: '在顾客挑选时先替顾客将已挑选的商品加入购物车，并先设定会员、优惠等信息，有效节省结账时间。' },
       { name: '多样化折扣与变价设定', desc: '灵活设定商品折扣，从单样商品折扣、整单优惠折扣都能轻松应变，也可设定现金折扣或折数折扣。' },
       { name: '多种付款情境与收款方式', desc: '预定单、未付款留货、单笔拆不同方式付款及退换货等付款情境都能聪明应对，系统自动更新库存、营收。' },
@@ -210,7 +210,7 @@ const en: PosFeaturesCopy = {
       features: [
       { name: 'Complete checkout logs', desc: 'Capture member, cashier, channel, discounts, and payment from the moment of sale.' },
       { name: 'Smart checkout UI', desc: 'Visual products, sortable lists, and live stock — simple to learn.' },
-      { name: 'In-store payments', desc: 'ARVIX Payments + POS terminals and LINE Pay for unified omnichannel finance.' },
+      { name: 'In-store payments', desc: 'ARVIX Payments helps unify online and in-store payment operations.' },
       { name: 'Smooth cart flow', desc: 'Preload cart items, membership, and offers while shoppers browse to cut wait time.' },
       { name: 'Flexible discounts', desc: 'Item or order discounts, cash-off or percent-off templates.' },
       { name: 'Multiple payment scenarios', desc: 'Deposits, hold-unpaid, split tender, and returns with auto stock/revenue updates.' },

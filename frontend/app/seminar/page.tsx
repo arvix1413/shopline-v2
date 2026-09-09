@@ -30,7 +30,7 @@ const zhTW: SeminarCopy = {
   ],
   learnTitle: '參加講座，你將學會這些開店關鍵',
   topics: [
-    { title: '快速建立網路商店', desc: 'ARVIX 提供超過 20 種商店版型，並支援信用卡、電子支付等多元金流服務，完整電商功能一次到位。' },
+    { title: '快速建立網路商店', desc: 'ARVIX 提供超過 20 種商店版型，並支援信用卡結帳；台灣出貨商店可再開通 7-11 取貨／貨到付款。' },
     { title: '打造高回購會員經營系統', desc: '不只是會賣！更要讓顧客回來！從會員分級、分眾優惠設定到自動化推播，教你打造持續變現的會員經營閉環。' },
     { title: '用數據驅動品牌成長', desc: '視覺化報表、多種專業分析報告到商品潛力預測，透過完整數據洞察優化行銷效益，讓你看懂數據、用對數據！' },
     { title: '多管道流量整合', desc: '社群、官網、團購、門市…等多元流量來源也能輕鬆管控。為你整合多管道流量，讓每一筆流量都能有效變現。' },
@@ -58,7 +58,7 @@ const zhCN: SeminarCopy = {
   ],
   learnTitle: '参加讲座，你将学会这些开店关键',
   topics: [
-    { title: '快速建立网络商店', desc: 'ARVIX 提供超过 20 种商店版型，并支持信用卡、电子支付等多元支付服务，完整电商功能一次到位。' },
+    { title: '快速建立网络商店', desc: 'ARVIX 提供超过 20 种商店版型，并支持信用卡结账，完整电商功能一次到位。' },
     { title: '打造高回购会员经营系统', desc: '不只是会卖！更要让顾客回来！从会员分级、分众优惠设定到自动化推播，教你打造持续变现的会员经营闭环。' },
     { title: '用数据驱动品牌成长', desc: '可视化报表、多种专业分析报告到商品潜力预测，通过完整数据洞察优化营销效益，让你看懂数据、用对数据！' },
     { title: '多渠道流量整合', desc: '社群、官网、团购、门店…等多元流量来源也能轻松管控。为你整合多渠道流量，让每一笔流量都能有效变现。' },
@@ -86,7 +86,7 @@ const en: SeminarCopy = {
   ],
   learnTitle: 'What you will learn',
   topics: [
-    { title: 'Launch an online store fast', desc: '20+ themes plus cards and e-wallets — a complete commerce stack.' },
+    { title: 'Launch an online store fast', desc: '20+ themes plus card checkout — a complete commerce stack.' },
     { title: 'Build a high-repurchase loyalty system', desc: 'From tiers and segment offers to automated pushes — a loop that keeps converting.' },
     { title: 'Grow with data', desc: 'Visual reports, analytics, and product potential insights so you act on the right numbers.' },
     { title: 'Unify multi-channel traffic', desc: 'Social, site, group buys, stores — control every source and monetize each visit.' },

@@ -18,8 +18,8 @@ const zhTW: SetupCopy = {
   steps: [
     { num: '1', title: '建立品牌網站商店', items: ['設定商店名稱、品牌標誌 ( Logo )', '在 ARVIX 後台申請專屬的獨有網址'] },
     { num: '2', title: '打造獨特品牌風格', items: ['自由選擇版型，挑選符合品牌調性的設計主題', '開始建置頁面，透過拖曳方式完成頁面編排'] },
-    { num: '3', title: '設定物流送貨選項', items: ['多樣物流選擇，整合黑貓、7-11、全家等主流物流', '設定運費規則，依重量、金額或地區彈性設定'] },
-    { num: '4', title: '制定金流收款方式', items: ['開通 ARVIX Payments，一次申請多種支付方式', '支援信用卡、ATM 轉帳、行動支付等多元收款'] },
+    { num: '3', title: '設定物流送貨選項', items: ['支援宅配；台灣出貨商店可開通 7-11 超商取貨', '設定運費規則，依重量、金額或地區彈性設定'] },
+    { num: '4', title: '制定金流收款方式', items: ['開通信用卡結帳', '台灣出貨商店可再串接 7-11 貨到付款'] },
     { num: '5', title: '上傳商品並建立分類', items: ['新增商品資訊、圖片與價格，設定商品規格', '建立商品分類，讓顧客輕鬆找到想要的商品'] },
   ],
   doneTitle: '大功告成！ 立即開始你的網路生意',
@@ -32,8 +32,8 @@ const zhCN: SetupCopy = {
   steps: [
     { num: '1', title: '建立品牌网站商店', items: ['设定商店名称、品牌标志 ( Logo )', '在 ARVIX 后台申请专属的独有网址'] },
     { num: '2', title: '打造独特品牌风格', items: ['自由选择版型，挑选符合品牌调性的设计主题', '开始建置页面，透过拖曳方式完成页面编排'] },
-    { num: '3', title: '设定物流送货选项', items: ['多样物流选择，整合黑猫、7-11、全家等主流物流', '设定运费规则，依重量、金额或地区弹性设定'] },
-    { num: '4', title: '制定金流收款方式', items: ['开通 ARVIX Payments，一次申请多种支付方式', '支持信用卡、ATM 转账、行动支付等多元收款'] },
+    { num: '3', title: '设定物流送货选项', items: ['支持宅配出货', '设定运费规则，依重量、金额或地区弹性设定'] },
+    { num: '4', title: '制定金流收款方式', items: ['开通信用卡结账', '安全稳定的线上收款体验'] },
     { num: '5', title: '上传商品并建立分类', items: ['新增商品信息、图片与价格，设定商品规格', '建立商品分类，让顾客轻松找到想要的商品'] },
   ],
   doneTitle: '大功告成！立即开始你的网络生意',
@@ -46,8 +46,8 @@ const en: SetupCopy = {
   steps: [
     { num: '1', title: 'Create your brand store', items: ['Set store name and logo', 'Request a unique store URL in ARVIX admin'] },
     { num: '2', title: 'Define your brand look', items: ['Pick a theme that matches your brand', 'Build pages with drag-and-drop'] },
-    { num: '3', title: 'Configure shipping', items: ['Integrate major carriers like Black Cat, 7-Eleven, FamilyMart', 'Set flexible shipping rules by weight, amount, or region'] },
-    { num: '4', title: 'Set up payments', items: ['Enable ARVIX Payments for multiple methods at once', 'Cards, ATM transfer, mobile wallets, and more'] },
+    { num: '3', title: 'Configure shipping', items: ['Home delivery is supported; local pickup depends on store setup', 'Set flexible shipping rules by weight, amount, or region'] },
+    { num: '4', title: 'Set up payments', items: ['Enable card checkout', 'Secure online payment experience'] },
     { num: '5', title: 'Upload products & categories', items: ['Add product info, images, prices, and variants', 'Create categories so shoppers find products easily'] },
   ],
   doneTitle: 'You’re ready — start selling online',

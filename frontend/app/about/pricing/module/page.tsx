@@ -47,7 +47,7 @@ const zhTW: PricingModuleCopy = {
     {
       category: '金流服務',
       items: [
-        { name: 'ARVIX Payments', price: '依交易量計費', desc: '一站式金流，支援多種支付方式' },
+        { name: 'ARVIX Payments', price: '依交易量計費', desc: '信用卡結帳；台灣出貨商店可加開 7-11 貨到付款' },
       ],
     },
   ],
@@ -88,7 +88,7 @@ const zhCN: PricingModuleCopy = {
     {
       category: '金流服务',
       items: [
-        { name: 'ARVIX Payments', price: '按交易量计费', desc: '一站式金流，支持多种支付方式' },
+        { name: 'ARVIX Payments', price: '按交易量计费', desc: '信用卡结账' },
       ],
     },
   ],
@@ -129,7 +129,7 @@ const en: PricingModuleCopy = {
     {
       category: 'Payments',
       items: [
-        { name: 'ARVIX Payments', price: 'Usage-based', desc: 'One payments stack with many methods' },
+        { name: 'ARVIX Payments', price: 'Usage-based', desc: 'Card checkout for your store' },
       ],
     },
   ],

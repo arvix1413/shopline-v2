@@ -156,7 +156,7 @@ export default function CooperatePage() {
         <div className="max-w-2xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="text-3xl font-black mb-4" style={{ color: '#00142D' }}>{c.contactTitle}</h2>
           <p className="mb-8" style={{ color: '#687280' }}>{c.contactDesc}</p>
-          <a href="mailto:partner@arvix.com" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>
+          <a href="mailto:arvix1413@gmail.com" className="inline-block text-white font-bold px-10 py-4 rounded-full text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#5B5FF0' }}>
             {c.contactCta}
           </a>
         </div>

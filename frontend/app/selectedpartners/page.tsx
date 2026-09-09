@@ -20,8 +20,8 @@ const zhTW: PartnersCopy = {
   categories: [
     {
       title: '豐富金物流選項',
-      desc: '整合多元金流與物流服務，讓商家輕鬆提供消費者最便利的付款與收貨方式。',
-      partners: ['ARVIX Payments', 'LINE Pay', 'Apple Pay', '街口支付', '黑貓宅急便', '7-11 超商取貨', '全家便利商店', '郵局'],
+      desc: '商店結帳支援信用卡；台灣出貨商店可再串接 7-11 超商取貨／貨到付款。',
+      partners: ['ARVIX Payments', '信用卡結帳', '7-11 超商取貨', '宅配出貨'],
     },
     {
       title: '專業設計、行銷團隊',
@@ -45,8 +45,8 @@ const zhCN: PartnersCopy = {
   categories: [
     {
       title: '丰富金物流选项',
-      desc: '整合多元金流与物流服务，让商家轻松提供消费者最便利的付款与收货方式。',
-      partners: ['ARVIX Payments', 'LINE Pay', 'Apple Pay', '街口支付', '黑猫宅急便', '7-11 超商取货', '全家便利商店', '邮局'],
+      desc: '商店结账支持信用卡付款。',
+      partners: ['ARVIX Payments', '信用卡结账', '宅配出货'],
     },
     {
       title: '专业设计、营销团队',
@@ -70,8 +70,8 @@ const en: PartnersCopy = {
   categories: [
     {
       title: 'Payments & logistics options',
-      desc: 'Integrate diverse payment and shipping services for convenient checkout and delivery.',
-      partners: ['ARVIX Payments', 'LINE Pay', 'Apple Pay', 'JKO Pay', 'Black Cat', '7-Eleven pickup', 'FamilyMart', 'Post Office'],
+      desc: 'Card checkout for stores, with home delivery. Local pickup depends on the store’s shipping setup.',
+      partners: ['ARVIX Payments', 'Card checkout', 'Home delivery'],
     },
     {
       title: 'Design & marketing teams',

@@ -72,10 +72,10 @@ const zhTW: OnlineStoreFeaturesCopy = {
     {
       label: '金物流串接',
       features: [
-      { name: 'ARVIX Payments', desc: '通過 PCI-DSS 安全認證，提供信用卡刷卡 / 分期、ATM 轉帳、無卡分期及行動支付等付款方式。' },
-      { name: '第三方金流串接', desc: '支援 LINE Pay、街口支付、PayPal 等多種第三方金流平台串接，滿足不同顧客的付款需求。' },
-      { name: '超商取貨付款', desc: '提供 7-11、全家便利商店超商取貨付款服務，貼近台灣在地消費者習慣。' },
-      { name: '多元物流整合', desc: '整合黑貓宅急便、7-11、全家等主流物流商，讓出貨流程更順暢高效。' },
+      { name: 'ARVIX Payments', desc: '商店結帳支援信用卡付款，提供安全穩定的收款體驗。' },
+      { name: '7-11 超商取貨', desc: '台灣出貨商店可串接 7-11 取貨與貨到付款（須綠界物流）。' },
+      { name: '宅配出貨', desc: '支援宅配；運費與出貨流程由店家設定。' },
+      { name: '安全結帳', desc: '付款流程注重交易安全，降低異常風險。' },
       ],
     },
     {
@@ -166,7 +166,7 @@ const zhTW: OnlineStoreFeaturesCopy = {
       features: [
       { name: '多國語系', desc: '提供商店前後台多國語系顯示，讓海外顧客也能輕鬆瀏覽購物。' },
       { name: '幣值切換', desc: '支援多種幣值切換，讓海外顧客以熟悉的貨幣進行交易。' },
-      { name: '跨境金流服務', desc: '提供 PayPal 等跨境金流服務，讓你輕鬆接收來自全球的訂單。' },
+      { name: '跨境金流服務', desc: '海外顧客可使用信用卡完成結帳（實際可用方式依商店設定）。' },
       { name: '稅金設定', desc: '支援不同地區的稅金設定，確保跨境交易的合規性。' },
       ],
     },
@@ -213,10 +213,10 @@ const zhCN: OnlineStoreFeaturesCopy = {
     {
       label: '金物流串接',
       features: [
-      { name: 'ARVIX Payments', desc: '通过 PCI-DSS 安全认证，提供信用卡刷卡 / 分期、ATM 转账、无卡分期及行动支付等付款方式。' },
-      { name: '第三方金流串接', desc: '支持 LINE Pay、街口支付、PayPal 等多种第三方金流平台串接，满足不同顾客的付款需求。' },
-      { name: '超商取货付款', desc: '提供 7-11、全家便利商店超商取货付款服务，贴近台湾在地消费者习惯。' },
-      { name: '多元物流整合', desc: '整合黑猫宅急便、7-11、全家等主流物流商，让出货流程更顺畅高效。' },
+      { name: 'ARVIX Payments', desc: '商店结账支持信用卡付款，提供安全稳定的收款体验。' },
+      { name: '宅配出货', desc: '支持宅配；运费与出货流程由店家设定。' },
+      { name: '安全结账', desc: '付款流程注重交易安全，降低异常风险。' },
+      { name: '订单管理', desc: '统一管理订单与出货状态，提升运营效率。' },
       ],
     },
     {
@@ -307,7 +307,7 @@ const zhCN: OnlineStoreFeaturesCopy = {
       features: [
       { name: '多国语系', desc: '提供商店前后台多国语系显示，让海外顾客也能轻松浏览购物。' },
       { name: '币值切换', desc: '支持多种币值切换，让海外顾客以熟悉的货币进行交易。' },
-      { name: '跨境金流服务', desc: '提供 PayPal 等跨境金流服务，让你轻松接收来自全球的订单。' },
+      { name: '跨境金流服务', desc: '海外顾客可使用信用卡完成结账（实际可用方式依商店设定）。' },
       { name: '税金设定', desc: '支持不同地区的税金设定，确保跨境交易的合规性。' },
       ],
     },
@@ -354,10 +354,10 @@ const en: OnlineStoreFeaturesCopy = {
     {
       label: 'Payments & logistics',
       features: [
-      { name: 'ARVIX Payments', desc: 'PCI-DSS certified cards/installments, ATM, cardless installments, and wallets.' },
-      { name: 'Third-party payments', desc: 'Connect LINE Pay, JKO Pay, PayPal, and more.' },
-      { name: 'Convenience store COD', desc: '7-Eleven and FamilyMart pickup & pay for local habits.' },
-      { name: 'Multi-carrier shipping', desc: 'Black Cat, 7-Eleven, FamilyMart, and more for smoother fulfillment.' },
+      { name: 'ARVIX Payments', desc: 'Card checkout for secure store payments.' },
+      { name: 'Home delivery', desc: 'Ship with home delivery; fees and flow are set by the merchant.' },
+      { name: 'Secure checkout', desc: 'Payment flow designed to reduce fraud risk.' },
+      { name: 'Order management', desc: 'Manage orders and fulfillment status in one place.' },
       ],
     },
     {
@@ -448,7 +448,7 @@ const en: OnlineStoreFeaturesCopy = {
       features: [
       { name: 'Multiple languages', desc: 'Localize storefront and admin for overseas shoppers.' },
       { name: 'Currency switching', desc: 'Let shoppers pay in familiar currencies.' },
-      { name: 'Cross-border payments', desc: 'PayPal and more to accept global orders.' },
+      { name: 'Cross-border payments', desc: 'International shoppers can pay by card (availability depends on store setup).' },
       { name: 'Tax settings', desc: 'Region-aware tax rules for compliance.' },
       ],
     },
