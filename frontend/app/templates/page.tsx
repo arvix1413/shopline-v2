@@ -67,17 +67,144 @@ const en: TemplatesCopy = {
   },
 }
 
+const ko: TemplatesCopy = {
+  title: '모든 브랜드 스타일을 위한 테마',
+  subtitle: '세련된 레이아웃을 언제든 적용하고 브랜드에 맞는 스토어프론트를 만드세요',
+  cta: '테마 무료 체험',
+  preview: '미리보기',
+  tryFree: '무료 체험',
+  useTheme: '이 테마 사용',
+  ctaTitle: '전 세계 60만+ 판매자가 신뢰합니다',
+  ctaButton: '14일 무료 체험',
+  tags: {
+    themeColor: '사용자 지정 테마 색상',
+    footerColor: '사용자 지정 푸터 색상',
+    fontColor: '사용자 지정 글꼴 색상',
+    font: '사용자 지정 글꼴',
+    bgColor: '사용자 지정 배경',
+  },
+}
+
+const ja: TemplatesCopy = {
+  title: 'あらゆるブランドスタイルのテーマ',
+  subtitle: '洗練されたレイアウトをいつでも適用し、ブランドに合うストアフロントを形に',
+  cta: 'テーマを無料で試す',
+  preview: 'プレビュー',
+  tryFree: '無料トライアル',
+  useTheme: 'このテーマを使う',
+  ctaTitle: '世界中 60 万以上の加盟店が信頼',
+  ctaButton: '14 日間無料トライアル',
+  tags: {
+    themeColor: 'テーマカラーをカスタム',
+    footerColor: 'フッターカラーをカスタム',
+    fontColor: 'フォントカラーをカスタム',
+    font: 'フォントをカスタム',
+    bgColor: '背景をカスタム',
+  },
+}
+
+const vi: TemplatesCopy = {
+  title: 'Theme cho mọi phong cách thương hiệu',
+  subtitle: 'Áp dụng bố cục tinh tế bất cứ lúc nào và tạo storefront khớp thương hiệu',
+  cta: 'Dùng thử theme miễn phí',
+  preview: 'Xem trước',
+  tryFree: 'Dùng thử miễn phí',
+  useTheme: 'Dùng theme này',
+  ctaTitle: 'Được hơn 600.000 người bán trên thế giới tin dùng',
+  ctaButton: 'Dùng thử miễn phí 14 ngày',
+  tags: {
+    themeColor: 'Màu theme tùy chỉnh',
+    footerColor: 'Màu footer tùy chỉnh',
+    fontColor: 'Màu chữ tùy chỉnh',
+    font: 'Phông chữ tùy chỉnh',
+    bgColor: 'Nền tùy chỉnh',
+  },
+}
+
+const es: TemplatesCopy = {
+  title: 'Temas para cada estilo de marca',
+  subtitle: 'Aplica layouts pulidos cuando quieras y da forma a una tienda que encaje con tu marca',
+  cta: 'Probar temas gratis',
+  preview: 'Vista previa',
+  tryFree: 'Prueba gratis',
+  useTheme: 'Usar tema',
+  ctaTitle: 'Más de 600.000 comercios confían en ARVIX',
+  ctaButton: 'Prueba gratis de 14 días',
+  tags: {
+    themeColor: 'Color de tema personalizado',
+    footerColor: 'Color de pie personalizado',
+    fontColor: 'Color de fuente personalizado',
+    font: 'Fuentes personalizadas',
+    bgColor: 'Fondo personalizado',
+  },
+}
+
+const pt: TemplatesCopy = {
+  title: 'Temas para cada estilo de marca',
+  subtitle: 'Aplique layouts polidos a qualquer momento e molde uma vitrine que combine com sua marca',
+  cta: 'Testar temas grátis',
+  preview: 'Prévia',
+  tryFree: 'Teste grátis',
+  useTheme: 'Usar tema',
+  ctaTitle: 'Mais de 600.000 comerciantes confiam na ARVIX',
+  ctaButton: 'Teste grátis de 14 dias',
+  tags: {
+    themeColor: 'Cor do tema personalizada',
+    footerColor: 'Cor do rodapé personalizada',
+    fontColor: 'Cor da fonte personalizada',
+    font: 'Fontes personalizadas',
+    bgColor: 'Fundo personalizado',
+  },
+}
+
+const de: TemplatesCopy = {
+  title: 'Themes für jeden Markenstil',
+  subtitle: 'Polierte Layouts jederzeit anwenden und einen Storefront formen, der zu Ihrer Marke passt',
+  cta: 'Themes kostenlos testen',
+  preview: 'Vorschau',
+  tryFree: 'Kostenlose Testphase',
+  useTheme: 'Theme verwenden',
+  ctaTitle: 'Über 600.000 Händler weltweit vertrauen ARVIX',
+  ctaButton: '14 Tage kostenlos testen',
+  tags: {
+    themeColor: 'Benutzerdefinierte Theme-Farbe',
+    footerColor: 'Benutzerdefinierte Footer-Farbe',
+    fontColor: 'Benutzerdefinierte Schriftfarbe',
+    font: 'Benutzerdefinierte Schriften',
+    bgColor: 'Benutzerdefinierter Hintergrund',
+  },
+}
+
+const fr: TemplatesCopy = {
+  title: 'Thèmes pour chaque style de marque',
+  subtitle: 'Appliquez des layouts soignés à tout moment et façonnez une vitrine adaptée à votre marque',
+  cta: 'Essayer les thèmes gratuitement',
+  preview: 'Aperçu',
+  tryFree: 'Essai gratuit',
+  useTheme: 'Utiliser le thème',
+  ctaTitle: 'Plus de 600 000 marchands font confiance à ARVIX',
+  ctaButton: 'Essai gratuit de 14 jours',
+  tags: {
+    themeColor: 'Couleur de thème personnalisée',
+    footerColor: 'Couleur de pied de page personnalisée',
+    fontColor: 'Couleur de police personnalisée',
+    font: 'Polices personnalisées',
+    bgColor: 'Arrière-plan personnalisé',
+  },
+}
+
+
 const copy: Partial<Record<Locale, TemplatesCopy>> & { 'zh-TW': TemplatesCopy; en: TemplatesCopy } = {
   'zh-TW': zhTW,
   'zh-CN': zhCN,
   en,
-  ko: en,
-  ja: en,
-  vi: en,
-  es: en,
-  pt: en,
-  de: en,
-  fr: en,
+  ko,
+  ja,
+  vi,
+  es,
+  pt,
+  de,
+  fr,
 }
 
 export default function TemplatesPage() {

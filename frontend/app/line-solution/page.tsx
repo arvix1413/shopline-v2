@@ -80,17 +80,158 @@ const en: LineCopy = {
   ctaTitle: 'Trusted by 600,000+ merchants worldwide',
 }
 
+const ko: LineCopy = {
+  title: '공식 LINE 기술 파트너\n스토어에는 LINE이 필요합니다\n공식 계정으로 더 많이 판매하세요',
+  subtitle: 'LINE 친구, 트래픽, 리텐션, 리타깃팅을 통합 — 360° 쇼핑 트래픽을 매출로.',
+  cta: '무료 체험 시작',
+  integrateTitle: 'LINE 친구를 완전 통합',
+  integrateDesc: '팬을 키우고, 주문을 유도하고, 스마트 지원을 운영 — LINE을 최강 판매 채널로.',
+  integrateItems: ['팬을 쉽게 늘리기', '주문 유도', '스마트 지원'],
+  retargetTitle: '트래픽 + 리텐션 리타깃팅\n한 흐름으로',
+  retargetDesc: 'LINE 라이브 +1로 라이브 매출을 올리고, LINE 성과형 광고로 전환 비용을 낮추세요.',
+  retargetItems: [
+    { title: 'LINE 로그인 & 주문 상태 알림', desc: '원탭 LINE 로그인과 실시간 주문 푸시 알림.' },
+    { title: 'LINE 친구를 스토어 회원에 연결', desc: 'LINE 친구와 스토어 계정을 연결해 데이터를 통합.' },
+    { title: '독점 LINE PNP 지원', desc: 'LINE PNP 메시지로 고객에게 정밀하게 도달.' },
+    { title: '정밀 LINE 브로드캐스트', desc: '오디언스를 세그먼트하고 열람률 높은 타깃 브로드캐스트를 전송.' },
+  ],
+  aiTitle: 'AI 고객 서비스\n모든 대화를 잡으세요',
+  aiDesc: '모든 채팅을 판매 기회로 바꾸는 AI 지원으로 쇼핑 트래픽을 수익화하세요.',
+  ctaTitle: '전 세계 60만+ 판매자가 신뢰합니다',
+}
+
+const ja: LineCopy = {
+  title: '公式 LINE 技術パートナー\nショップに LINE は必須\n公式アカウントでもっと売る',
+  subtitle: 'LINE 友だち、トラフィック、リテンション、リターゲティングを統合 — 360° のショッピングトラフィックを売上に。',
+  cta: '無料トライアルを開始',
+  integrateTitle: 'LINE 友だちをフル統合',
+  integrateDesc: 'ファンを増やし、注文を促し、スマートサポートを運用 — LINE を最強の販売チャネルに。',
+  integrateItems: ['かんたんにファン獲得', '注文を促進', 'スマートサポート'],
+  retargetTitle: 'トラフィック＋リテンションのリターゲティング\nひとつの流れで',
+  retargetDesc: 'LINE ライブ +1 でライブ売上を伸ばし、LINE 成果型広告でコンバージョンコストを削減。',
+  retargetItems: [
+    { title: 'LINE ログイン＆注文ステータス通知', desc: 'ワンタップ LINE ログインとリアルタイム注文プッシュ。' },
+    { title: 'LINE 友だちとストア会員を紐付け', desc: 'LINE 友だちとストアアカウントを連携してデータを統合。' },
+    { title: '独自 LINE PNP 対応', desc: 'LINE PNP メッセージで顧客に精密リーチ。' },
+    { title: '精密 LINE ブロードキャスト', desc: 'オーディエンスをセグメントし、開封されるターゲティング配信を。' },
+  ],
+  aiTitle: 'AI カスタマーサービス\nすべての会話を勝ち取る',
+  aiDesc: 'すべてのチャットを販売機会に変える AI サポートでショッピングトラフィックを収益化。',
+  ctaTitle: '世界中 60 万以上の加盟店が信頼',
+}
+
+const vi: LineCopy = {
+  title: 'Đối tác công nghệ LINE chính thức\nCửa hàng cần LINE\nBán nhiều hơn với Official Account',
+  subtitle: 'Hợp nhất bạn LINE, traffic, giữ chân và retargeting — biến traffic mua sắm 360° thành doanh thu.',
+  cta: 'Bắt đầu dùng thử miễn phí',
+  integrateTitle: 'Tích hợp đầy đủ bạn LINE',
+  integrateDesc: 'Tăng fan, thúc đẩy đơn và chạy hỗ trợ thông minh — biến LINE thành kênh bán mạnh nhất.',
+  integrateItems: ['Tăng fan dễ dàng', 'Thúc đẩy đơn hàng', 'Hỗ trợ thông minh'],
+  retargetTitle: 'Retargeting traffic + giữ chân\ntrong một luồng',
+  retargetDesc: 'Tăng doanh số live với LINE live +1, rồi giảm chi phí chuyển đổi bằng quảng cáo hiệu suất LINE.',
+  retargetItems: [
+    { title: 'Đăng nhập LINE & cảnh báo trạng thái đơn', desc: 'Đăng nhập LINE một chạm với push trạng thái đơn realtime.' },
+    { title: 'Gắn bạn LINE với thành viên cửa hàng', desc: 'Liên kết bạn LINE với tài khoản cửa hàng để hợp nhất dữ liệu.' },
+    { title: 'Hỗ trợ LINE PNP độc quyền', desc: 'Tiếp cận khách chính xác bằng tin nhắn LINE PNP.' },
+    { title: 'Broadcast LINE chính xác', desc: 'Phân khúc đối tượng và gửi broadcast mục tiêu được mở.' },
+  ],
+  aiTitle: 'Chăm sóc khách AI\nChiến thắng mọi cuộc hội thoại',
+  aiDesc: 'Kiếm tiền từ traffic mua sắm với hỗ trợ AI biến mọi chat thành cơ hội bán hàng.',
+  ctaTitle: 'Được hơn 600.000 người bán trên thế giới tin dùng',
+}
+
+const es: LineCopy = {
+  title: 'Socio tecnológico oficial de LINE\nTu tienda necesita LINE\nVende más con Official Account',
+  subtitle: 'Unifica amigos de LINE, tráfico, retención y retargeting — convierte el tráfico de compra 360° en ingresos.',
+  cta: 'Empezar prueba gratis',
+  integrateTitle: 'Integra por completo a los amigos de LINE',
+  integrateDesc: 'Haz crecer fans, impulsa pedidos y ofrece soporte inteligente — haz de LINE tu canal de ventas más fuerte.',
+  integrateItems: ['Haz crecer fans fácilmente', 'Impulsa pedidos', 'Soporte inteligente'],
+  retargetTitle: 'Retargeting de tráfico + retención\nen un solo flujo',
+  retargetDesc: 'Impulsa ventas en vivo con LINE live +1 y baja el costo de conversión con anuncios de rendimiento LINE.',
+  retargetItems: [
+    { title: 'Login LINE y alertas de estado de pedido', desc: 'Login LINE de un toque con pushes de pedido en tiempo real.' },
+    { title: 'Vincular amigos LINE a miembros de la tienda', desc: 'Conecta amigos LINE con cuentas de tienda para unificar datos.' },
+    { title: 'Soporte exclusivo LINE PNP', desc: 'Llega con precisión a clientes con mensajes LINE PNP.' },
+    { title: 'Broadcasts LINE precisos', desc: 'Segmenta audiencias y envía broadcasts dirigidos que se abren.' },
+  ],
+  aiTitle: 'Atención al cliente con IA\nGana cada conversación',
+  aiDesc: 'Monetiza el tráfico de compra con soporte IA que convierte cada chat en oportunidad de venta.',
+  ctaTitle: 'Más de 600.000 comercios confían en ARVIX',
+}
+
+const pt: LineCopy = {
+  title: 'Parceiro tecnológico oficial LINE\nSua loja precisa do LINE\nVenda mais com Official Account',
+  subtitle: 'Unifique amigos LINE, tráfego, retenção e retargeting — transforme tráfego de compra 360° em receita.',
+  cta: 'Começar teste grátis',
+  integrateTitle: 'Integre totalmente os amigos LINE',
+  integrateDesc: 'Cresça fãs, impulsione pedidos e rode suporte inteligente — faça do LINE seu canal de vendas mais forte.',
+  integrateItems: ['Cresça fãs com facilidade', 'Impulsione pedidos', 'Suporte inteligente'],
+  retargetTitle: 'Retargeting de tráfego + retenção\nem um fluxo',
+  retargetDesc: 'Aumente vendas ao vivo com LINE live +1 e reduza o custo de conversão com anúncios de performance LINE.',
+  retargetItems: [
+    { title: 'Login LINE e alertas de status do pedido', desc: 'Login LINE com um toque e push de pedido em tempo real.' },
+    { title: 'Vincular amigos LINE a membros da loja', desc: 'Ligue amigos LINE a contas da loja para unificar dados.' },
+    { title: 'Suporte exclusivo LINE PNP', desc: 'Alcance clientes com precisão com mensagens LINE PNP.' },
+    { title: 'Broadcasts LINE precisos', desc: 'Segmente audiências e envie broadcasts direcionados que abrem.' },
+  ],
+  aiTitle: 'Atendimento ao cliente com IA\nVença cada conversa',
+  aiDesc: 'Monetize o tráfego de compra com suporte IA que transforma cada chat em oportunidade de venda.',
+  ctaTitle: 'Mais de 600.000 comerciantes confiam na ARVIX',
+}
+
+const de: LineCopy = {
+  title: 'Offizieller LINE-Tech-Partner\nIhr Shop braucht LINE\nMehr verkaufen mit Official Account',
+  subtitle: 'LINE-Freunde, Traffic, Retention und Retargeting vereinen — 360°-Shopping-Traffic in Umsatz verwandeln.',
+  cta: 'Kostenlose Testphase starten',
+  integrateTitle: 'LINE-Freunde vollständig integrieren',
+  integrateDesc: 'Fans gewinnen, Bestellungen antreiben und smarten Support betreiben — machen Sie LINE zu Ihrem stärksten Verkaufskanal.',
+  integrateItems: ['Fans leicht gewinnen', 'Bestellungen antreiben', 'Smarter Support'],
+  retargetTitle: 'Traffic- + Retention-Retargeting\nin einem Flow',
+  retargetDesc: 'Steigern Sie Live-Umsatz mit LINE Live +1 und senken Sie Conversion-Kosten mit LINE Performance Ads.',
+  retargetItems: [
+    { title: 'LINE-Login & Bestellstatus-Alerts', desc: 'Ein-Tipp-LINE-Login mit Echtzeit-Bestell-Pushes.' },
+    { title: 'LINE-Freunde an Store-Mitglieder binden', desc: 'LINE-Freunde mit Store-Konten verknüpfen und Daten vereinen.' },
+    { title: 'Exklusive LINE-PNP-Unterstützung', desc: 'Erreichen Sie Kunden präzise mit LINE-PNP-Nachrichten.' },
+    { title: 'Präzise LINE-Broadcasts', desc: 'Segmente Audiences und senden Sie gezielte Broadcasts, die geöffnet werden.' },
+  ],
+  aiTitle: 'KI-Kundenservice\nGewinnen Sie jedes Gespräch',
+  aiDesc: 'Monetarisieren Sie Shopping-Traffic mit KI-Support, der jeden Chat zur Verkaufschance macht.',
+  ctaTitle: 'Über 600.000 Händler weltweit vertrauen ARVIX',
+}
+
+const fr: LineCopy = {
+  title: 'Partenaire tech officiel LINE\nVotre boutique a besoin de LINE\nVendez plus avec Official Account',
+  subtitle: 'Unifiez amis LINE, trafic, rétention et retargeting — transformez le trafic shopping 360° en revenus.',
+  cta: 'Démarrer l’essai gratuit',
+  integrateTitle: 'Intégrez pleinement les amis LINE',
+  integrateDesc: 'Développez les fans, stimulez les commandes et offrez un support intelligent — faites de LINE votre canal de vente le plus fort.',
+  integrateItems: ['Développez les fans facilement', 'Stimulez les commandes', 'Support intelligent'],
+  retargetTitle: 'Retargeting trafic + rétention\nen un seul flux',
+  retargetDesc: 'Boostez les ventes live avec LINE live +1, puis réduisez le coût de conversion avec les pubs performance LINE.',
+  retargetItems: [
+    { title: 'Connexion LINE et alertes de statut de commande', desc: 'Connexion LINE en un tap avec pushes de commande en temps réel.' },
+    { title: 'Lier les amis LINE aux membres de la boutique', desc: 'Reliez amis LINE et comptes boutique pour unifier les données.' },
+    { title: 'Support LINE PNP exclusif', desc: 'Atteignez précisément les clients avec les messages LINE PNP.' },
+    { title: 'Broadcasts LINE précis', desc: 'Segmentez les audiences et envoyez des broadcasts ciblés qui s’ouvrent.' },
+  ],
+  aiTitle: 'Service client IA\nGagnez chaque conversation',
+  aiDesc: 'Monétisez le trafic shopping avec un support IA qui transforme chaque chat en opportunité de vente.',
+  ctaTitle: 'Plus de 600 000 marchands font confiance à ARVIX',
+}
+
+
 const copy: Partial<Record<Locale, LineCopy>> & { 'zh-TW': LineCopy; en: LineCopy } = {
   'zh-TW': zhTW,
   'zh-CN': zhCN,
   en,
-  ko: en,
-  ja: en,
-  vi: en,
-  es: en,
-  pt: en,
-  de: en,
-  fr: en,
+  ko,
+  ja,
+  vi,
+  es,
+  pt,
+  de,
+  fr,
 }
 
 export default function LineSolutionPage() {

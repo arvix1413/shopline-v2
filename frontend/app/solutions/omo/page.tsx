@@ -92,17 +92,185 @@ const en: OmoCopy = {
   ctaSubtitle: 'Join and start your omnichannel journey',
 }
 
+const ko: OmoCopy = {
+  title: 'OMO 옴니채널 통합',
+  subtitle: '매장과 이커머스를 잇는 하나의 OMO 스택 — 채널, 시스템, 데이터 — 으로 끊김 없는 개인화 여정을 만드세요.',
+  cta: '무료 체험 시작',
+  prosTitle: 'OMO 3대 강점',
+  pros: ['채널 통합', '시스템 연동', '데이터 통합'],
+  marketTitle: '가장 완성도 높은 OMO 솔루션',
+  marketSubtitle: '끊김 없는 옴니채널 쇼핑 여정',
+  firstVisitTitle: '첫 매장 방문\n멤버십·브랜드 충성도를 높이는 3단계',
+  steps1: [
+    { step: 'STEP 01', title: '신규 회원 혜택 + 간편 가입으로 회원 수·앱 설치 확대', img: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80', alt: '신규 회원 혜택이 있는 간편 가입' },
+    { step: 'STEP 02', title: '통합 POS — 온·오프라인 데이터 완전 연결', img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: '통합 데이터로 오프라인 연동' },
+    { step: 'STEP 03', title: '퇴점 후에도 지속 소통 — 마찰 없는 온라인 판매', img: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&q=80', alt: '매장 떠난 뒤에도 이어지는 인게이지먼트' },
+  ],
+  revisitTitle: '재방문율 향상\nCX와 AOV를 높이는 3단계',
+  steps2: [
+    { step: 'STEP 01', title: '온라인 트래픽을 매장으로 유도해 재방문 창출', img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'BOPIS와 매장 전용 쿠폰' },
+    { step: 'STEP 02', title: '한눈에 보는 회원 프로필로 실시간 직원 판매', img: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80', alt: '채널 통합 회원 프로필' },
+    { step: 'STEP 03', title: '원탭 회원 바코드로 더 빠른 스캔 결제', img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'ARVIX OMO 옴니채널 솔루션' },
+  ],
+  ctaTitle: '전 세계 600,000+ 셀러가 신뢰하는 ARVIX',
+  ctaSubtitle: '합류하고 옴니채널 여정을 시작하세요',
+}
+
+const ja: OmoCopy = {
+  title: 'OMO オムニチャネル統合',
+  subtitle: '店舗と EC をつなぐ一つの OMO スタック — チャネル・システム・データ — でシームレスなパーソナライズ体験を。',
+  cta: '無料トライアルを開始',
+  prosTitle: 'OMO の 3 つの強み',
+  pros: ['チャネル統合', 'システム連携', 'データ統合'],
+  marketTitle: '最も完成度の高い OMO ソリューション',
+  marketSubtitle: 'シームレスなオムニチャネル購買体験',
+  firstVisitTitle: '初回来店\n会員化とブランド定着の 3 ステップ',
+  steps1: [
+    { step: 'STEP 01', title: '新規会員特典＋かんたん登録で会員数・アプリ導入を拡大', img: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80', alt: '新規会員特典付きの簡単登録' },
+    { step: 'STEP 02', title: '統合 POS — オンラインとオフラインのデータを完全接続', img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: '統合データによるオフライン連携' },
+    { step: 'STEP 03', title: '退店後も継続エンゲージ — 摩擦のないオンライン販売', img: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&q=80', alt: '退店後も続くエンゲージメント' },
+  ],
+  revisitTitle: '再来店率を向上\nCX と AOV を高める 3 ステップ',
+  steps2: [
+    { step: 'STEP 01', title: 'オンライン流入を店舗へ導き再来店を創出', img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'BOPIS と店舗限定クーポン' },
+    { step: 'STEP 02', title: '会員プロフィールを一目で把握しリアルタイム接客', img: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80', alt: 'チャネル横断の会員プロフィール' },
+    { step: 'STEP 03', title: 'ワンタップ会員バーコードでより速いスキャン会計', img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'ARVIX OMO オムニチャネルソリューション' },
+  ],
+  ctaTitle: '世界中の 600,000+ のマーチャントに信頼されています',
+  ctaSubtitle: '参加してオムニチャネルの旅を始めましょう',
+}
+
+const vi: OmoCopy = {
+  title: 'Tích hợp OMO omnichannel',
+  subtitle: 'Một stack OMO nối cửa hàng và thương mại điện tử — kênh, hệ thống và dữ liệu — cho hành trình cá nhân hóa liền mạch.',
+  cta: 'Bắt đầu dùng thử miễn phí',
+  prosTitle: 'Ba lợi thế OMO',
+  pros: ['Tích hợp kênh', 'Kết nối hệ thống', 'Dữ liệu thống nhất'],
+  marketTitle: 'Giải pháp OMO hoàn thiện nhất',
+  marketSubtitle: 'Hành trình mua sắm omnichannel liền mạch',
+  firstVisitTitle: 'Lần đầu đến cửa hàng\n3 bước để tăng đăng ký thành viên & gắn kết thương hiệu',
+  steps1: [
+    { step: 'STEP 01', title: 'Ưu đãi thành viên mới + đăng ký đơn giản tăng hội viên & cài app', img: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80', alt: 'Đăng ký đơn giản với ưu đãi thành viên mới' },
+    { step: 'STEP 02', title: 'POS thống nhất — dữ liệu online và offline kết nối đầy đủ', img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'Tích hợp offline với dữ liệu thống nhất' },
+    { step: 'STEP 03', title: 'Giữ tương tác sau khi rời cửa hàng — bán online không ma sát', img: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&q=80', alt: 'Tương tác liên tục sau khi rời cửa hàng' },
+  ],
+  revisitTitle: 'Tăng tỷ lệ quay lại\n3 bước cải thiện CX và AOV',
+  steps2: [
+    { step: 'STEP 01', title: 'Dẫn traffic online vào cửa hàng để tạo lần quay lại', img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'BOPIS và coupon riêng cửa hàng' },
+    { step: 'STEP 02', title: 'Hồ sơ thành viên nhìn một phát để nhân viên bán realtime', img: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80', alt: 'Hồ sơ thành viên thống nhất đa kênh' },
+    { step: 'STEP 03', title: 'Mã vạch thành viên một chạm để thanh toán quét nhanh hơn', img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'Giải pháp OMO omnichannel ARVIX' },
+  ],
+  ctaTitle: 'Được hơn 600.000 thương nhân trên thế giới tin dùng',
+  ctaSubtitle: 'Tham gia và bắt đầu hành trình omnichannel của bạn',
+}
+
+const es: OmoCopy = {
+  title: 'Integración OMO omnicanal',
+  subtitle: 'Un stack OMO que une tiendas y ecommerce — canales, sistemas y datos — para un viaje personalizado sin fricción.',
+  cta: 'Empieza la prueba gratis',
+  prosTitle: 'Tres ventajas OMO',
+  pros: ['Integración de canales', 'Conectividad de sistemas', 'Datos unificados'],
+  marketTitle: 'La solución OMO más completa',
+  marketSubtitle: 'Un viaje de compra omnicanal sin fisuras',
+  firstVisitTitle: 'Primera visita en tienda\n3 pasos a membresía y adhesión de marca',
+  steps1: [
+    { step: 'STEP 01', title: 'Ofertas de nuevo miembro + registro simple aumentan socios e instalaciones de app', img: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80', alt: 'Registro simple con ofertas de nuevo miembro' },
+    { step: 'STEP 02', title: 'POS unificado — datos online y offline totalmente conectados', img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'Integración offline con datos unificados' },
+    { step: 'STEP 03', title: 'Sigue el engagement al salir — venta online sin fricción', img: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&q=80', alt: 'Engagement continuo tras salir de la tienda' },
+  ],
+  revisitTitle: 'Sube la tasa de revisita\n3 pasos a mejor CX y ticket medio',
+  steps2: [
+    { step: 'STEP 01', title: 'Lleva el tráfico online a tiendas para visitas repetidas', img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'BOPIS y cupones exclusivos de tienda' },
+    { step: 'STEP 02', title: 'Perfiles de miembro de un vistazo para venta en tiempo real', img: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80', alt: 'Perfiles de miembro unificados entre canales' },
+    { step: 'STEP 03', title: 'Códigos de barras de miembro con un toque para checkout más rápido', img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'Solución OMO omnicanal ARVIX' },
+  ],
+  ctaTitle: 'Más de 600.000 comercios en el mundo confían en ARVIX',
+  ctaSubtitle: 'Únete y comienza tu viaje omnicanal',
+}
+
+const pt: OmoCopy = {
+  title: 'Integração OMO omnichannel',
+  subtitle: 'Um stack OMO que une lojas e e-commerce — canais, sistemas e dados — para uma jornada personalizada sem atrito.',
+  cta: 'Começar teste grátis',
+  prosTitle: 'Três vantagens OMO',
+  pros: ['Integração de canais', 'Conectividade de sistemas', 'Dados unificados'],
+  marketTitle: 'A solução OMO mais completa',
+  marketSubtitle: 'Uma jornada de compra omnichannel sem falhas',
+  firstVisitTitle: 'Primeira visita na loja\n3 passos para associação e adesão à marca',
+  steps1: [
+    { step: 'STEP 01', title: 'Ofertas de novo membro + cadastro simples aumentam membros e instalações do app', img: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80', alt: 'Cadastro simples com ofertas de novo membro' },
+    { step: 'STEP 02', title: 'POS unificado — dados online e offline totalmente conectados', img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'Integração offline com dados unificados' },
+    { step: 'STEP 03', title: 'Mantenha o engajamento ao sair — venda online sem atrito', img: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&q=80', alt: 'Engajamento contínuo após sair da loja' },
+  ],
+  revisitTitle: 'Aumente a taxa de retorno\n3 passos para melhor CX e ticket médio',
+  steps2: [
+    { step: 'STEP 01', title: 'Leve o tráfego online às lojas para visitas repetidas', img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'BOPIS e cupons exclusivos da loja' },
+    { step: 'STEP 02', title: 'Perfis de membro de relance para venda em tempo real pela equipe', img: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80', alt: 'Perfis de membro unificados entre canais' },
+    { step: 'STEP 03', title: 'Códigos de barras de membro com um toque para checkout mais rápido', img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'Solução OMO omnichannel ARVIX' },
+  ],
+  ctaTitle: 'Mais de 600.000 comerciantes no mundo confiam na ARVIX',
+  ctaSubtitle: 'Participe e comece sua jornada omnichannel',
+}
+
+const de: OmoCopy = {
+  title: 'OMO-Omnichannel-Integration',
+  subtitle: 'Ein OMO-Stack, der Stores und E‑Commerce verbindet — Kanäle, Systeme und Daten — für eine nahtlose personalisierte Journey.',
+  cta: 'Kostenlos testen',
+  prosTitle: 'Drei OMO-Vorteile',
+  pros: ['Kanalintegration', 'Systemanbindung', 'Vereinheitlichte Daten'],
+  marketTitle: 'Die vollständigste OMO-Lösung',
+  marketSubtitle: 'Eine nahtlose Omnichannel-Shopping-Journey',
+  firstVisitTitle: 'Erster Ladenbesuch\n3 Schritte zu Mitgliedschaft & Markenbindung',
+  steps1: [
+    { step: 'STEP 01', title: 'Neukundenangebote + einfache Anmeldung steigern Mitglieder & App-Installs', img: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80', alt: 'Einfache Anmeldung mit Neukundenangeboten' },
+    { step: 'STEP 02', title: 'Einheitliches POS — Online- und Offline-Daten voll verbunden', img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'Offline-Integration mit einheitlichen Daten' },
+    { step: 'STEP 03', title: 'Nach dem Verlassen weiter engagieren — Online-Verkauf ohne Reibung', img: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&q=80', alt: 'Kontinuierliches Engagement nach dem Verlassen des Stores' },
+  ],
+  revisitTitle: 'Wiederbesuchsrate steigern\n3 Schritte zu besserem CX und AOV',
+  steps2: [
+    { step: 'STEP 01', title: 'Online-Traffic in Stores lenken für Wiederbesuche', img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'BOPIS und store-exklusive Coupons' },
+    { step: 'STEP 02', title: 'Mitgliederprofile auf einen Blick für Echtzeit-Verkauf durchs Team', img: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80', alt: 'Einheitliche Mitgliederprofile über Kanäle' },
+    { step: 'STEP 03', title: 'Mitglieder-Barcodes per Tipp für schnelleren Scan-Checkout', img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'ARVIX OMO-Omnichannel-Lösung' },
+  ],
+  ctaTitle: 'Mehr als 600.000 Händler weltweit vertrauen ARVIX',
+  ctaSubtitle: 'Mitmachen und deine Omnichannel-Reise starten',
+}
+
+const fr: OmoCopy = {
+  title: 'Intégration OMO omnicanale',
+  subtitle: 'Un stack OMO qui relie magasins et e‑commerce — canaux, systèmes et données — pour un parcours personnalisé fluide.',
+  cta: 'Démarrer l’essai gratuit',
+  prosTitle: 'Trois atouts OMO',
+  pros: ['Intégration des canaux', 'Connectivité des systèmes', 'Données unifiées'],
+  marketTitle: 'La solution OMO la plus complète',
+  marketSubtitle: 'Un parcours d’achat omnicanal sans rupture',
+  firstVisitTitle: 'Première visite en magasin\n3 étapes vers l’adhésion et l’attachement à la marque',
+  steps1: [
+    { step: 'STEP 01', title: 'Offres nouveaux membres + inscription simple pour croître membres & installs d’app', img: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80', alt: 'Inscription simple avec offres nouveaux membres' },
+    { step: 'STEP 02', title: 'POS unifié — données online et offline pleinement connectées', img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'Intégration offline avec données unifiées' },
+    { step: 'STEP 03', title: 'Restez engagés après le départ — vente online sans friction', img: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&q=80', alt: 'Engagement continu après avoir quitté le magasin' },
+  ],
+  revisitTitle: 'Augmentez le taux de revisite\n3 étapes pour un meilleur CX et panier moyen',
+  steps2: [
+    { step: 'STEP 01', title: 'Orientez le trafic online vers les magasins pour des revisites', img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'BOPIS et coupons exclusifs magasin' },
+    { step: 'STEP 02', title: 'Profils membres en un coup d’œil pour la vente staff en temps réel', img: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80', alt: 'Profils membres unifiés entre canaux' },
+    { step: 'STEP 03', title: 'Codes-barres membres en un tap pour un checkout scan plus rapide', img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'Solution OMO omnicanale ARVIX' },
+  ],
+  ctaTitle: 'Plus de 600 000 marchands dans le monde font confiance à ARVIX',
+  ctaSubtitle: 'Rejoignez-nous et démarrez votre parcours omnicanal',
+}
+
 const copy: Partial<Record<Locale, OmoCopy>> & { 'zh-TW': OmoCopy; en: OmoCopy } = {
   'zh-TW': zhTW,
   'zh-CN': zhCN,
   en,
-  ko: en,
-  ja: en,
-  vi: en,
-  es: en,
-  pt: en,
-  de: en,
-  fr: en,
+  ko,
+  ja,
+  vi,
+  es,
+  pt,
+  de,
+  fr,
 }
 
 export default function OmoPage() {

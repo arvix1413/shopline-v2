@@ -76,17 +76,157 @@ const en: ShopEfficiencyCopy = {
   ctaSubtitle: 'Join and start your omnichannel journey',
 }
 
+const ko: ShopEfficiencyCopy = {
+  title: '스토어 운영 효율 솔루션',
+  subtitle: '원스톱 UI × 자동 주문 관리 × 멀티채널 판매 — 준비부터 판매·애프터서비스까지 운영을 간소화하고 인건비를 절감하세요.',
+  cta: '무료 체험 시작',
+  keysTitle: '효율적인 스토어 운영의 핵심',
+  keys: [
+    { title: '올인원 관리자', desc: '모든 스토어 도구를 직관적인 하나의 백오피스에서 — 학습 부담을 낮춥니다.' },
+    { title: '자동 주문 운영', desc: '주문 처리·알림·추적을 자동화해 수작업을 크게 줄입니다.' },
+    { title: '멀티채널 통합', desc: '온라인, POS, 소셜 커머스를 함께 관리하고 실시간으로 동기화합니다.' },
+  ],
+  expertTitle: '운영 효율을 높이는 풀스택 리테일 통합',
+  sections: [
+    { title: '브랜드 오픈 전 준비', items: ['카드 결제 & 배송 설정', '캠페인 랜딩 페이지', '대량 도구 & Open API'], img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: '브랜드 스토어프론트 준비' },
+    { title: '판매 & 주문 관리', items: ['멀티채널 판매', '상품', '주문', '재고'], img: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=1200&q=80', alt: '판매 및 재고 운영' },
+    { title: '출고 & 애프터서비스', items: ['메시지 센터', '전자 인보이스', '정산 도구'], img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80', alt: '출고 및 지원' },
+  ],
+  ctaTitle: '전 세계 600,000+ 셀러가 신뢰하는 ARVIX',
+  ctaSubtitle: '합류하고 옴니채널 여정을 시작하세요',
+}
+
+const ja: ShopEfficiencyCopy = {
+  title: 'ストア運営効率化ソリューション',
+  subtitle: 'ワンUI × 自動注文管理 × マルチチャネル販売 — 準備・販売・アフターまで整え、人件費を削減。',
+  cta: '無料トライアルを開始',
+  keysTitle: '効率的なストア運営の鍵',
+  keys: [
+    { title: 'すべてを一つの管理画面で', desc: 'ストアツールを直感的な一つのバックオフィスに集約 — 学習コストを下げます。' },
+    { title: '注文の自動化', desc: '処理・通知・追跡を自動化し、手作業を大幅に削減。' },
+    { title: 'マルチチャネル統合', desc: 'オンライン・POS・ソーシャルコマースを一括管理し、リアルタイム同期。' },
+  ],
+  expertTitle: '運営効率を高めるフルスタック小売統合',
+  sections: [
+    { title: 'ブランド開店前の準備', items: ['カード決済＆配送設定', 'キャンペーンLP', '一括ツール＆Open API'], img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'ブランドストアフロント準備' },
+    { title: '販売＆注文管理', items: ['マルチチャネル販売', '商品', '注文', '在庫'], img: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=1200&q=80', alt: '販売と在庫オペレーション' },
+    { title: '出荷＆アフターサービス', items: ['メッセージセンター', '電子インボイス', '照合ツール'], img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80', alt: '出荷とサポート' },
+  ],
+  ctaTitle: '世界中の 600,000+ のマーチャントに信頼されています',
+  ctaSubtitle: '参加してオムニチャネルの旅を始めましょう',
+}
+
+const vi: ShopEfficiencyCopy = {
+  title: 'Giải pháp hiệu quả vận hành cửa hàng',
+  subtitle: 'Một giao diện × đơn hàng tự động × bán đa kênh — tinh gọn chuẩn bị, bán hàng và hậu mãi, cắt chi phí nhân sự.',
+  cta: 'Bắt đầu dùng thử miễn phí',
+  keysTitle: 'Chìa khóa vận hành cửa hàng hiệu quả',
+  keys: [
+    { title: 'Một admin cho mọi thứ', desc: 'Mọi công cụ cửa hàng trong một back office trực quan — giảm đường cong học.' },
+    { title: 'Vận hành đơn tự động', desc: 'Tự động xử lý, thông báo và theo dõi đơn với ít thao tác thủ công hơn nhiều.' },
+    { title: 'Thống nhất đa kênh', desc: 'Online, POS và thương mại xã hội quản lý chung với đồng bộ trực tiếp.' },
+  ],
+  expertTitle: 'Tích hợp bán lẻ toàn diện để nâng hiệu quả vận hành',
+  sections: [
+    { title: 'Chuẩn bị trước khi ra mắt thương hiệu', items: ['Thanh toán thẻ & thiết lập giao hàng', 'Landing page chiến dịch', 'Công cụ hàng loạt & Open API'], img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'Chuẩn bị storefront thương hiệu' },
+    { title: 'Quản lý bán hàng & đơn', items: ['Bán đa kênh', 'Sản phẩm', 'Đơn hàng', 'Tồn kho'], img: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=1200&q=80', alt: 'Vận hành bán và tồn kho' },
+    { title: 'Giao hàng & hậu mãi', items: ['Trung tâm tin nhắn', 'Hóa đơn điện tử', 'Công cụ đối soát'], img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80', alt: 'Giao hàng và hỗ trợ' },
+  ],
+  ctaTitle: 'Được hơn 600.000 thương nhân trên thế giới tin dùng',
+  ctaSubtitle: 'Tham gia và bắt đầu hành trình omnichannel của bạn',
+}
+
+const es: ShopEfficiencyCopy = {
+  title: 'Eficiencia operativa de la tienda',
+  subtitle: 'Una UI × pedidos automatizados × venta multicanal — agiliza preparación, ventas y posventa mientras reduces costes de personal.',
+  cta: 'Empieza la prueba gratis',
+  keysTitle: 'Claves para una operación eficiente',
+  keys: [
+    { title: 'Un admin para todo', desc: 'Todas las herramientas de la tienda en un back office intuitivo — menor curva de aprendizaje.' },
+    { title: 'Pedidos automatizados', desc: 'Procesa, notifica y rastrea pedidos automáticamente con mucho menos trabajo manual.' },
+    { title: 'Unidad multicanal', desc: 'Online, POS y social commerce gestionados juntos con sincronización en vivo.' },
+  ],
+  expertTitle: 'Integración retail completa para elevar la eficiencia operativa',
+  sections: [
+    { title: 'Preparación previa al lanzamiento', items: ['Checkout con tarjeta y envíos', 'Landing pages de campaña', 'Herramientas masivas y Open API'], img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'Preparación de la tienda de marca' },
+    { title: 'Ventas y pedidos', items: ['Venta multicanal', 'Productos', 'Pedidos', 'Inventario'], img: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=1200&q=80', alt: 'Operaciones de ventas e inventario' },
+    { title: 'Cumplimiento y posventa', items: ['Centro de mensajes', 'Facturación electrónica', 'Herramientas de conciliación'], img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80', alt: 'Cumplimiento y soporte' },
+  ],
+  ctaTitle: 'Más de 600.000 comercios en el mundo confían en ARVIX',
+  ctaSubtitle: 'Únete y comienza tu viaje omnicanal',
+}
+
+const pt: ShopEfficiencyCopy = {
+  title: 'Eficiência operacional da loja',
+  subtitle: 'Uma UI × pedidos automatizados × venda multicanal — agilize preparação, vendas e pós-venda cortando custos de mão de obra.',
+  cta: 'Começar teste grátis',
+  keysTitle: 'Chaves para operações eficientes',
+  keys: [
+    { title: 'Um admin para tudo', desc: 'Todas as ferramentas da loja em um back office intuitivo — curva de aprendizado menor.' },
+    { title: 'Pedidos automatizados', desc: 'Processe, notifique e rastreie pedidos automaticamente com bem menos trabalho manual.' },
+    { title: 'Unidade multicanal', desc: 'Online, POS e social commerce geridos juntos com sincronização ao vivo.' },
+  ],
+  expertTitle: 'Integração de varejo completa para elevar a eficiência operacional',
+  sections: [
+    { title: 'Preparação pré-lançamento da marca', items: ['Checkout com cartão e frete', 'Landing pages de campanha', 'Ferramentas em massa e Open API'], img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'Preparação da vitrine da marca' },
+    { title: 'Vendas e pedidos', items: ['Venda multicanal', 'Produtos', 'Pedidos', 'Estoque'], img: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=1200&q=80', alt: 'Operações de vendas e estoque' },
+    { title: 'Fulfillment e pós-venda', items: ['Central de mensagens', 'Nota fiscal eletrônica', 'Ferramentas de conciliação'], img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80', alt: 'Fulfillment e suporte' },
+  ],
+  ctaTitle: 'Mais de 600.000 comerciantes no mundo confiam na ARVIX',
+  ctaSubtitle: 'Participe e comece sua jornada omnichannel',
+}
+
+const de: ShopEfficiencyCopy = {
+  title: 'Effizienz im Store-Betrieb',
+  subtitle: 'Eine UI × automatisierte Bestellungen × Multichannel-Verkauf — Prep, Sales und After-Sales straffen und Personalkosten senken.',
+  cta: 'Kostenlos testen',
+  keysTitle: 'Schlüssel für effizienten Store-Betrieb',
+  keys: [
+    { title: 'Ein Admin für alles', desc: 'Alle Store-Tools in einem intuitiven Backoffice — flachere Lernkurve.' },
+    { title: 'Automatisierte Bestellungen', desc: 'Bestellungen automatisch verarbeiten, benachrichtigen und tracken — deutlich weniger Handarbeit.' },
+    { title: 'Multichannel-Einheit', desc: 'Online, POS und Social Commerce gemeinsam mit Live-Sync verwalten.' },
+  ],
+  expertTitle: 'Full-Stack-Retail-Integration für mehr Betriebseffizienz',
+  sections: [
+    { title: 'Vorbereitung vor dem Markenstart', items: ['Kartencheckout & Versand-Setup', 'Kampagnen-Landingpages', 'Bulk-Tools & Open API'], img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'Vorbereitung der Marken-Storefront' },
+    { title: 'Verkauf & Bestellmanagement', items: ['Multichannel-Verkauf', 'Produkte', 'Bestellungen', 'Lager'], img: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=1200&q=80', alt: 'Verkaufs- und Lagerbetrieb' },
+    { title: 'Fulfillment & After-Sales', items: ['Nachrichtencenter', 'E-Rechnungen', 'Abstimmungs-Tools'], img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80', alt: 'Fulfillment und Support' },
+  ],
+  ctaTitle: 'Mehr als 600.000 Händler weltweit vertrauen ARVIX',
+  ctaSubtitle: 'Mitmachen und deine Omnichannel-Reise starten',
+}
+
+const fr: ShopEfficiencyCopy = {
+  title: 'Efficacité opérationnelle de la boutique',
+  subtitle: 'Une UI × commandes automatisées × vente multicanale — fluidifiez préparation, ventes et après-vente tout en réduisant les coûts de main-d’œuvre.',
+  cta: 'Démarrer l’essai gratuit',
+  keysTitle: 'Clés d’une exploitation boutique efficace',
+  keys: [
+    { title: 'Un admin pour tout', desc: 'Tous les outils boutique dans un back-office intuitif — courbe d’apprentissage réduite.' },
+    { title: 'Commandes automatisées', desc: 'Traitez, notifiez et suivez les commandes automatiquement avec bien moins de travail manuel.' },
+    { title: 'Unité multicanale', desc: 'Online, POS et social commerce gérés ensemble avec sync en direct.' },
+  ],
+  expertTitle: 'Intégration retail complète pour hausser l’efficacité opérationnelle',
+  sections: [
+    { title: 'Préparation avant le lancement', items: ['Paiement carte & configuration livraison', 'Landing pages de campagne', 'Outils bulk & Open API'], img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', alt: 'Préparation de la vitrine de marque' },
+    { title: 'Ventes & gestion des commandes', items: ['Vente multicanale', 'Produits', 'Commandes', 'Stock'], img: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=1200&q=80', alt: 'Opérations ventes et stock' },
+    { title: 'Fulfillment & après-vente', items: ['Centre de messages', 'Facturation électronique', 'Outils de rapprochement'], img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80', alt: 'Fulfillment et support' },
+  ],
+  ctaTitle: 'Plus de 600 000 marchands dans le monde font confiance à ARVIX',
+  ctaSubtitle: 'Rejoignez-nous et démarrez votre parcours omnicanal',
+}
+
 const copy: Partial<Record<Locale, ShopEfficiencyCopy>> & { 'zh-TW': ShopEfficiencyCopy; en: ShopEfficiencyCopy } = {
   'zh-TW': zhTW,
   'zh-CN': zhCN,
   en,
-  ko: en,
-  ja: en,
-  vi: en,
-  es: en,
-  pt: en,
-  de: en,
-  fr: en,
+  ko,
+  ja,
+  vi,
+  es,
+  pt,
+  de,
+  fr,
 }
 
 export default function ShopEfficiencyPage() {

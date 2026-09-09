@@ -285,10 +285,30 @@ app.post('/api/stripe/webhook', async (c) => {
     const session = event.data?.object || {}
     const orderId = Number(session.metadata?.order_id || 0)
     const cartSessionId = String(session.metadata?.cart_session_id || '')
-    if (orderId) {
-      await c.env.DB.prepare(
-        `UPDATE orders SET status='paid', updated_at=datetime('now', '+8 hours') WHERE id=?`
-      ).bind(orderId).run().catch(() => {})
+    const checkoutType = String(session.metadata?.arvix_checkout || '')
+    if (orderId && checkoutType === 'store') {
+      const current = await c.env.DB.prepare(
+        `SELECT id, status FROM orders WHERE id=?`
+      ).bind(orderId).first<{ id: number; status: string }>()
+      const status = String(current?.status || '').toLowerCase()
+      if (current && status === 'pending') {
+        await c.env.DB.prepare(
+          `UPDATE orders SET status='paid', updated_at=datetime('now', '+8 hours') WHERE id=? AND status='pending'`
+        ).bind(orderId).run().catch(() => {})
+
+        // Decrement stock once when card payment completes
+        const items = await c.env.DB.prepare(
+          `SELECT product_id as productId, quantity FROM order_items WHERE order_id=?`
+        ).bind(orderId).all()
+        for (const row of (items.results || []) as any[]) {
+          const pid = Number(row.productId || 0)
+          const qty = Number(row.quantity || 0)
+          if (!pid || qty < 1) continue
+          await c.env.DB.prepare(
+            `UPDATE products SET stock = CASE WHEN stock > ? THEN stock - ? ELSE 0 END, updated_at=datetime('now', '+8 hours') WHERE id=?`
+          ).bind(qty, qty, pid).run().catch(() => {})
+        }
+      }
 
       // 刷卡完成後：若是 7-11 取貨且尚無寄件碼，嘗試建立綠界物流單
       try {
@@ -348,18 +368,17 @@ app.post('/api/stripe/webhook', async (c) => {
         console.error('Create logistics after Stripe pay failed', e)
       }
     }
-    if (cartSessionId) {
+    if (cartSessionId && checkoutType === 'store') {
       await c.env.DB.prepare(`DELETE FROM cart_items WHERE session_id=?`).bind(cartSessionId).run().catch(() => {})
     }
     const storeSlug = String(session.metadata?.store_slug || '')
-    if (storeSlug) {
+    if (storeSlug && checkoutType === 'store') {
       await c.env.DB.prepare(
         `UPDATE stores SET payments_enabled=1, onboarding_stage='payments_setup', updated_at=datetime('now', '+8 hours') WHERE slug=?`
       ).bind(storeSlug).run().catch(() => {})
     }
 
     // Merchant SaaS subscription → unlock store after trial
-    const checkoutType = String(session.metadata?.arvix_checkout || '')
     const userId = Number(session.metadata?.user_id || session.client_reference_id || 0)
     const plan = String(session.metadata?.arvix_plan || session.subscription_data?.metadata?.arvix_plan || 'standard')
     if (userId > 0 && (checkoutType === 'subscription' || session.mode === 'subscription')) {
@@ -1045,7 +1064,8 @@ app.get('/api/cart/:sessionId', async (c) => {
         price: schema.products.price,
         imageUrl: schema.products.imageUrl,
         category: schema.products.category,
-        stock: schema.products.stock
+        stock: schema.products.stock,
+        storeSlug: schema.products.storeSlug,
       }
     })
     .from(schema.cartItems)
@@ -1055,7 +1075,7 @@ app.get('/api/cart/:sessionId', async (c) => {
     return c.json(cartItems)
   } catch (error) {
     console.error('Get cart error:', error)
-    return c.json({ error: '获取购物车失败' }, 500)
+    return c.json({ error: 'Cart fetch failed', code: 'CART_FETCH_FAILED' }, 500)
   }
 })
 
@@ -1066,18 +1086,18 @@ app.post('/api/cart', async (c) => {
     const db = drizzle(c.env.DB, { schema })
     
     if (!sessionId || !productId) {
-      return c.json({ error: '缺少必要参数' }, 400)
+      return c.json({ error: 'Missing fields', code: 'INVALID' }, 400)
     }
     
     // 检查商品是否存在
     const product = await db.select().from(schema.products).where(eq(schema.products.id, productId)).get()
     if (!product) {
-      return c.json({ error: '商品不存在' }, 404)
+      return c.json({ error: 'Product not found', code: 'NOT_FOUND' }, 404)
     }
     
     // 检查库存
-    if (product.stock < quantity) {
-      return c.json({ error: '库存不足' }, 400)
+    if ((product.stock ?? 0) < quantity) {
+      return c.json({ error: 'Out of stock', code: 'OUT_OF_STOCK' }, 400)
     }
     
     // 检查购物车中是否已有该商品
@@ -1092,8 +1112,8 @@ app.post('/api/cart', async (c) => {
     if (existingItem) {
       // 更新数量
       const newQuantity = existingItem.quantity + quantity
-      if (product.stock < newQuantity) {
-        return c.json({ error: '库存不足' }, 400)
+      if ((product.stock ?? 0) < newQuantity) {
+        return c.json({ error: 'Out of stock', code: 'OUT_OF_STOCK' }, 400)
       }
       
       const updatedItem = await db.update(schema.cartItems)
@@ -1121,7 +1141,7 @@ app.post('/api/cart', async (c) => {
     }
   } catch (error) {
     console.error('Add to cart error:', error)
-    return c.json({ error: '添加到购物车失败' }, 500)
+    return c.json({ error: 'Add to cart failed', code: 'CART_ADD_FAILED' }, 500)
   }
 })
 
@@ -1134,7 +1154,7 @@ app.put('/api/cart/:id', async (c) => {
     const db = drizzle(c.env.DB, { schema })
     
     if (!quantity || quantity < 1) {
-      return c.json({ error: '数量必须大于0' }, 400)
+      return c.json({ error: 'Invalid quantity', code: 'INVALID' }, 400)
     }
     
     // 获取购物车项目和商品信息
@@ -1148,12 +1168,12 @@ app.put('/api/cart/:id', async (c) => {
     .get()
     
     if (!cartItem) {
-      return c.json({ error: '购物车项目不存在' }, 404)
+      return c.json({ error: 'Cart item not found', code: 'NOT_FOUND' }, 404)
     }
     
     // 检查库存
     if (cartItem.product && cartItem.product.stock < quantity) {
-      return c.json({ error: '库存不足' }, 400)
+      return c.json({ error: 'Out of stock', code: 'OUT_OF_STOCK' }, 400)
     }
     
     const updatedItem = await db.update(schema.cartItems)
@@ -1168,7 +1188,7 @@ app.put('/api/cart/:id', async (c) => {
     return c.json(updatedItem)
   } catch (error) {
     console.error('Update cart error:', error)
-    return c.json({ error: '更新购物车失败' }, 500)
+    return c.json({ error: 'Update cart failed', code: 'CART_UPDATE_FAILED' }, 500)
   }
 })
 
@@ -1184,13 +1204,13 @@ app.delete('/api/cart/:id', async (c) => {
       .get()
     
     if (!deletedItem) {
-      return c.json({ error: '购物车项目不存在' }, 404)
+      return c.json({ error: 'Cart item not found', code: 'NOT_FOUND' }, 404)
     }
     
-    return c.json({ message: '商品已从购物车移除' })
+    return c.json({ message: 'Removed', code: 'OK' })
   } catch (error) {
     console.error('Remove from cart error:', error)
-    return c.json({ error: '移除商品失败' }, 500)
+    return c.json({ error: 'Remove failed', code: 'CART_REMOVE_FAILED' }, 500)
   }
 })
 
@@ -1203,10 +1223,10 @@ app.delete('/api/cart/clear/:sessionId', async (c) => {
     await db.delete(schema.cartItems)
       .where(eq(schema.cartItems.sessionId, sessionId))
     
-    return c.json({ message: '购物车已清空' })
+    return c.json({ message: 'Cleared', code: 'OK' })
   } catch (error) {
     console.error('Clear cart error:', error)
-    return c.json({ error: '清空购物车失败' }, 500)
+    return c.json({ error: 'Clear failed', code: 'CART_CLEAR_FAILED' }, 500)
   }
 })
 
@@ -1409,45 +1429,37 @@ app.post('/api/store-checkout/session', async (c) => {
     if (method === 'cod') cvsCollection = 'Y'
     if (method === 'stripe' && shippingMethod === 'seven_eleven') cvsCollection = 'N'
 
-    if (!sessionId || !storeSlug) return c.json({ error: '缺少購物車或店舖資訊' }, 400)
+    if (!sessionId || !storeSlug) return c.json({ error: 'Missing cart or store', code: 'MISSING_SESSION' }, 400)
     if (!customerName || customerName.length < 2) {
-      return c.json({ error: '請填寫收貨人全名' }, 400)
+      return c.json({ error: 'Name required', code: 'NAME_REQUIRED' }, 400)
     }
-    if (!customerPhone) return c.json({ error: '請填寫手機號碼' }, 400)
+    if (!customerPhone) return c.json({ error: 'Phone required', code: 'PHONE_REQUIRED' }, 400)
     if (!shippingAddress) {
       return c.json({
-        error: shippingMethod === 'seven_eleven' ? '請先選擇 7-11 門市' : '請填寫收件地址',
+        error: shippingMethod === 'seven_eleven' ? 'CVS store required' : 'Address required',
+        code: shippingMethod === 'seven_eleven' ? 'CVS_REQUIRED' : 'ADDR_REQUIRED',
       }, 400)
     }
     if (method === 'cod' && shippingMethod !== 'seven_eleven') {
-      return c.json({ error: '貨到付款僅限 7-11 取貨' }, 400)
+      return c.json({ error: 'COD requires 7-11 pickup', code: 'COD_ONLY_SEVEN' }, 400)
     }
 
     await ensureStoresTable(c.env.DB)
     await ensureProductsStoreSlug(c.env.DB)
     const store = await c.env.DB.prepare(
-      `SELECT id, slug, name, status, user_id, market,
+      `SELECT id, slug, name, status, user_id,
               ecpay_merchant_id, ecpay_hash_key, ecpay_hash_iv, ecpay_logistics_mode,
               ecpay_logistics_subtype, ecpay_sender_name, ecpay_sender_phone
        FROM stores WHERE slug=? AND status='active'`
     ).bind(storeSlug).first<any>()
-    if (!store) return c.json({ error: '商店不存在' }, 404)
-
-    // 以商店出貨市場為準（不看買家語系／所在地／前端傳的 market）
-    const market = String(store.market || 'TW').trim().toUpperCase() === 'INTL' ? 'INTL' : 'TW'
-    if (market !== 'TW') {
-      shippingMethod = 'home'
-      if (method === 'cod') {
-        return c.json({ error: '此商店不支援貨到付款' }, 400)
-      }
-    }
+    if (!store) return c.json({ error: 'Store not found', code: 'STORE_NOT_FOUND' }, 404)
 
     const { resolveEcpayEnv, ecpayConfigured, ecpayCreateReady, createCvsLogisticsOrder } = await import('./ecpayLogistics')
     const ecpayEnv = resolveEcpayEnv(c.env, store)
     const mapReady = ecpayConfigured(ecpayEnv)
     const createReady = ecpayCreateReady(ecpayEnv)
     if (shippingMethod === 'seven_eleven' && mapReady && !cvsStoreId) {
-      return c.json({ error: '請先用電子地圖選擇 7-11 門市', code: 'CVS_MAP_REQUIRED' }, 400)
+      return c.json({ error: 'Select CVS on map first', code: 'CVS_MAP_REQUIRED' }, 400)
     }
     if (
       shippingMethod === 'seven_eleven' &&
@@ -1458,10 +1470,7 @@ app.post('/api/store-checkout/session', async (c) => {
         (method === 'stripe' && String(body.cvsCollection).toUpperCase() === 'Y'))
     ) {
       return c.json({
-        error:
-          method === 'cod'
-            ? '此門市是用「刷卡取貨」選的，貨到付款請改點「貨到付款選門市」重選'
-            : '此門市是用「貨到付款」選的，刷卡請改點「刷卡取貨選門市」重選',
+        error: 'CVS collection type mismatch',
         code: 'CVS_COLLECTION_MISMATCH',
       }, 400)
     }
@@ -1469,7 +1478,7 @@ app.post('/api/store-checkout/session', async (c) => {
     if (store.user_id) {
       const trial = await loadAndSyncTrial(c.env.DB, store.user_id)
       if (!merchantCanOperate(trial)) {
-        return c.json({ error: '此商店試用已結束，暫時無法結帳', code: 'STORE_SUSPENDED' }, 403)
+        return c.json({ error: 'Store trial ended', code: 'STORE_SUSPENDED' }, 403)
       }
     }
 
@@ -1492,21 +1501,21 @@ app.post('/api/store-checkout/session', async (c) => {
       .where(eq(schema.cartItems.sessionId, sessionId))
 
     const storeItems = cartItems.filter((item) => item.product && (item.product as any).storeSlug === storeSlug)
-    if (storeItems.length === 0) return c.json({ error: '購物車是空的' }, 400)
+    if (storeItems.length === 0) return c.json({ error: 'Cart empty', code: 'EMPTY_CART' }, 400)
 
     for (const item of storeItems) {
       const stock = Number((item.product as any)?.stock || 0)
       if (stock < item.quantity) {
-        return c.json({ error: `「${(item.product as any)?.name || '商品'}」庫存不足` }, 400)
+        return c.json({ error: 'Out of stock', code: 'OUT_OF_STOCK' }, 400)
       }
     }
 
     const totalAmount = storeItems.reduce((sum, item) => {
       return sum + Number((item.product as any)?.price || 0) * item.quantity
     }, 0)
-    if (totalAmount <= 0) return c.json({ error: '訂單金額無效' }, 400)
+    if (totalAmount <= 0) return c.json({ error: 'Invalid amount', code: 'INVALID_AMOUNT' }, 400)
     if (shippingMethod === 'seven_eleven' && totalAmount > 20000) {
-      return c.json({ error: '7-11 取貨／貨到付款單筆金額上限為 NT$ 20,000', code: 'CVS_AMOUNT_LIMIT' }, 400)
+      return c.json({ error: 'CVS amount limit exceeded', code: 'CVS_AMOUNT_LIMIT' }, 400)
     }
 
     const shippingObj: Record<string, unknown> = {
@@ -1515,6 +1524,8 @@ app.post('/api/store-checkout/session', async (c) => {
       phone: customerPhone,
       address: shippingAddress,
       storeSlug,
+      cartSessionId: sessionId,
+      currency: 'TWD',
       shippingMethod,
       shippingMethodLabel: shippingMethod === 'seven_eleven' ? '7-11 超商取貨' : '宅配／其他',
       method,
@@ -1584,6 +1595,12 @@ app.post('/api/store-checkout/session', async (c) => {
     const successPath = `${siteUrl}/s/shop?slug=${encodeURIComponent(storeSlug)}&paid=1&order=${order.id}`
 
     if (method === 'cod') {
+      // Cancel abandoned Stripe pending orders for this cart so COD + later Stripe can't double-fulfill
+      await c.env.DB.prepare(
+        `UPDATE orders SET status='cancelled', updated_at=datetime('now', '+8 hours')
+         WHERE status='pending' AND shipping_address LIKE ?`
+      ).bind(`%"cartSessionId":"${sessionId}"%`).run().catch(() => {})
+      // Also cancel pending by store+phone heuristic for same cart session metadata after we store it
       for (const item of storeItems) {
         const product = item.product as any
         if (product?.id != null) {
@@ -1596,6 +1613,8 @@ app.post('/api/store-checkout/session', async (c) => {
       await c.env.DB.prepare(
         `UPDATE stores SET payments_enabled=1, onboarding_stage='payments_setup', updated_at=datetime('now', '+8 hours') WHERE slug=?`
       ).bind(storeSlug).run().catch(() => {})
+      const redirect = new URL(successPath)
+      if (shippingObj.shipmentCode) redirect.searchParams.set('shipment', String(shippingObj.shipmentCode))
       return c.json({
         ok: true,
         method: 'cod',
@@ -1604,17 +1623,20 @@ app.post('/api/store-checkout/session', async (c) => {
         totalAmount,
         shipmentCode: shippingObj.shipmentCode,
         logisticsError: shippingObj.logisticsError,
-        redirectUrl: successPath,
+        redirectUrl: redirect.toString(),
       })
     }
 
     if (!c.env.STRIPE_SECRET_KEY) {
-      return c.json({ error: '尚未設定信用卡金流，請改選貨到付款', orderId: order.id }, 503)
+      return c.json({ error: 'Card payment unavailable', code: 'STRIPE_UNAVAILABLE', orderId: order.id }, 503)
     }
+
+    // Merchants set catalog prices in TWD for Stripe Checkout.
+    const payCurrency = 'twd'
+    const zeroDecimal = true
 
     const params = new URLSearchParams({
       mode: 'payment',
-      'payment_method_types[0]': 'card',
       success_url: `${successPath}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/s/shop?slug=${encodeURIComponent(storeSlug)}&checkout=cancelled`,
       'metadata[order_id]': String(order.id),
@@ -1622,6 +1644,7 @@ app.post('/api/store-checkout/session', async (c) => {
       'metadata[cart_session_id]': sessionId,
       'metadata[shipping_method]': shippingMethod,
       'metadata[arvix_checkout]': 'store',
+      'metadata[currency]': payCurrency,
     })
     if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) {
       params.set('customer_email', customerEmail)
@@ -1629,10 +1652,13 @@ app.post('/api/store-checkout/session', async (c) => {
 
     storeItems.forEach((item, index) => {
       const product = item.product as any
-      const unit = Math.max(1, Math.round(Number(product.price || 0)))
-      params.set(`line_items[${index}][price_data][currency]`, 'twd')
-      params.set(`line_items[${index}][price_data][unit_amount]`, String(unit))
-      params.set(`line_items[${index}][price_data][product_data][name]`, String(product.name || '商品').slice(0, 120))
+      const price = Number(product.price || 0)
+      const unitAmount = Math.max(1, Math.round(zeroDecimal ? price : price * 100))
+      const rawName = String(product.name || 'Product').replace(/[\u0000-\u001f]/g, ' ').trim()
+      const name = (rawName || 'Product').slice(0, 120)
+      params.set(`line_items[${index}][price_data][currency]`, payCurrency)
+      params.set(`line_items[${index}][price_data][unit_amount]`, String(unitAmount))
+      params.set(`line_items[${index}][price_data][product_data][name]`, name)
       params.set(`line_items[${index}][quantity]`, String(item.quantity))
     })
 
@@ -1646,18 +1672,21 @@ app.post('/api/store-checkout/session', async (c) => {
     })
     const result = await response.json<any>()
     if (!response.ok || !result?.url) {
-      console.error('Store Stripe Checkout error', result?.error?.type, result?.error?.code, result?.error?.message)
+      console.error('Store Stripe Checkout error', result?.error || result)
       await c.env.DB.prepare(`UPDATE orders SET status='failed' WHERE id=?`).bind(order.id).run().catch(() => {})
       return c.json({
-        error: '信用卡付款暫時無法使用，請改選貨到付款',
+        error: 'Card payment unavailable',
+        code: 'STRIPE_UNAVAILABLE',
         orderId: order.id,
         stripeCode: result?.error?.code || null,
+        stripeMessage: result?.error?.message || null,
       }, 502)
     }
 
     const shippingWithSession = JSON.stringify({
       ...JSON.parse(shippingPayload),
       stripeSessionId: result.id,
+      cartSessionId: sessionId,
     })
     await c.env.DB.prepare(`UPDATE orders SET shipping_address=? WHERE id=?`)
       .bind(shippingWithSession, order.id).run().catch(() => {})
@@ -1670,7 +1699,39 @@ app.post('/api/store-checkout/session', async (c) => {
     })
   } catch (error) {
     console.error('Store checkout error:', error)
-    return c.json({ error: '結帳失敗，請稍後再試' }, 500)
+    return c.json({ error: 'Checkout failed', code: 'CHECKOUT_FAILED' }, 500)
+  }
+})
+
+/** Public receipt peek for paid banner (shipment code after async webhook). */
+app.get('/api/store-checkout/receipt', async (c) => {
+  try {
+    const orderId = Number(c.req.query('order') || 0)
+    const storeSlug = String(c.req.query('slug') || '').trim().toLowerCase()
+    if (!orderId || !storeSlug) return c.json({ error: 'Missing params', code: 'INVALID' }, 400)
+    const row = await c.env.DB.prepare(
+      `SELECT id, status, shipping_address as shippingAddress FROM orders WHERE id=?`
+    ).bind(orderId).first<any>()
+    if (!row) return c.json({ error: 'Not found', code: 'NOT_FOUND' }, 404)
+    let shipping: any = {}
+    try {
+      shipping = row.shippingAddress ? JSON.parse(row.shippingAddress) : {}
+    } catch {
+      shipping = {}
+    }
+    if (String(shipping.storeSlug || '').toLowerCase() !== storeSlug) {
+      return c.json({ error: 'Not found', code: 'NOT_FOUND' }, 404)
+    }
+    return c.json({
+      orderId: row.id,
+      status: row.status,
+      method: shipping.method || null,
+      shippingMethod: shipping.shippingMethod || null,
+      shipmentCode: shipping.shipmentCode || null,
+      currency: shipping.currency || 'TWD',
+    })
+  } catch (e: any) {
+    return c.json({ error: String(e) }, 500)
   }
 })
 
@@ -2719,12 +2780,14 @@ app.put('/api/stores/me/logistics', requireUser, async (c) => {
     const subtype = body.subtype !== undefined
       ? String(body.subtype || '').trim().toUpperCase() || null
       : (store.ecpay_logistics_subtype || null)
-    const senderName = body.senderName !== undefined
-      ? String(body.senderName || '').trim() || null
-      : (store.ecpay_sender_name || null)
-    const senderPhone = body.senderPhone !== undefined
-      ? String(body.senderPhone || '').replace(/\D/g, '').slice(0, 10) || null
-      : (store.ecpay_sender_phone || null)
+    const senderName =
+      body.senderName !== undefined && String(body.senderName || '').trim()
+        ? String(body.senderName).trim()
+        : (store.ecpay_sender_name || null)
+    const senderPhone =
+      body.senderPhone !== undefined && String(body.senderPhone || '').replace(/\D/g, '')
+        ? String(body.senderPhone || '').replace(/\D/g, '').slice(0, 10)
+        : (store.ecpay_sender_phone || null)
 
     await c.env.DB.prepare(
       `UPDATE stores SET
@@ -2877,7 +2940,7 @@ app.get('/api/stores/me/orders', requireUser, async (c) => {
   try {
     const payload = c.get('userPayload')
     const store = await getOwnedStore(c, payload.userId)
-    if (!store) return c.json({ error: '尚未建立商店' }, 404)
+    if (!store) return c.json({ error: 'Store not found', code: 'STORE_NOT_FOUND' }, 404)
     const rows = await c.env.DB.prepare(
       `SELECT id, total_amount as totalAmount, status, shipping_address as shippingAddress, created_at as createdAt
        FROM orders WHERE shipping_address LIKE ? ORDER BY id DESC LIMIT 100`
@@ -2903,11 +2966,12 @@ app.get('/api/stores/me/orders', requireUser, async (c) => {
         customerName: shipping.name || null,
         customerPhone: shipping.phone || null,
         shippingMethod: shipping.shippingMethod || null,
+        currency: shipping.currency || 'TWD',
       }
     })
     return c.json({ orders })
   } catch (e: any) {
-    return c.json({ error: String(e) }, 500)
+    return c.json({ error: String(e), code: 'ORDERS_LOAD_FAILED' }, 500)
   }
 })
 
@@ -2916,36 +2980,36 @@ app.post('/api/stores/me/orders/:id/create-shipment', requireUser, async (c) => 
   try {
     const payload = c.get('userPayload')
     const store = await getOwnedStore(c, payload.userId)
-    if (!store) return c.json({ error: '尚未建立商店' }, 404)
+    if (!store) return c.json({ error: 'Store not found', code: 'STORE_NOT_FOUND' }, 404)
     const id = parseInt(c.req.param('id'))
     const row = await c.env.DB.prepare(
       `SELECT id, total_amount as totalAmount, status, shipping_address as shippingAddress FROM orders WHERE id=?`
     ).bind(id).first<any>()
-    if (!row) return c.json({ error: '訂單不存在' }, 404)
+    if (!row) return c.json({ error: 'Order not found', code: 'NOT_FOUND' }, 404)
     let shipping: any = {}
     try {
       shipping = row.shippingAddress ? JSON.parse(row.shippingAddress) : {}
     } catch {
-      return c.json({ error: '訂單物流資料損壞' }, 400)
+      return c.json({ error: 'Corrupt shipping data', code: 'INVALID_SHIPPING' }, 400)
     }
-    if (shipping.storeSlug !== store.slug) return c.json({ error: '無權限' }, 403)
+    if (shipping.storeSlug !== store.slug) return c.json({ error: 'Forbidden', code: 'FORBIDDEN' }, 403)
     if (shipping.shippingMethod !== 'seven_eleven') {
-      return c.json({ error: '此訂單不是 7-11 取貨' }, 400)
+      return c.json({ error: 'Not a CVS order', code: 'NOT_CVS' }, 400)
     }
-    if (!shipping.cvsStoreId) return c.json({ error: '缺少門市代碼，客人需重新用地圖選店' }, 400)
+    if (!shipping.cvsStoreId) return c.json({ error: 'Missing CVS store id', code: 'CVS_REQUIRED' }, 400)
     const status = String(row.status || '').toLowerCase()
     const paidOk = status === 'paid' || status === 'cod' || shipping.method === 'cod'
     if (!paidOk) {
-      return c.json({ error: '訂單尚未付款完成，無法產生寄件代碼', code: 'PAYMENT_REQUIRED' }, 402)
+      return c.json({ error: 'Payment required', code: 'PAYMENT_REQUIRED' }, 402)
     }
     if (Number(row.totalAmount || 0) > 20000) {
-      return c.json({ error: '金額超過 7-11 上限 NT$ 20,000，無法建立物流單' }, 400)
+      return c.json({ error: 'Amount exceeds CVS limit', code: 'CVS_AMOUNT_LIMIT' }, 400)
     }
 
     const { resolveEcpayEnv, ecpayCreateReady, createCvsLogisticsOrder } = await import('./ecpayLogistics')
     const ecpayEnv = resolveEcpayEnv(c.env, store)
     if (!ecpayCreateReady(ecpayEnv)) {
-      return c.json({ error: '請先在「收款／物流」完成綠界 MerchantID／HashKey／HashIV 設定' }, 503)
+      return c.json({ error: 'ECPay not configured', code: 'ECPAY_NOT_CONFIGURED' }, 503)
     }
 
     const apiOrigin = new URL(c.req.url).origin
@@ -2953,11 +3017,11 @@ app.post('/api/stores/me/orders/:id/create-shipment', requireUser, async (c) => 
       env: ecpayEnv,
       merchantTradeNo: `R${id}${Date.now().toString(36)}`.slice(0, 20),
       goodsAmount: Number(row.totalAmount || 0),
-      goodsName: store.name || '商品',
+      goodsName: store.name || 'Goods',
       isCollection: shipping.method === 'cod' || shipping.cvsCollection === 'Y',
-      senderName: (ecpayEnv.ECPAY_SENDER_NAME || store.name || '店家').toString(),
+      senderName: (ecpayEnv.ECPAY_SENDER_NAME || store.name || 'Store').toString(),
       senderCellPhone: (ecpayEnv.ECPAY_SENDER_PHONE || '0912345678').toString(),
-      receiverName: String(shipping.name || '顧客'),
+      receiverName: String(shipping.name || 'Customer'),
       receiverCellPhone: String(shipping.phone || '0912345678'),
       receiverStoreId: String(shipping.cvsStoreId),
       serverReplyUrl: `${apiOrigin}/api/logistics/ecpay/status-callback`,
@@ -2967,7 +3031,7 @@ app.post('/api/stores/me/orders/:id/create-shipment', requireUser, async (c) => 
       shipping.logisticsError = created.error
       await c.env.DB.prepare(`UPDATE orders SET shipping_address=? WHERE id=?`)
         .bind(JSON.stringify(shipping), id).run()
-      return c.json({ error: created.error || '建立失敗' }, 502)
+      return c.json({ error: created.error || 'Create failed', code: 'SHIPMENT_CREATE_FAILED' }, 502)
     }
     shipping.shipmentCode = created.shipmentCode
     shipping.cvsPaymentNo = created.cvsPaymentNo
@@ -2985,7 +3049,7 @@ app.post('/api/stores/me/orders/:id/create-shipment', requireUser, async (c) => 
       logisticsId: created.logisticsId,
     })
   } catch (e: any) {
-    return c.json({ error: String(e) }, 500)
+    return c.json({ error: String(e), code: 'SHIPMENT_CREATE_FAILED' }, 500)
   }
 })
 
@@ -3016,11 +3080,9 @@ app.get('/api/stores/:slug', async (c) => {
       pagesRaw = null
     }
     const pages = parseStorePages(pagesRaw, store.name).filter((p) => p.published)
-    const market = String(store.market || 'TW').trim().toUpperCase() === 'INTL' ? 'INTL' : 'TW'
     const { user_id: _uid, layout_json: _lj, pages_json: _pj, market: _m, ...publicStore } = store
     return c.json({
       ...publicStore,
-      market,
       layout,
       pages,
       urlPath: `/s/shop?slug=${slug}`,
@@ -3191,9 +3253,14 @@ app.post('/api/me/confirm-subscription', requireUser, async (c) => {
     const session = await response.json<any>()
     if (!response.ok) return c.json({ error: '無法驗證付款' }, 502)
 
+    const checkoutType = String(session.metadata?.arvix_checkout || '')
+    if (checkoutType !== 'subscription' && session.mode !== 'subscription') {
+      return c.json({ error: '此付款不是訂閱方案，無法開通帳號', code: 'NOT_SUBSCRIPTION' }, 400)
+    }
+
     const metaUser = Number(session.metadata?.user_id || session.client_reference_id || 0)
-    if (metaUser && metaUser !== payload.userId) {
-      return c.json({ error: '付款與帳號不符' }, 403)
+    if (!metaUser || metaUser !== payload.userId) {
+      return c.json({ error: '付款與帳號不符', code: 'USER_MISMATCH' }, 403)
     }
     const paid =
       session.payment_status === 'paid' ||

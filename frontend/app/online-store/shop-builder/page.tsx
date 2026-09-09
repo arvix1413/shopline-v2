@@ -69,17 +69,129 @@ const en: ShopBuilderCopy = {
   ctaTitle: 'Trusted by 600,000+ merchants worldwide',
 }
 
+const ko: ShopBuilderCopy = {
+  title: '자유롭게 디자인하세요\nSHOP Builder 페이지 에디터',
+  subtitle: '코딩 없이 드래그 앤 드롭으로 페이지를 만들고 세계적 수준의 브랜드 사이트를 완성하세요.',
+  cta: '무료 체험 시작',
+  sec1Title: 'SHOP Builder + 산업별 테마\n프리미엄 브랜드 사이트를 쉽게',
+  sec1Desc: '엄선된 레이아웃과 산업별 테마로 세련된 브랜드 룩을 빠르게 런칭하세요.',
+  sec1Items: ['코딩 없는 드래그 앤 드롭 편집', '산업 추천 테마 옵션', '프론트엔드 커스터마이즈용 Layout Engine'],
+  sec2Title: '스마트한 빌딩 블록\n15+ 인터랙티브 모듈',
+  sec2Desc: '풍부한 인터랙티브 모듈로 방문자의 참여와 체류 시간을 높입니다.',
+  sec2Items: ['SHOP Builder 전환 모듈', '스토어프론트에서 크라우드펀딩 페이지'],
+  sec3Title: '성능 향상\n사이트를 한 단계 더',
+  sec3Desc: '더 빠른 로딩과 더 높은 Google 점수로 롱테일 SEO 가치를 확보하세요.',
+  sec3Items: ['더 빠른 페이지 요소 로딩', '더 나은 Google 사이트 점수', '롱테일 트래픽을 위한 강력한 SEO'],
+  ctaTitle: '전 세계 60만+ 판매자가 ARVIX를 신뢰합니다',
+}
+
+const ja: ShopBuilderCopy = {
+  title: '自由にデザイン\nSHOP Builder ページエディター',
+  subtitle: 'コード不要 — ドラッグ＆ドロップでページを作り、一流のブランドサイトを実現。',
+  cta: '無料トライアルを開始',
+  sec1Title: 'SHOP Builder + 業界テーマ\nプレミアムなブランドサイトを簡単に',
+  sec1Desc: '厳選レイアウトと業界向けテーマで、洗練されたブランドルックをすばやく公開。',
+  sec1Items: ['コーディング不要のドラッグ＆ドロップ編集', '業界おすすめテーマオプション', 'フロントエンドカスタマイズ用 Layout Engine'],
+  sec2Title: 'スマートな構成パーツ\n15+ インタラクティブモジュール',
+  sec2Desc: '豊富なインタラクティブモジュールで滞在時間とエンゲージメントを向上。',
+  sec2Items: ['SHOP Builder コンバージョンモジュール', 'ストアフロントでクラウドファンディングページ'],
+  sec3Title: 'パフォーマンス向上\nサイトをさらに先へ',
+  sec3Desc: '高速読み込みと高い Google スコアでロングテール SEO の価値を解放。',
+  sec3Items: ['ページ要素の読み込み高速化', 'より良い Google サイトスコア', 'ロングテール流入向けの強力な SEO'],
+  ctaTitle: '世界中 60 万以上の加盟店が ARVIX を利用',
+}
+
+const vi: ShopBuilderCopy = {
+  title: 'Thiết kế tự do\nTrình chỉnh sửa trang SHOP Builder',
+  subtitle: 'Không cần code — kéo thả để dựng trang và tạo website thương hiệu đẳng cấp.',
+  cta: 'Bắt đầu dùng thử miễn phí',
+  sec1Title: 'SHOP Builder + theme ngành\nWebsite thương hiệu cao cấp thật dễ',
+  sec1Desc: 'Chọn layout chọn lọc và theme sẵn cho ngành để ra mắt vẻ ngoài chuyên nghiệp nhanh chóng.',
+  sec1Items: ['Chỉnh sửa kéo-thả, không cần code', 'Tùy chọn theme theo ngành', 'Layout Engine tùy biến front-end'],
+  sec2Title: 'Khối dựng thông minh\n15+ module tương tác',
+  sec2Desc: 'Module tương tác phong phú giữ khách tham gia và tăng thời gian trên trang.',
+  sec2Items: ['Module chuyển đổi SHOP Builder', 'Trang crowdfunding trên storefront'],
+  sec3Title: 'Tăng hiệu năng\nĐưa website lên tầm cao hơn',
+  sec3Desc: 'Tải nhanh hơn và điểm Google cao hơn mở khóa giá trị SEO đuôi dài.',
+  sec3Items: ['Tải phần tử trang nhanh hơn', 'Điểm Google tốt hơn', 'SEO mạnh cho traffic đuôi dài'],
+  ctaTitle: 'Được hơn 600.000 người bán trên thế giới tin dùng',
+}
+
+const es: ShopBuilderCopy = {
+  title: 'Diseña con libertad\nEditor de páginas SHOP Builder',
+  subtitle: 'Sin código — arrastra y suelta para crear páginas y un sitio de marca de primer nivel.',
+  cta: 'Empieza la prueba gratis',
+  sec1Title: 'SHOP Builder + temas de industria\nUn sitio de marca premium, fácil',
+  sec1Desc: 'Elige layouts curados y temas listos para tu industria y lanza un look pulido rápido.',
+  sec1Items: ['Edición arrastrar y soltar, sin código', 'Opciones de temas recomendadas por industria', 'Layout Engine para personalización front-end'],
+  sec2Title: 'Bloques inteligentes\n15+ módulos interactivos',
+  sec2Desc: 'Módulos interactivos ricos mantienen el engagement y aumentan el tiempo en sitio.',
+  sec2Items: ['Módulos de conversión SHOP Builder', 'Páginas de crowdfunding en tu escaparate'],
+  sec3Title: 'Impulso de rendimiento\nLleva tu sitio más lejos',
+  sec3Desc: 'Cargas más rápidas y mejores puntuaciones de Google desbloquean más SEO de cola larga.',
+  sec3Items: ['Carga más rápida de elementos', 'Mejores puntuaciones de Google', 'SEO fuerte para tráfico de cola larga'],
+  ctaTitle: 'Más de 600.000 comercios confían en ARVIX',
+}
+
+const pt: ShopBuilderCopy = {
+  title: 'Desenhe com liberdade\nEditor de páginas SHOP Builder',
+  subtitle: 'Sem código — arraste e solte para montar páginas e criar um site de marca de alto nível.',
+  cta: 'Começar teste grátis',
+  sec1Title: 'SHOP Builder + temas do setor\nSite de marca premium, fácil',
+  sec1Desc: 'Escolha layouts selecionados e temas prontos para o setor e lance um visual polido rápido.',
+  sec1Items: ['Edição arrastar e soltar, sem código', 'Opções de tema recomendadas por setor', 'Layout Engine para customização front-end'],
+  sec2Title: 'Blocos inteligentes\n15+ módulos interativos',
+  sec2Desc: 'Módulos interativos ricos mantêm o engajamento e aumentam o tempo no site.',
+  sec2Items: ['Módulos de conversão SHOP Builder', 'Páginas de crowdfunding na vitrine'],
+  sec3Title: 'Impulso de desempenho\nLeve seu site mais longe',
+  sec3Desc: 'Carregamentos mais rápidos e melhores notas do Google liberam mais SEO de cauda longa.',
+  sec3Items: ['Carregamento mais rápido de elementos', 'Melhores notas do Google', 'SEO forte para tráfego de cauda longa'],
+  ctaTitle: 'Mais de 600.000 lojistas confiam na ARVIX',
+}
+
+const de: ShopBuilderCopy = {
+  title: 'Frei gestalten\nSHOP Builder Seiten-Editor',
+  subtitle: 'Kein Code nötig — per Drag-and-Drop Seiten bauen und eine erstklassige Markenseite erstellen.',
+  cta: 'Kostenlos testen',
+  sec1Title: 'SHOP Builder + Branchenthemes\nPremium-Markenseite leicht gemacht',
+  sec1Desc: 'Wählen Sie kuratierte Layouts und branchenfertige Themes für einen polierten Markenauftritt.',
+  sec1Items: ['Drag-and-Drop ohne Coding', 'Branchenseitige Theme-Optionen', 'Layout Engine für Front-End-Anpassung'],
+  sec2Title: 'Smarte Bausteine\n15+ interaktive Module',
+  sec2Desc: 'Reichhaltige interaktive Module halten Besucher engagiert und verlängern die Verweildauer.',
+  sec2Items: ['SHOP Builder Conversion-Module', 'Crowdfunding-Seiten im Storefront'],
+  sec3Title: 'Performance-Boost\nBringen Sie Ihre Seite weiter',
+  sec3Desc: 'Schnellere Ladezeiten und bessere Google-Scores erschließen mehr Long-Tail-SEO.',
+  sec3Items: ['Schnellere Seiten-Element-Ladung', 'Bessere Google-Site-Scores', 'Starkes SEO für Long-Tail-Traffic'],
+  ctaTitle: 'Über 600.000 Händler weltweit vertrauen ARVIX',
+}
+
+const fr: ShopBuilderCopy = {
+  title: 'Concevez librement\nÉditeur de pages SHOP Builder',
+  subtitle: 'Sans code — glissez-déposez pour construire des pages et créer un site de marque de premier plan.',
+  cta: 'Démarrer l’essai gratuit',
+  sec1Title: 'SHOP Builder + thèmes sectoriels\nUn site de marque premium, en toute simplicité',
+  sec1Desc: 'Choisissez des mises en page soignées et des thèmes prêts pour votre secteur pour un look poli rapidement.',
+  sec1Items: ['Édition glisser-déposer, sans code', 'Options de thèmes recommandées par secteur', 'Layout Engine pour personnalisation front-end'],
+  sec2Title: 'Blocs intelligents\n15+ modules interactifs',
+  sec2Desc: 'Des modules interactifs riches maintiennent l’engagement et augmentent le temps passé sur le site.',
+  sec2Items: ['Modules de conversion SHOP Builder', 'Pages de crowdfunding sur votre vitrine'],
+  sec3Title: 'Boost de performance\nFaites aller plus loin votre site',
+  sec3Desc: 'Chargements plus rapides et meilleurs scores Google débloquent plus de SEO de longue traîne.',
+  sec3Items: ['Chargement plus rapide des éléments', 'Meilleurs scores Google', 'SEO fort pour le trafic de longue traîne'],
+  ctaTitle: 'Plus de 600 000 marchands font confiance à ARVIX',
+}
+
 const copy: Partial<Record<Locale, ShopBuilderCopy>> & { 'zh-TW': ShopBuilderCopy; en: ShopBuilderCopy } = {
   'zh-TW': zhTW,
   'zh-CN': zhCN,
   en,
-  ko: en,
-  ja: en,
-  vi: en,
-  es: en,
-  pt: en,
-  de: en,
-  fr: en,
+  ko,
+  ja,
+  vi,
+  es,
+  pt,
+  de,
+  fr,
 }
 
 export default function ShopBuilderPage() {

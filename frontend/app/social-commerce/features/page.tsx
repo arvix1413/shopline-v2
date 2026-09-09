@@ -54,17 +54,73 @@ const en: SocialFeaturesCopy = {
   cta: 'Start free trial',
 }
 
+const ko: SocialFeaturesCopy = {
+  title: '높은 참여, 빠른 전환 — 소셜 커머스',
+  subtitle: '라이브 쇼핑부터 채팅 결제까지 완전한 소셜 커머스 툴킷.',
+  tabs: ['소셜 스토어', '라이브 쇼핑', '채팅 쇼핑', '인박스 허브', '재고', '결제 & 물류', '주문', '고객', '프로모션', '마케팅', '분석', '운영', '광고 트래픽'],
+  ctaTitle: '전 세계 60만+ 판매자가 ARVIX를 신뢰합니다',
+  cta: '무료 체험 시작',
+}
+
+const ja: SocialFeaturesCopy = {
+  title: '高いエンゲージメント、速いコンバージョン — ソーシャルコマース',
+  subtitle: 'ライブショッピングからチャット決済まで、フルのソーシャルコマースツールキット。',
+  tabs: ['ソーシャルストア', 'ライブショッピング', 'チャットショッピング', '受信箱ハブ', '在庫', '決済＆物流', '注文', '顧客', 'プロモーション', 'マーケティング', '分析', '運営', '広告流入'],
+  ctaTitle: '世界中 60 万以上の加盟店が ARVIX を利用',
+  cta: '無料トライアルを開始',
+}
+
+const vi: SocialFeaturesCopy = {
+  title: 'Tương tác cao, chuyển đổi nhanh — thương mại xã hội',
+  subtitle: 'Bộ công cụ thương mại xã hội đầy đủ từ live shopping đến thanh toán qua chat.',
+  tabs: ['Cửa hàng social', 'Live shopping', 'Chat shopping', 'Hub hộp thư', 'Tồn kho', 'Thanh toán & logistics', 'Đơn hàng', 'Khách hàng', 'Khuyến mãi', 'Marketing', 'Phân tích', 'Vận hành', 'Traffic quảng cáo'],
+  ctaTitle: 'Được hơn 600.000 người bán trên thế giới tin dùng',
+  cta: 'Bắt đầu dùng thử miễn phí',
+}
+
+const es: SocialFeaturesCopy = {
+  title: 'Alto engagement, conversión rápida — comercio social',
+  subtitle: 'Kit completo de comercio social desde live shopping hasta checkout por chat.',
+  tabs: ['Tienda social', 'Live shopping', 'Compra por chat', 'Hub de bandeja', 'Inventario', 'Pagos y logística', 'Pedidos', 'Clientes', 'Promociones', 'Marketing', 'Analítica', 'Operaciones', 'Tráfico de anuncios'],
+  ctaTitle: 'Más de 600.000 comercios confían en ARVIX',
+  cta: 'Empieza la prueba gratis',
+}
+
+const pt: SocialFeaturesCopy = {
+  title: 'Alto engajamento, conversão rápida — comércio social',
+  subtitle: 'Kit completo de comércio social do live shopping ao checkout por chat.',
+  tabs: ['Loja social', 'Live shopping', 'Compra por chat', 'Hub de inbox', 'Estoque', 'Pagamentos e logística', 'Pedidos', 'Clientes', 'Promoções', 'Marketing', 'Analytics', 'Operações', 'Tráfego de anúncios'],
+  ctaTitle: 'Mais de 600.000 lojistas confiam na ARVIX',
+  cta: 'Começar teste grátis',
+}
+
+const de: SocialFeaturesCopy = {
+  title: 'Hohes Engagement, schnelle Conversion — Social Commerce',
+  subtitle: 'Volles Social-Commerce-Toolkit von Live-Shopping bis Chat-Checkout.',
+  tabs: ['Social Store', 'Live-Shopping', 'Chat-Shopping', 'Inbox-Hub', 'Bestand', 'Zahlungen & Logistik', 'Bestellungen', 'Kunden', 'Aktionen', 'Marketing', 'Analytics', 'Betrieb', 'Anzeigen-Traffic'],
+  ctaTitle: 'Über 600.000 Händler weltweit vertrauen ARVIX',
+  cta: 'Kostenlos testen',
+}
+
+const fr: SocialFeaturesCopy = {
+  title: 'Engagement élevé, conversion rapide — commerce social',
+  subtitle: 'Boîte à outils complète de commerce social du live shopping au checkout par chat.',
+  tabs: ['Boutique sociale', 'Live shopping', 'Achat par chat', 'Hub messagerie', 'Stock', 'Paiements & logistique', 'Commandes', 'Clients', 'Promotions', 'Marketing', 'Analytique', 'Opérations', 'Trafic pub'],
+  ctaTitle: 'Plus de 600 000 marchands font confiance à ARVIX',
+  cta: 'Démarrer l’essai gratuit',
+}
+
 const copy: Partial<Record<Locale, SocialFeaturesCopy>> & { 'zh-TW': SocialFeaturesCopy; en: SocialFeaturesCopy } = {
   'zh-TW': zhTW,
   'zh-CN': zhCN,
   en,
-  ko: en,
-  ja: en,
-  vi: en,
-  es: en,
-  pt: en,
-  de: en,
-  fr: en,
+  ko,
+  ja,
+  vi,
+  es,
+  pt,
+  de,
+  fr,
 }
 
 export default function SocialCommerceFeaturesPage() {

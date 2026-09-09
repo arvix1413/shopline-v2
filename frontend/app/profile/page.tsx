@@ -53,17 +53,94 @@ const en: ProfileCopy = {
   logout: 'Log out',
 }
 
+const ko: ProfileCopy = {
+  backHome: '← 홈으로 돌아가기',
+  accountInfo: '계정 정보',
+  name: '이름',
+  role: '역할',
+  admin: '관리자',
+  user: '회원',
+  settings: '계정 설정',
+  logout: '로그아웃',
+}
+
+const ja: ProfileCopy = {
+  backHome: '← ホームに戻る',
+  accountInfo: 'アカウント情報',
+  name: '氏名',
+  role: '役割',
+  admin: '管理者',
+  user: 'メンバー',
+  settings: 'アカウント設定',
+  logout: 'ログアウト',
+}
+
+const vi: ProfileCopy = {
+  backHome: '← Về trang chủ',
+  accountInfo: 'Thông tin tài khoản',
+  name: 'Tên',
+  role: 'Vai trò',
+  admin: 'Quản trị viên',
+  user: 'Thành viên',
+  settings: 'Cài đặt tài khoản',
+  logout: 'Đăng xuất',
+}
+
+const es: ProfileCopy = {
+  backHome: '← Volver al inicio',
+  accountInfo: 'Información de la cuenta',
+  name: 'Nombre',
+  role: 'Rol',
+  admin: 'Administrador',
+  user: 'Miembro',
+  settings: 'Configuración de la cuenta',
+  logout: 'Cerrar sesión',
+}
+
+const pt: ProfileCopy = {
+  backHome: '← Voltar ao início',
+  accountInfo: 'Informações da conta',
+  name: 'Nome',
+  role: 'Função',
+  admin: 'Administrador',
+  user: 'Membro',
+  settings: 'Configurações da conta',
+  logout: 'Sair',
+}
+
+const de: ProfileCopy = {
+  backHome: '← Zurück zur Startseite',
+  accountInfo: 'Kontoinformationen',
+  name: 'Name',
+  role: 'Rolle',
+  admin: 'Administrator',
+  user: 'Mitglied',
+  settings: 'Kontoeinstellungen',
+  logout: 'Abmelden',
+}
+
+const fr: ProfileCopy = {
+  backHome: '← Retour à l’accueil',
+  accountInfo: 'Informations du compte',
+  name: 'Nom',
+  role: 'Rôle',
+  admin: 'Administrateur',
+  user: 'Membre',
+  settings: 'Paramètres du compte',
+  logout: 'Se déconnecter',
+}
+
 const copy: Partial<Record<Locale, ProfileCopy>> & { 'zh-TW': ProfileCopy; en: ProfileCopy } = {
   'zh-TW': zhTW,
   'zh-CN': zhCN,
   en,
-  ko: en,
-  ja: en,
-  vi: en,
-  es: en,
-  pt: en,
-  de: en,
-  fr: en,
+  ko,
+  ja,
+  vi,
+  es,
+  pt,
+  de,
+  fr,
 }
 
 export default function ProfilePage() {

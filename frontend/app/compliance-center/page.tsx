@@ -115,17 +115,242 @@ const en: ComplianceCopy = {
   cta: 'Start free trial',
 }
 
+const ko: ComplianceCopy = {
+  title: '신뢰와 인증',
+  subtitle: 'ARVIX는 판매자와 쇼퍼 데이터를 보호하는 국제 인증과 함께 안전한 커머스 플랫폼을 제공합니다',
+  modelTitle: 'ARVIX 공동 책임 모델',
+  modelDesc: 'ARVIX와 판매자가 플랫폼 보안 책임을 공유해 생태계를 안전하게 유지합니다',
+  sections: [
+    {
+      title: 'ARVIX 보안 책임',
+      items: ['인프라 보안과 가용성', '물리적 데이터센터 보호', '네트워크 보안과 DDoS 방어', '애플리케이션 보안 업데이트와 패치', '전송 중·저장 시 데이터 암호화'],
+    },
+    {
+      title: '판매자 보안 책임',
+      items: ['계정 비밀번호 위생', '적절한 직원 권한 설정', '고객 개인정보의 준수 처리', '서드파티 앱 보안 검토', '계정 접근 로그 정기 검토'],
+    },
+  ],
+  certTitle: '수상 및 인증',
+  certifications: [
+    { title: 'PCI-DSS 준수', desc: 'ARVIX Payments는 결제 거래 보안을 위해 PCI-DSS 표준을 충족합니다.' },
+    { title: 'CBPR 인증', desc: '국제 데이터 전송을 위한 APEC 국경 간 개인정보 규칙 인증.' },
+    { title: 'ISO/IEC 27001:2022', desc: 'ARVIX 통제를 위한 국제 정보보안 관리 인증.' },
+  ],
+  dataTitle: '데이터 처리 부속서',
+  dataItems: [
+    { title: 'ARVIX 데이터 처리 부속서', desc: 'GDPR 및 대만 PDPA 하에서 ARVIX가 개인정보를 처리·저장·보호하는 방식.' },
+    { title: '플랫폼 데이터 보안', desc: '무단 접근에 대비한 AES-256 저장 암호화와 정기 감사·침투 테스트.' },
+    { title: '보안 구성 & 운영', desc: '권한, MFA 및 기타 판매자 보안 통제 가이드.' },
+  ],
+  ctaTitle: '전 세계 60만+ 판매자가 신뢰합니다',
+  ctaSubtitle: '궁금한 점이 있나요? 보안 팀이 도와드릴 준비가 되어 있습니다',
+  cta: '무료 체험 시작',
+}
+
+const ja: ComplianceCopy = {
+  title: '信頼と認証',
+  subtitle: 'ARVIX は加盟店とショッパーのデータを守る国際認証とともに、安全なコマースプラットフォームを提供します',
+  modelTitle: 'ARVIX 共同責任モデル',
+  modelDesc: 'ARVIX と加盟店がプラットフォームセキュリティの責務を共有し、エコシステムを安全に保ちます',
+  sections: [
+    {
+      title: 'ARVIX のセキュリティ責任',
+      items: ['インフラのセキュリティと可用性', 'データセンターの物理的保護', 'ネットワークセキュリティと DDoS 防御', 'アプリケーションのセキュリティ更新とパッチ', '転送中・保管時のデータ暗号化'],
+    },
+    {
+      title: '加盟店のセキュリティ責任',
+      items: ['アカウントパスワードの衛生管理', '適切なスタッフ権限設定', '顧客個人データの準拠した取り扱い', 'サードパーティアプリのセキュリティレビュー', 'アカウントアクセスログの定期確認'],
+    },
+  ],
+  certTitle: '受賞と認証',
+  certifications: [
+    { title: 'PCI-DSS 準拠', desc: 'ARVIX Payments は決済取引の安全のため PCI-DSS 基準を満たします。' },
+    { title: 'CBPR 認証', desc: '国際データ転送向けの APEC 越境プライバシールール認証。' },
+    { title: 'ISO/IEC 27001:2022', desc: 'ARVIX の統制のための国際情報セキュリティ管理認証。' },
+  ],
+  dataTitle: 'データ処理補足条項',
+  dataItems: [
+    { title: 'ARVIX データ処理補足条項', desc: 'GDPR および台湾 PDPA のもとで ARVIX が個人データを処理・保管・保護する方法。' },
+    { title: 'プラットフォーム上のデータの安全性', desc: 'AES-256 保管時暗号化と、不正アクセスに対する定期監査・侵入テスト。' },
+    { title: 'セキュリティ設定と運用', desc: '権限、MFA、その他加盟店セキュリティ統制のガイド。' },
+  ],
+  ctaTitle: '世界中 60 万以上の加盟店が信頼',
+  ctaSubtitle: 'ご質問は？セキュリティチームがサポートします',
+  cta: '無料トライアルを開始',
+}
+
+const vi: ComplianceCopy = {
+  title: 'Tin cậy & chứng nhận',
+  subtitle: 'ARVIX cung cấp nền tảng thương mại an toàn với các chứng nhận quốc tế bảo vệ dữ liệu người bán và người mua',
+  modelTitle: 'Mô hình trách nhiệm chung ARVIX',
+  modelDesc: 'ARVIX và người bán chia sẻ trách nhiệm bảo mật nền tảng để giữ hệ sinh thái an toàn',
+  sections: [
+    {
+      title: 'Trách nhiệm bảo mật của ARVIX',
+      items: ['Bảo mật và tính sẵn sàng hạ tầng', 'Bảo vệ vật lý trung tâm dữ liệu', 'Bảo mật mạng và phòng thủ DDoS', 'Cập nhật và vá bảo mật ứng dụng', 'Mã hóa dữ liệu khi truyền và khi lưu'],
+    },
+    {
+      title: 'Trách nhiệm bảo mật của người bán',
+      items: ['Vệ sinh mật khẩu tài khoản', 'Thiết lập quyền nhân viên phù hợp', 'Xử lý dữ liệu cá nhân khách hàng đúng tuân thủ', 'Rà soát bảo mật ứng dụng bên thứ ba', 'Định kỳ xem nhật ký truy cập tài khoản'],
+    },
+  ],
+  certTitle: 'Giải thưởng & chứng nhận',
+  certifications: [
+    { title: 'Tuân thủ PCI-DSS', desc: 'ARVIX Payments đáp ứng tiêu chuẩn PCI-DSS để giữ giao dịch thanh toán an toàn.' },
+    { title: 'Chứng nhận CBPR', desc: 'Chứng nhận Quy tắc quyền riêng tư xuyên biên giới APEC cho truyền dữ liệu quốc tế.' },
+    { title: 'ISO/IEC 27001:2022', desc: 'Chứng nhận quản lý bảo mật thông tin quốc tế cho kiểm soát ARVIX.' },
+  ],
+  dataTitle: 'Phụ lục xử lý dữ liệu',
+  dataItems: [
+    { title: 'Phụ lục xử lý dữ liệu ARVIX', desc: 'Cách ARVIX xử lý, lưu trữ và bảo vệ dữ liệu cá nhân theo GDPR và PDPA Đài Loan.' },
+    { title: 'Bảo mật dữ liệu trên nền tảng', desc: 'Mã hóa AES-256 khi lưu kèm kiểm toán và kiểm thử xâm nhập định kỳ chống truy cập trái phép.' },
+    { title: 'Cấu hình & vận hành bảo mật', desc: 'Hướng dẫn về quyền, MFA và các kiểm soát bảo mật khác cho người bán.' },
+  ],
+  ctaTitle: 'Được hơn 600.000 người bán trên thế giới tin dùng',
+  ctaSubtitle: 'Có câu hỏi? Đội bảo mật của chúng tôi sẵn sàng hỗ trợ',
+  cta: 'Bắt đầu dùng thử miễn phí',
+}
+
+const es: ComplianceCopy = {
+  title: 'Confianza y certificaciones',
+  subtitle: 'ARVIX ofrece una plataforma de comercio segura con certificaciones internacionales que protegen los datos de comercios y compradores',
+  modelTitle: 'Modelo de responsabilidad compartida ARVIX',
+  modelDesc: 'ARVIX y los comercios comparten deberes de seguridad de la plataforma para mantener el ecosistema seguro',
+  sections: [
+    {
+      title: 'Responsabilidades de seguridad de ARVIX',
+      items: ['Seguridad y disponibilidad de la infraestructura', 'Protección física del centro de datos', 'Seguridad de red y defensa DDoS', 'Actualizaciones y parches de seguridad de aplicaciones', 'Datos cifrados en tránsito y en reposo'],
+    },
+    {
+      title: 'Responsabilidades de seguridad del comercio',
+      items: ['Higiene de contraseñas de cuenta', 'Configuración adecuada de permisos del personal', 'Manejo conforme de datos personales de clientes', 'Revisión de seguridad de apps de terceros', 'Revisión regular de registros de acceso a cuentas'],
+    },
+  ],
+  certTitle: 'Premios y certificaciones',
+  certifications: [
+    { title: 'Cumplimiento PCI-DSS', desc: 'ARVIX Payments cumple estándares PCI-DSS para mantener seguras las transacciones de pago.' },
+    { title: 'Certificación CBPR', desc: 'Certificación de Reglas de Privacidad Transfronteriza APEC para transferencias internacionales de datos.' },
+    { title: 'ISO/IEC 27001:2022', desc: 'Certificación internacional de gestión de seguridad de la información para controles ARVIX.' },
+  ],
+  dataTitle: 'Anexo de procesamiento de datos',
+  dataItems: [
+    { title: 'Anexo de procesamiento de datos ARVIX', desc: 'Cómo ARVIX procesa, almacena y protege datos personales bajo GDPR y PDPA de Taiwán.' },
+    { title: 'Seguridad de los datos en la plataforma', desc: 'Cifrado AES-256 en reposo con auditorías y pruebas de penetración regulares contra acceso no autorizado.' },
+    { title: 'Configuración y operaciones de seguridad', desc: 'Guías de permisos, MFA y otros controles de seguridad del comercio.' },
+  ],
+  ctaTitle: 'Más de 600.000 comercios confían en ARVIX',
+  ctaSubtitle: '¿Preguntas? Nuestro equipo de seguridad está listo para ayudar',
+  cta: 'Empezar prueba gratis',
+}
+
+const pt: ComplianceCopy = {
+  title: 'Confiança e certificações',
+  subtitle: 'A ARVIX oferece uma plataforma de comércio segura com certificações internacionais que protegem dados de comerciantes e compradores',
+  modelTitle: 'Modelo de responsabilidade compartilhada ARVIX',
+  modelDesc: 'ARVIX e comerciantes compartilham deveres de segurança da plataforma para manter o ecossistema seguro',
+  sections: [
+    {
+      title: 'Responsabilidades de segurança da ARVIX',
+      items: ['Segurança e disponibilidade da infraestrutura', 'Proteção física do data center', 'Segurança de rede e defesa DDoS', 'Atualizações e patches de segurança de aplicações', 'Dados criptografados em trânsito e em repouso'],
+    },
+    {
+      title: 'Responsabilidades de segurança do comerciante',
+      items: ['Higiene de senhas de conta', 'Configuração adequada de permissões da equipe', 'Tratamento conforme de dados pessoais de clientes', 'Revisão de segurança de apps de terceiros', 'Revisão regular de logs de acesso à conta'],
+    },
+  ],
+  certTitle: 'Prêmios e certificações',
+  certifications: [
+    { title: 'Conformidade PCI-DSS', desc: 'O ARVIX Payments atende padrões PCI-DSS para manter transações de pagamento seguras.' },
+    { title: 'Certificação CBPR', desc: 'Certificação das Regras de Privacidade Transfronteiriça APEC para transferências internacionais de dados.' },
+    { title: 'ISO/IEC 27001:2022', desc: 'Certificação internacional de gestão de segurança da informação para controles ARVIX.' },
+  ],
+  dataTitle: 'Adendo de processamento de dados',
+  dataItems: [
+    { title: 'Adendo de processamento de dados ARVIX', desc: 'Como a ARVIX processa, armazena e protege dados pessoais sob GDPR e PDPA de Taiwan.' },
+    { title: 'Segurança dos dados na plataforma', desc: 'Criptografia AES-256 em repouso com auditorias e testes de penetração regulares contra acesso não autorizado.' },
+    { title: 'Configuração e operações de segurança', desc: 'Guias de permissões, MFA e outros controles de segurança do comerciante.' },
+  ],
+  ctaTitle: 'Mais de 600.000 comerciantes confiam na ARVIX',
+  ctaSubtitle: 'Dúvidas? Nossa equipe de segurança está pronta para ajudar',
+  cta: 'Começar teste grátis',
+}
+
+const de: ComplianceCopy = {
+  title: 'Vertrauen & Zertifizierungen',
+  subtitle: 'ARVIX liefert eine sichere Commerce-Plattform mit internationalen Zertifizierungen, die Händler- und Shopper-Daten schützen',
+  modelTitle: 'ARVIX Shared-Responsibility-Modell',
+  modelDesc: 'ARVIX und Händler teilen Plattform-Sicherheitspflichten, um das Ökosystem sicher zu halten',
+  sections: [
+    {
+      title: 'Sicherheitsverantwortung von ARVIX',
+      items: ['Infrastruktursicherheit und Verfügbarkeit', 'Physischer Rechenzentrumsschutz', 'Netzwerksicherheit und DDoS-Abwehr', 'Anwendungssicherheitsupdates und Patches', 'Verschlüsselte Daten in Transit und at Rest'],
+    },
+    {
+      title: 'Sicherheitsverantwortung des Händlers',
+      items: ['Konto-Passwort-Hygiene', 'Angemessene Mitarbeiterberechtigungen', 'Konforme Verarbeitung von Kundendaten', 'Sicherheitsprüfung von Drittanbieter-Apps', 'Regelmäßige Prüfung von Kontozugriffsprotokollen'],
+    },
+  ],
+  certTitle: 'Auszeichnungen & Zertifizierungen',
+  certifications: [
+    { title: 'PCI-DSS-Konformität', desc: 'ARVIX Payments erfüllt PCI-DSS-Standards, um Zahlungstransaktionen sicher zu halten.' },
+    { title: 'CBPR-Zertifizierung', desc: 'APEC Cross-Border Privacy Rules-Zertifizierung für internationale Datenübertragungen.' },
+    { title: 'ISO/IEC 27001:2022', desc: 'Internationale Informationssicherheitsmanagement-Zertifizierung für ARVIX-Kontrollen.' },
+  ],
+  dataTitle: 'Datenverarbeitungszusatz',
+  dataItems: [
+    { title: 'ARVIX-Datenverarbeitungszusatz', desc: 'Wie ARVIX personenbezogene Daten unter GDPR und Taiwan-PDPA verarbeitet, speichert und schützt.' },
+    { title: 'Sicherheit der Daten auf der Plattform', desc: 'AES-256-Verschlüsselung at Rest mit regelmäßigen Audits und Penetrationstests gegen unbefugten Zugriff.' },
+    { title: 'Sicherheitskonfiguration & Betrieb', desc: 'Leitfäden für Berechtigungen, MFA und weitere Händler-Sicherheitskontrollen.' },
+  ],
+  ctaTitle: 'Über 600.000 Händler weltweit vertrauen ARVIX',
+  ctaSubtitle: 'Fragen? Unser Sicherheitsteam hilft gerne',
+  cta: 'Kostenlose Testphase starten',
+}
+
+const fr: ComplianceCopy = {
+  title: 'Confiance et certifications',
+  subtitle: 'ARVIX propose une plateforme commerce sécurisée avec des certifications internationales qui protègent les données marchands et acheteurs',
+  modelTitle: 'Modèle de responsabilité partagée ARVIX',
+  modelDesc: 'ARVIX et les marchands partagent les devoirs de sécurité de la plateforme pour garder l’écosystème sûr',
+  sections: [
+    {
+      title: 'Responsabilités de sécurité d’ARVIX',
+      items: ['Sécurité et disponibilité de l’infrastructure', 'Protection physique du data center', 'Sécurité réseau et défense DDoS', 'Mises à jour et correctifs de sécurité applicative', 'Données chiffrées en transit et au repos'],
+    },
+    {
+      title: 'Responsabilités de sécurité du marchand',
+      items: ['Hygiène des mots de passe de compte', 'Paramétrage approprié des permissions du personnel', 'Traitement conforme des données personnelles clients', 'Revue de sécurité des apps tierces', 'Revue régulière des journaux d’accès aux comptes'],
+    },
+  ],
+  certTitle: 'Récompenses et certifications',
+  certifications: [
+    { title: 'Conformité PCI-DSS', desc: 'ARVIX Payments répond aux normes PCI-DSS pour sécuriser les transactions de paiement.' },
+    { title: 'Certification CBPR', desc: 'Certification APEC Cross-Border Privacy Rules pour les transferts internationaux de données.' },
+    { title: 'ISO/IEC 27001:2022', desc: 'Certification internationale de management de la sécurité de l’information pour les contrôles ARVIX.' },
+  ],
+  dataTitle: 'Addendum de traitement des données',
+  dataItems: [
+    { title: 'Addendum de traitement des données ARVIX', desc: 'Comment ARVIX traite, stocke et protège les données personnelles sous GDPR et PDPA de Taïwan.' },
+    { title: 'Sécurité des données sur la plateforme', desc: 'Chiffrement AES-256 au repos avec audits et tests d’intrusion réguliers contre l’accès non autorisé.' },
+    { title: 'Configuration et ops de sécurité', desc: 'Guides pour permissions, MFA et autres contrôles de sécurité marchands.' },
+  ],
+  ctaTitle: 'Plus de 600 000 marchands font confiance à ARVIX',
+  ctaSubtitle: 'Des questions ? Notre équipe sécurité est prête à aider',
+  cta: 'Démarrer l’essai gratuit',
+}
+
+
 const copy: Partial<Record<Locale, ComplianceCopy>> & { 'zh-TW': ComplianceCopy; en: ComplianceCopy } = {
   'zh-TW': zhTW,
   'zh-CN': zhCN,
   en,
-  ko: en,
-  ja: en,
-  vi: en,
-  es: en,
-  pt: en,
-  de: en,
-  fr: en,
+  ko,
+  ja,
+  vi,
+  es,
+  pt,
+  de,
+  fr,
 }
 
 export default function ComplianceCenterPage() {

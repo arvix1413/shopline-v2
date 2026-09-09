@@ -8,21 +8,18 @@ import StoreLayoutView from '../../components/StoreLayoutView'
 import { parseStoreLayout, type StoreLayout } from '../../../lib/storeLayout'
 import { findStorePage, parseStorePages, type StorePage } from '../../../lib/storePages'
 import { storeHomeUrl } from '../../../lib/storefrontUrl'
+import { useI18n } from '../../../contexts/I18nContext'
+import { getCheckoutCopy } from '../../../lib/checkoutCopy'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://shopline-backend.arvix1413.workers.dev'
 
-/** 7-11／貨到付款綁商店出貨市場（TW），與買家語系、所在地無關 */
-function isTaiwanStoreMarket(market?: string | null) {
-  return String(market || 'TW').trim().toUpperCase() !== 'INTL'
-}
-
+/** 出貨選項跟語系無關；超商取貨是選配物流 */
 type Store = {
   id: number
   slug: string
   name: string
   tagline?: string
   status: string
-  market?: string
   urlPath: string
   suspended?: boolean
   suspendReason?: string | null
@@ -55,8 +52,16 @@ type CartItem = {
   }
 }
 
-function formatPrice(n: number) {
-  return `NT$ ${Math.round(n).toLocaleString('zh-TW')}`
+function formatPrice(n: number, currency: 'TWD' | 'USD' = 'TWD') {
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: 'currency',
+      currency,
+      maximumFractionDigits: currency === 'TWD' ? 0 : 2,
+    }).format(n)
+  } catch {
+    return currency === 'USD' ? `$${n.toLocaleString()}` : `NT$ ${Math.round(n).toLocaleString('zh-TW')}`
+  }
 }
 
 function parseListPrice(description?: string): number | null {
@@ -70,6 +75,9 @@ function parseListPrice(description?: string): number | null {
 function getCartSessionKey(storeSlug: string) {
   return `arvix_cart_${storeSlug}`
 }
+
+/** Internal category sentinel — never show this string; always localize the label. */
+const ALL_CATEGORY = '__all__'
 
 function ensureCartSession(storeSlug: string) {
   const key = getCartSessionKey(storeSlug)
@@ -108,14 +116,16 @@ export default function BrandStoreClient({
   pageKey?: string
 }) {
   const params = useParams<{ slug: string }>()
+  const { locale } = useI18n()
+  const cx = getCheckoutCopy(locale)
   const [slug, setSlug] = useState('')
   const [store, setStore] = useState<Store | null>(null)
-  const taiwanMarket = Boolean(store && isTaiwanStoreMarket(store.market))
+  const priceCurrency: 'TWD' | 'USD' = 'TWD'
   const [pages, setPages] = useState<StorePage[]>([])
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [missing, setMissing] = useState(false)
-  const [category, setCategory] = useState('全部')
+  const [category, setCategory] = useState(ALL_CATEGORY)
   const [selected, setSelected] = useState<Product | null>(null)
   const [cartOpen, setCartOpen] = useState(false)
   const [cartItems, setCartItems] = useState<CartItem[]>([])
@@ -142,20 +152,14 @@ export default function BrandStoreClient({
   })
   const [ecpayMapReady, setEcpayMapReady] = useState(false)
 
-  // 非台灣出貨市場強制宅配，不出現 7-11／貨到付款（與買家語系／所在地無關）
+  // 超商取貨為選配：有開綠界地圖就可用；沒開也可選並手填門市
   useEffect(() => {
-    if (!taiwanMarket) {
-      setForm((f) => (f.shippingMethod === 'home' ? f : { ...f, shippingMethod: 'home' }))
-    }
-  }, [taiwanMarket])
-
-  useEffect(() => {
-    if (!taiwanMarket || !slug) return
+    if (!slug) return
     fetch(`${API}/api/logistics/seven/status?slug=${encodeURIComponent(slug)}`)
       .then((r) => r.json())
       .then((d) => setEcpayMapReady(Boolean(d.configured)))
       .catch(() => setEcpayMapReady(false))
-  }, [taiwanMarket, slug])
+  }, [slug])
 
   useEffect(() => {
     const q = new URLSearchParams(window.location.search)
@@ -178,7 +182,48 @@ export default function BrandStoreClient({
     const paid = q.get('paid')
     const orderId = q.get('order')
     if (paid === '1' && orderId) {
-      setPaidNotice({ orderId, method: q.get('session_id') ? 'stripe' : 'cod' })
+      setPaidNotice({
+        orderId,
+        method: q.get('session_id') ? 'stripe' : 'cod',
+        shipmentCode: q.get('shipment') || undefined,
+      })
+      // Stripe webhook may create shipment code async — poll briefly
+      const slugForReceipt = (fromQuery || '').toLowerCase() || (() => {
+        const parts = window.location.pathname.split('/').filter(Boolean)
+        const fromPath = parts[0] === 's' ? parts[1] : parts[0]
+        return fromPath && fromPath !== 'shop' ? fromPath.toLowerCase() : ''
+      })()
+      const initialShipment = q.get('shipment') || ''
+      if (!initialShipment && slugForReceipt) {
+        let tries = 0
+        const poll = async () => {
+          tries += 1
+          try {
+            const res = await fetch(
+              `${API}/api/store-checkout/receipt?order=${encodeURIComponent(orderId)}&slug=${encodeURIComponent(slugForReceipt)}`
+            )
+            if (res.ok) {
+              const data = await res.json()
+              if (data.shipmentCode) {
+                setPaidNotice((prev) =>
+                  prev && prev.orderId === orderId
+                    ? { ...prev, shipmentCode: data.shipmentCode, method: data.method || prev.method }
+                    : prev
+                )
+                return
+              }
+            }
+          } catch {
+            /* ignore */
+          }
+          if (tries < 8) setTimeout(poll, 1500)
+        }
+        setTimeout(poll, 800)
+      }
+    }
+    if (q.get('checkout') === 'cancelled') {
+      setCheckoutError(cx.errCancelled)
+      setCartOpen(true)
     }
     const cvsId = q.get('cvs_id')
     const cvsName = q.get('cvs_name')
@@ -192,7 +237,7 @@ export default function BrandStoreClient({
         cvsStoreName: cvsName || f.cvsStoreName,
         cvsAddress: cvsAddr || f.cvsAddress,
         cvsCollection: (cvsId || cvsName || cvsAddr ? cvsCollection : f.cvsCollection) as 'Y' | 'N',
-        shippingAddress: [cvsName, cvsId ? `店號 ${cvsId}` : '', cvsAddr].filter(Boolean).join('／') || f.shippingAddress,
+        shippingAddress: [cvsName, cvsId ? `#${cvsId}` : '', cvsAddr].filter(Boolean).join('／') || f.shippingAddress,
       }))
       setCartOpen(true)
     }
@@ -258,7 +303,7 @@ export default function BrandStoreClient({
   const addToCart = async (product: Product) => {
     if (!sessionId) return
     if (store?.suspended) {
-      setCheckoutError('此商店試用已結束，暫時無法購買')
+      setCheckoutError(cx.trialEnded)
       return
     }
     setAdding(true)
@@ -271,14 +316,14 @@ export default function BrandStoreClient({
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
-        setCheckoutError(data.error || '加入購物車失敗')
+        setCheckoutError(mapApiError(data, cx.addFail))
         return
       }
       await refreshCart()
       setSelected(null)
       setCartOpen(true)
     } catch {
-      setCheckoutError('加入購物車失敗，請稍後再試')
+      setCheckoutError(cx.addFail)
     } finally {
       setAdding(false)
     }
@@ -299,15 +344,67 @@ export default function BrandStoreClient({
     if (res.ok) await refreshCart()
   }
 
+  const mapApiError = (data: { code?: string }, fallback: string) => {
+    switch (data.code) {
+      case 'EMPTY_CART':
+        return cx.empty
+      case 'STORE_SUSPENDED':
+      case 'TRIAL_ENDED':
+        return cx.trialEnded
+      case 'COD_ONLY_SEVEN':
+        return cx.errCodOnly
+      case 'COD_NOT_SUPPORTED':
+        return cx.errNoCod
+      case 'NAME_REQUIRED':
+        return cx.errName
+      case 'PHONE_REQUIRED':
+        return cx.errPhone
+      case 'ADDR_REQUIRED':
+        return cx.errAddr
+      case 'CVS_REQUIRED':
+        return cx.errCvsRequired
+      case 'CVS_MAP_REQUIRED':
+        return cx.errMapRequired
+      case 'CVS_COLLECTION_MISMATCH':
+        return cx.errCollectionMismatch
+      case 'CVS_AMOUNT_LIMIT':
+        return cx.errAmountLimit
+      case 'OUT_OF_STOCK':
+        return cx.errStock
+      case 'STRIPE_UNAVAILABLE':
+        return cx.errStripeUnavailable
+      case 'CART_ADD_FAILED':
+      case 'NOT_FOUND':
+        return cx.addFail
+      default:
+        // Never surface raw backend language to shoppers
+        return fallback
+    }
+  }
+
   const checkout = async (method: 'stripe' | 'cod') => {
     if (!store || !sessionId) return
-    const shippingMethod = taiwanMarket ? form.shippingMethod : 'home'
-    if (method === 'cod' && (!taiwanMarket || shippingMethod !== 'seven_eleven')) {
-      setCheckoutError(taiwanMarket ? '貨到付款僅限 7-11 取貨' : '此市場不支援貨到付款')
+    if (store.suspended) {
+      setCheckoutError(cx.trialEnded)
+      return
+    }
+    const shippingMethod = form.shippingMethod
+    if (method === 'cod' && shippingMethod !== 'seven_eleven') {
+      setCheckoutError(cx.errCodOnly)
       return
     }
     if (!form.customerName.trim() || form.customerName.trim().length < 2) {
-      setCheckoutError('請填寫收貨人全名')
+      setCheckoutError(cx.errName)
+      return
+    }
+    if (!form.customerPhone.trim()) {
+      setCheckoutError(cx.errPhone)
+      return
+    }
+    if (!form.shippingAddress.trim()) {
+      setCheckoutError(
+        shippingMethod === 'seven_eleven' ? cx.errCvsRequired : cx.errAddr
+      )
       return
     }
     setCheckingOut(true)
@@ -321,7 +418,6 @@ export default function BrandStoreClient({
           storeSlug: store.slug,
           method,
           shippingMethod,
-          market: taiwanMarket ? 'TW' : 'INTL',
           customerName: form.customerName,
           customerPhone: form.customerPhone,
           customerEmail: form.customerEmail,
@@ -334,15 +430,11 @@ export default function BrandStoreClient({
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
-        setCheckoutError(data.error || '結帳失敗')
+        setCheckoutError(mapApiError(data, cx.checkoutFail))
         return
       }
       if (method === 'stripe' && data.url) {
         window.location.href = data.url
-        return
-      }
-      if (data.redirectUrl) {
-        window.location.href = data.redirectUrl
         return
       }
       setPaidNotice({
@@ -352,8 +444,13 @@ export default function BrandStoreClient({
       })
       setCartOpen(false)
       await refreshCart()
+      if (data.redirectUrl) {
+        const u = new URL(data.redirectUrl, window.location.origin)
+        if (data.shipmentCode) u.searchParams.set('shipment', String(data.shipmentCode))
+        window.history.replaceState({}, '', `${u.pathname}${u.search}`)
+      }
     } catch {
-      setCheckoutError('結帳失敗，請稍後再試')
+      setCheckoutError(cx.checkoutFail)
     } finally {
       setCheckingOut(false)
     }
@@ -362,7 +459,7 @@ export default function BrandStoreClient({
   if (loading) {
     return (
       <main className="min-h-screen flex items-center justify-center" style={{ background: '#FAFBFA' }}>
-        <div className="text-sm tracking-wide" style={{ color: '#6B7280' }}>載入店舖中...</div>
+        <div className="text-sm tracking-wide" style={{ color: '#6B7280' }}>{cx.loadingStore}</div>
       </main>
     )
   }
@@ -371,12 +468,12 @@ export default function BrandStoreClient({
     return (
       <main className="min-h-screen flex flex-col items-center justify-center px-6" style={{ background: '#FAFBFA' }}>
         <p className="font-brand text-2xl font-extrabold brand-text mb-4">ARVIX</p>
-        <h1 className="text-2xl font-black mb-2" style={{ color: '#111827' }}>找不到這間店</h1>
+        <h1 className="text-2xl font-black mb-2" style={{ color: '#111827' }}>{cx.storeNotFound}</h1>
         <p className="text-sm mb-8" style={{ color: '#6B7280' }}>
-          網址 /{slug || '...'} 尚未開通，或品牌名稱有誤。
+          {cx.storeNotFoundTip} /{slug || '...'}
         </p>
         <Link href="/register" className="btn-brand btn-glow px-6 py-3 rounded-full text-sm font-bold">
-          免費開一間自己的店
+          {cx.openStoreCta}
         </Link>
       </main>
     )
@@ -390,16 +487,18 @@ export default function BrandStoreClient({
 
       {paidNotice && (
         <div className="px-5 py-3 text-sm text-center" style={{ background: '#ECFDF5', color: '#065F46' }}>
-          訂單 #{paidNotice.orderId} 已成立
-          {paidNotice.method === 'stripe' ? '（信用卡付款）' : '（貨到付款）'}。感謝購買！
-          {paidNotice.shipmentCode ? ` 店家寄件代碼已產生。` : ''}
-          <button type="button" className="ml-3 underline" onClick={() => setPaidNotice(null)}>關閉</button>
+          {cx.paidPrefix} #{paidNotice.orderId} {cx.paidThanks}
+          {paidNotice.method === 'stripe' ? cx.paidCard : cx.paidCod}
+          {paidNotice.shipmentCode
+            ? ` ${cx.paidShipment.replace('{code}', paidNotice.shipmentCode)}`
+            : ''}
+          <button type="button" className="ml-3 underline" onClick={() => setPaidNotice(null)}>{cx.close}</button>
         </div>
       )}
 
       {store.suspended && (
         <div className="px-5 py-3 text-sm text-center" style={{ background: '#FEF2F2', color: '#B91C1C' }}>
-          此商店試用已結束，暫時無法下單。店家開通方案後即可恢復購買。
+          {cx.suspended}
         </div>
       )}
 
@@ -419,12 +518,12 @@ export default function BrandStoreClient({
         >
           {view === 'products' && (
             <section className="max-w-6xl mx-auto px-5 py-12">
-              <h1 className="text-3xl font-bold mb-2">全部商品</h1>
+              <h1 className="text-3xl font-bold mb-2">{cx.catalogTitle}</h1>
               <p className="text-sm mb-8" style={{ color: layout.theme.muted }}>
-                共 {products.length} 件商品
+                {cx.catalogCount.replace('{n}', String(products.length))}
               </p>
               <div className="flex flex-wrap gap-2 mb-8">
-                {['全部', ...Array.from(new Set(products.map((p) => p.category).filter(Boolean) as string[]))].map((c) => (
+                {[ALL_CATEGORY, ...Array.from(new Set(products.map((p) => p.category).filter(Boolean) as string[]))].map((c) => (
                   <button
                     key={c}
                     type="button"
@@ -436,12 +535,12 @@ export default function BrandStoreClient({
                       color: category === c ? layout.theme.background : layout.theme.text,
                     }}
                   >
-                    {c}
+                    {c === ALL_CATEGORY ? cx.allCategory : c}
                   </button>
                 ))}
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-                {(category === '全部' ? products : products.filter((p) => p.category === category)).map((p) => (
+                {(category === ALL_CATEGORY ? products : products.filter((p) => p.category === category)).map((p) => (
                   <button
                     key={p.id}
                     type="button"
@@ -456,12 +555,12 @@ export default function BrandStoreClient({
                       style={{ background: `${layout.theme.text}10` }}
                     />
                     <div className="text-sm font-semibold line-clamp-2 mb-1 group-hover:opacity-70">{p.name}</div>
-                    <div className="text-sm font-bold">{formatPrice(p.price)}</div>
+                    <div className="text-sm font-bold">{formatPrice(p.price, priceCurrency)}</div>
                   </button>
                 ))}
               </div>
               {products.length === 0 && (
-                <p className="text-sm text-center py-16" style={{ color: layout.theme.muted }}>尚未上架商品</p>
+                <p className="text-sm text-center py-16" style={{ color: layout.theme.muted }}>{cx.noProducts}</p>
               )}
             </section>
           )}
@@ -471,7 +570,7 @@ export default function BrandStoreClient({
               {activePage ? (
                 <>
                   <p className="text-xs font-semibold tracking-widest mb-3" style={{ color: layout.theme.muted }}>
-                    <a href={storeHomeUrl(store.slug)} className="hover:opacity-70">首頁</a>
+                    <a href={storeHomeUrl(store.slug)} className="hover:opacity-70">{cx.homeNav}</a>
                     <span className="mx-2">/</span>
                     {activePage.title}
                   </p>
@@ -482,9 +581,9 @@ export default function BrandStoreClient({
                 </>
               ) : (
                 <>
-                  <h1 className="text-2xl font-bold mb-3">找不到此頁面</h1>
-                  <p className="text-sm mb-6" style={{ color: layout.theme.muted }}>此頁尚未發佈或不存在。</p>
-                  <a href={storeHomeUrl(store.slug)} className="text-sm font-semibold underline">回首頁</a>
+                  <h1 className="text-2xl font-bold mb-3">{cx.pageNotFound}</h1>
+                  <p className="text-sm mb-6" style={{ color: layout.theme.muted }}>{cx.pageNotFoundTip}</p>
+                  <a href={storeHomeUrl(store.slug)} className="text-sm font-semibold underline">{cx.backHome}</a>
                 </>
               )}
             </section>
@@ -509,15 +608,15 @@ export default function BrandStoreClient({
             )}
             <div className="p-6">
               <div className="text-[11px] font-semibold tracking-wide mb-2" style={{ color: '#3F6B55' }}>
-                {selected.category || '商品'}
+                {selected.category || cx.productFallback}
               </div>
               <h3 className="text-xl font-bold mb-3">{selected.name}</h3>
               <div className="flex items-baseline gap-2 mb-4">
-                <span className="text-lg font-bold">{formatPrice(selected.price)}</span>
+                <span className="text-lg font-bold">{formatPrice(selected.price, priceCurrency)}</span>
                 {(() => {
                   const list = parseListPrice(selected.description)
                   return list && list > selected.price ? (
-                    <span className="text-sm line-through" style={{ color: '#9CA3AF' }}>{formatPrice(list)}</span>
+                    <span className="text-sm line-through" style={{ color: '#9CA3AF' }}>{formatPrice(list, priceCurrency)}</span>
                   ) : null
                 })()}
               </div>
@@ -534,7 +633,7 @@ export default function BrandStoreClient({
                 style={{ background: '#111827', color: '#FAFBFA' }}
                 onClick={() => addToCart(selected)}
               >
-                {adding ? '加入中...' : '加入購物車'}
+                {adding ? cx.adding : cx.addToCart}
               </button>
             </div>
           </div>
@@ -553,13 +652,13 @@ export default function BrandStoreClient({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="sticky top-0 flex items-center justify-between px-5 h-16 border-b" style={{ borderColor: 'rgba(17,24,39,0.08)', background: '#FAFBFA' }}>
-              <h2 className="font-bold text-lg">購物車</h2>
-              <button type="button" className="text-sm" style={{ color: '#6B7280' }} onClick={() => setCartOpen(false)}>關閉</button>
+              <h2 className="font-bold text-lg">{cx.cart}</h2>
+              <button type="button" className="text-sm" style={{ color: '#6B7280' }} onClick={() => setCartOpen(false)}>{cx.close}</button>
             </div>
 
             <div className="p-5 space-y-4">
               {cartItems.length === 0 ? (
-                <p className="text-sm py-10 text-center" style={{ color: '#6B7280' }}>購物車是空的</p>
+                <p className="text-sm py-10 text-center" style={{ color: '#6B7280' }}>{cx.empty}</p>
               ) : (
                 cartItems.map((item) => (
                   <div key={item.id} className="flex gap-3">
@@ -572,12 +671,12 @@ export default function BrandStoreClient({
                     />
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-semibold line-clamp-2 mb-1">{item.product.name}</div>
-                      <div className="text-sm mb-2">{formatPrice(item.product.price)}</div>
+                      <div className="text-sm mb-2">{formatPrice(item.product.price, priceCurrency)}</div>
                       <div className="flex items-center gap-2">
                         <button type="button" className="px-2 py-0.5 text-sm border" onClick={() => updateQty(item.id, item.quantity - 1)} disabled={item.quantity <= 1}>−</button>
                         <span className="text-sm w-6 text-center">{item.quantity}</span>
                         <button type="button" className="px-2 py-0.5 text-sm border" onClick={() => updateQty(item.id, item.quantity + 1)}>+</button>
-                        <button type="button" className="ml-auto text-xs" style={{ color: '#B91C1C' }} onClick={() => removeItem(item.id)}>移除</button>
+                        <button type="button" className="ml-auto text-xs" style={{ color: '#B91C1C' }} onClick={() => removeItem(item.id)}>{cx.remove}</button>
                       </div>
                     </div>
                   </div>
@@ -588,13 +687,12 @@ export default function BrandStoreClient({
                 <>
                   <div className="border-t pt-4" style={{ borderColor: 'rgba(17,24,39,0.08)' }}>
                     <div className="flex justify-between font-bold mb-4">
-                      <span>合計</span>
-                      <span>{formatPrice(cartTotal)}</span>
+                      <span>{cx.total}</span>
+                      <span>{formatPrice(cartTotal, priceCurrency)}</span>
                     </div>
                     <div className="space-y-3">
-                      {taiwanMarket ? (
-                        <div>
-                          <div className="text-xs font-semibold mb-2" style={{ color: '#4B5563' }}>配送方式</div>
+                      <div>
+                          <div className="text-xs font-semibold mb-2" style={{ color: '#4B5563' }}>{cx.shipping}</div>
                           <div className="grid grid-cols-2 gap-2">
                             <button
                               type="button"
@@ -606,7 +704,7 @@ export default function BrandStoreClient({
                               }
                               onClick={() => setForm((f) => ({ ...f, shippingMethod: 'seven_eleven' }))}
                             >
-                              7-11 取貨
+                              {cx.seven}
                             </button>
                             <button
                               type="button"
@@ -618,13 +716,11 @@ export default function BrandStoreClient({
                               }
                               onClick={() => setForm((f) => ({ ...f, shippingMethod: 'home' }))}
                             >
-                              宅配／其他
+                              {cx.home}
                             </button>
                           </div>
                           <p className="text-[11px] mt-2 leading-relaxed" style={{ color: '#9CA3AF' }}>
-                            {form.shippingMethod === 'seven_eleven'
-                              ? '7-11：用地圖選門市後可刷卡或貨到付款；店家會取得 ibon 寄件代碼。'
-                              : '宅配／其他：僅接受信用卡付款。'}
+                            {form.shippingMethod === 'seven_eleven' ? cx.sevenTip : cx.homeTip}
                           </p>
                           {form.shippingMethod === 'seven_eleven' && (
                             <div className="mt-3 space-y-2">
@@ -635,58 +731,50 @@ export default function BrandStoreClient({
                                     className="block w-full text-center px-3 py-2.5 text-sm font-bold text-white"
                                     style={{ background: '#5B5FF0' }}
                                   >
-                                    刷卡取貨：開啟地圖選門市
+                                    {cx.mapCard}
                                   </a>
                                   <a
                                     href={`${API}/api/logistics/ecpay/map?slug=${encodeURIComponent(store?.slug || slug)}&collection=Y&device=${typeof window !== 'undefined' && window.innerWidth < 768 ? 1 : 0}`}
                                     className="block w-full text-center px-3 py-2.5 text-sm font-bold"
                                     style={{ background: '#fff', border: '1px solid #5B5FF0', color: '#5B5FF0' }}
                                   >
-                                    貨到付款：開啟地圖選門市
+                                    {cx.mapCod}
                                   </a>
                                   <p className="text-[11px] leading-relaxed" style={{ color: '#9CA3AF' }}>
-                                    綠界規定：選店時的「是否代收」必須跟付款方式一致，請依上方按鈕分開選。
+                                    {cx.mapRule}
                                   </p>
                                 </>
                               ) : (
                                 <p className="text-[11px]" style={{ color: '#B45309' }}>
-                                  此商店尚未開通 7-11 電子地圖。店家請至後台「收款／物流」依說明向綠界申請並完成串接；開通前可暫時手填門市，但不會有正式寄件代碼。
+                                  {cx.mapNotReady}
                                 </p>
                               )}
                               {form.cvsStoreId && (
                                 <div className="text-xs px-3 py-2 rounded" style={{ background: '#ECFDF5', color: '#065F46' }}>
-                                  已選門市：{form.cvsStoreName || '7-11'}（{form.cvsStoreId}）
+                                  {cx.selectedCvs}：{form.cvsStoreName || '7-11'}（{form.cvsStoreId}）
                                   {form.cvsAddress ? ` · ${form.cvsAddress}` : ''}
                                   {' · '}
-                                  {form.cvsCollection === 'Y' ? '貨到付款選店' : '刷卡取貨選店'}
+                                  {form.cvsCollection === 'Y' ? cx.codPick : cx.cardPick}
                                 </div>
                               )}
                             </div>
                           )}
                         </div>
-                      ) : (
-                        <div>
-                          <div className="text-xs font-semibold mb-2" style={{ color: '#4B5563' }}>Shipping</div>
-                          <p className="text-[11px] leading-relaxed" style={{ color: '#9CA3AF' }}>
-                            Delivery address + card payment only. This store does not offer Taiwan 7-11 pickup.
-                          </p>
-                        </div>
-                      )}
                       <input
                         className="w-full px-3 py-2 text-sm border outline-none"
-                        placeholder="收貨人全名 *"
+                        placeholder={cx.namePh}
                         value={form.customerName}
                         onChange={(e) => setForm((f) => ({ ...f, customerName: e.target.value }))}
                       />
                       <input
                         className="w-full px-3 py-2 text-sm border outline-none"
-                        placeholder="手機 *"
+                        placeholder={cx.phonePh}
                         value={form.customerPhone}
                         onChange={(e) => setForm((f) => ({ ...f, customerPhone: e.target.value }))}
                       />
                       <input
                         className="w-full px-3 py-2 text-sm border outline-none"
-                        placeholder="Email（選填）"
+                        placeholder={cx.emailPh}
                         value={form.customerEmail}
                         onChange={(e) => setForm((f) => ({ ...f, customerEmail: e.target.value }))}
                       />
@@ -694,13 +782,13 @@ export default function BrandStoreClient({
                         className="w-full px-3 py-2 text-sm border outline-none resize-none"
                         rows={3}
                         placeholder={
-                          taiwanMarket && form.shippingMethod === 'seven_eleven'
+                          form.shippingMethod === 'seven_eleven'
                             ? ecpayMapReady
-                              ? '請先用地圖選門市（選完會自動填入）'
-                              : '7-11 門市名稱／店號 *'
-                            : '收件地址 *'
+                              ? cx.mapPh
+                              : cx.cvsPh
+                            : cx.addrPh
                         }
-                        readOnly={Boolean(taiwanMarket && form.shippingMethod === 'seven_eleven' && ecpayMapReady && form.cvsStoreId)}
+                        readOnly={Boolean(form.shippingMethod === 'seven_eleven' && ecpayMapReady && form.cvsStoreId)}
                         value={form.shippingAddress}
                         onChange={(e) => setForm((f) => ({ ...f, shippingAddress: e.target.value }))}
                       />
@@ -716,9 +804,9 @@ export default function BrandStoreClient({
                     style={{ background: '#111827', color: '#FAFBFA' }}
                     onClick={() => checkout('stripe')}
                   >
-                    {checkingOut ? '處理中...' : '信用卡付款'}
+                    {checkingOut ? cx.processing : cx.payCard}
                   </button>
-                  {taiwanMarket && form.shippingMethod === 'seven_eleven' && (
+                  {form.shippingMethod === 'seven_eleven' && (
                     <button
                       type="button"
                       disabled={checkingOut}
@@ -726,13 +814,13 @@ export default function BrandStoreClient({
                       style={{ border: '1px solid rgba(17,24,39,0.15)', background: '#fff' }}
                       onClick={() => checkout('cod')}
                     >
-                      貨到付款下單
+                      {cx.payCod}
                     </button>
                   )}
                   <p className="text-[11px] leading-relaxed" style={{ color: '#9CA3AF' }}>
-                    {taiwanMarket && form.shippingMethod === 'seven_eleven'
-                      ? '7-11 取貨可用刷卡或貨到付款；刷卡時收貨人請留全名。'
-                      : '此配送方式僅能刷信用卡付款。'}
+                    {form.shippingMethod === 'seven_eleven'
+                      ? cx.tipSeven
+                      : cx.tipCardOnly}
                   </p>
                 </>
               )}

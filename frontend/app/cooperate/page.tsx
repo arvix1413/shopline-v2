@@ -28,7 +28,7 @@ const zhTW: CooperateCopy = {
     { title: '策略合作夥伴', desc: '與 ARVIX 共同開拓市場，提供互補的產品或服務，共創商業價值。', icon: '🤝' },
     { title: '代理商與聯盟夥伴', desc: '代理 ARVIX 服務，協助商家導入電商解決方案，享有豐厚分潤機制。', icon: '🏢' },
     { title: '開發者合作夥伴', desc: '透過 ARVIX 開放 API 開發擴充功能，上架至擴充功能商店觸及 60 萬商家。', icon: '💻' },
-    { title: '技術合作夥伴', desc: '整合金流、物流、行銷等技術服務，成為 ARVIX 生態圈的一環。', icon: '⚙️' },
+    { title: '技術合作夥伴', desc: '整合卡片結帳、運送與行銷等技術服務，成為 ARVIX 生態圈的一環。', icon: '⚙️' },
   ],
   advantagesTitle: '四大合作優勢',
   advantages: [
@@ -53,7 +53,7 @@ const zhCN: CooperateCopy = {
     { title: '策略合作伙伴', desc: '与 ARVIX 共同开拓市场，提供互补的产品或服务，共创商业价值。', icon: '🤝' },
     { title: '代理商与联盟伙伴', desc: '代理 ARVIX 服务，协助商家导入电商解决方案，享有丰厚分润机制。', icon: '🏢' },
     { title: '开发者合作伙伴', desc: '通过 ARVIX 开放 API 开发扩展功能，上架至扩展功能商店触及 60 万商家。', icon: '💻' },
-    { title: '技术合作伙伴', desc: '整合支付、物流、营销等技术服务，成为 ARVIX 生态圈的一环。', icon: '⚙️' },
+    { title: '技术合作伙伴', desc: '整合卡片结账、配送与营销等技术服务，成为 ARVIX 生态圈的一环。', icon: '⚙️' },
   ],
   advantagesTitle: '四大合作优势',
   advantages: [
@@ -78,7 +78,7 @@ const en: CooperateCopy = {
     { title: 'Strategic partners', desc: 'Co-develop markets with complementary products and shared value.', icon: '🤝' },
     { title: 'Resellers & affiliates', desc: 'Resell ARVIX and help merchants adopt commerce solutions with strong commissions.', icon: '🏢' },
     { title: 'Developer partners', desc: 'Build apps on ARVIX APIs and reach 600K merchants in the app store.', icon: '💻' },
-    { title: 'Technology partners', desc: 'Integrate payments, logistics, and marketing into the ARVIX ecosystem.', icon: '⚙️' },
+    { title: 'Technology partners', desc: 'Integrate card checkout, shipping, and marketing into the ARVIX ecosystem.', icon: '⚙️' },
   ],
   advantagesTitle: 'Four partner advantages',
   advantages: [
@@ -94,17 +94,192 @@ const en: CooperateCopy = {
   trialCta: 'Start free trial',
 }
 
+const ko: CooperateCopy = {
+  title: 'ARVIX 파트너 생태계에 합류하세요',
+  subtitle: '60만+ 판매자가 신뢰하는 커머스 플랫폼과 함께 리테일의 미래를 만드세요',
+  cta: '파트너 신청하기',
+  typesTitle: 'ARVIX와 협력하는 방법',
+  types: [
+    { title: '전략 파트너', desc: '보완적인 제품과 공유 가치로 시장을 함께 개척합니다.', icon: '🤝' },
+    { title: '리셀러 & 어필리에이트', desc: 'ARVIX를 재판매하고 판매자의 커머스 도입을 도우며 수수료를 받으세요.', icon: '🏢' },
+    { title: '개발자 파트너', desc: 'ARVIX API로 앱을 만들고 앱스토어에서 60만 판매자에게 도달하세요.', icon: '💻' },
+    { title: '기술 파트너', desc: '카드 결제, 배송, 마케팅을 ARVIX 생태계에 연동하세요.', icon: '⚙️' },
+  ],
+  advantagesTitle: '네 가지 파트너 이점',
+  advantages: [
+    { title: '바로 쓸 수 있는 고객 도달', desc: '60만 판매자 기반을 활용해 획득 비용을 낮추세요.' },
+    { title: '서비스 범위 확대', desc: 'ARVIX 리테일 솔루션과 결합해 새로운 기회를 여세요.' },
+    { title: '윈-윈-윈 수익', desc: '판매자, 파트너, ARVIX가 함께 성장하며 안정적인 수입을 만듭니다.' },
+    { title: '전담 성공 코칭', desc: '파트너 성공 팀이 온보딩과 성과 최적화를 돕습니다.' },
+  ],
+  contactTitle: '함께 파트너가 되고 싶으신가요?',
+  contactDesc: '연락 주시면 팀이 곧 답변드리겠습니다.',
+  contactCta: '파트너십 팀 문의',
+  ctaTitle: '전 세계 60만+ 판매자가 ARVIX를 신뢰합니다',
+  trialCta: '무료 체험 시작',
+}
+
+const ja: CooperateCopy = {
+  title: 'ARVIX パートナーエコシステムに参加',
+  subtitle: '60 万以上の加盟店が信頼するコマースプラットフォームと、リテールの未来を共に',
+  cta: 'パートナー申請',
+  typesTitle: 'ARVIX との提携方法',
+  types: [
+    { title: '戦略パートナー', desc: '補完的な製品と共有価値で市場を共同開拓します。', icon: '🤝' },
+    { title: 'リセラー＆アフィリエイト', desc: 'ARVIX を再販し、加盟店のコマース導入を支援してコミッションを得られます。', icon: '🏢' },
+    { title: '開発者パートナー', desc: 'ARVIX API でアプリを構築し、アプリストアで 60 万加盟店にリーチ。', icon: '💻' },
+    { title: '技術パートナー', desc: 'カード決済・配送・マーケティングを ARVIX エコシステムに統合。', icon: '⚙️' },
+  ],
+  advantagesTitle: '4 つのパートナー利点',
+  advantages: [
+    { title: 'すぐに使える顧客リーチ', desc: '60 万加盟店基盤を活用し、獲得コストを下げられます。' },
+    { title: 'サービス範囲の拡大', desc: 'ARVIX のリテールソリューションと組み合わせて新たな機会を。' },
+    { title: '三方良しの収益', desc: '加盟店・パートナー・ARVIX が共に成長し、安定収入を創出。' },
+    { title: '専任サクセスコーチング', desc: 'パートナーサクセスチームが立ち上がりと成果最適化を支援。' },
+  ],
+  contactTitle: 'パートナーになりませんか？',
+  contactDesc: 'ご連絡いただければ、チームより速やかにご返信します。',
+  contactCta: 'パートナーシップチームへ連絡',
+  ctaTitle: '世界中 60 万以上の加盟店が ARVIX を利用',
+  trialCta: '無料トライアルを開始',
+}
+
+const vi: CooperateCopy = {
+  title: 'Tham gia hệ sinh thái đối tác ARVIX',
+  subtitle: 'Hợp tác với nền tảng thương mại được hơn 600.000 người bán tin dùng và định hình tương lai bán lẻ',
+  cta: 'Đăng ký hợp tác',
+  typesTitle: 'Cách hợp tác với ARVIX',
+  types: [
+    { title: 'Đối tác chiến lược', desc: 'Cùng mở thị trường với sản phẩm bổ trợ và giá trị chia sẻ.', icon: '🤝' },
+    { title: 'Đại lý & affiliate', desc: 'Bán lại ARVIX, giúp người bán áp dụng giải pháp thương mại và nhận hoa hồng.', icon: '🏢' },
+    { title: 'Đối tác phát triển', desc: 'Xây app trên API ARVIX và tiếp cận 600K người bán trên app store.', icon: '💻' },
+    { title: 'Đối tác công nghệ', desc: 'Tích hợp thanh toán thẻ, vận chuyển và marketing vào hệ sinh thái ARVIX.', icon: '⚙️' },
+  ],
+  advantagesTitle: 'Bốn lợi thế đối tác',
+  advantages: [
+    { title: 'Tiếp cận khách hàng sẵn có', desc: 'Tận dụng 600K người bán để giảm chi phí thu hút.' },
+    { title: 'Mở rộng phạm vi dịch vụ', desc: 'Kết hợp giải pháp bán lẻ ARVIX để mở cơ hội mới.' },
+    { title: 'Doanh thu win-win-win', desc: 'Người bán, đối tác và ARVIX cùng tăng trưởng với thu nhập ổn định.' },
+    { title: 'Huấn luyện thành công chuyên trách', desc: 'Đội partner success hỗ trợ triển khai và tối ưu kết quả.' },
+  ],
+  contactTitle: 'Muốn hợp tác với chúng tôi?',
+  contactDesc: 'Hãy liên hệ — đội ngũ sẽ phản hồi sớm.',
+  contactCta: 'Liên hệ đội hợp tác',
+  ctaTitle: 'Hơn 600.000 người bán trên toàn cầu tin dùng ARVIX',
+  trialCta: 'Bắt đầu dùng thử miễn phí',
+}
+
+const es: CooperateCopy = {
+  title: 'Únete al ecosistema de partners ARVIX',
+  subtitle: 'Asóciate con una plataforma de comercio confiada por más de 600.000 merchants y da forma al futuro del retail',
+  cta: 'Solicitar partnership',
+  typesTitle: 'Formas de asociarte con ARVIX',
+  types: [
+    { title: 'Partners estratégicos', desc: 'Co-desarrolla mercados con productos complementarios y valor compartido.', icon: '🤝' },
+    { title: 'Revendedores y afiliados', desc: 'Revende ARVIX y ayuda a merchants a adoptar soluciones de comercio con comisiones sólidas.', icon: '🏢' },
+    { title: 'Partners desarrolladores', desc: 'Crea apps con las APIs de ARVIX y llega a 600K merchants en la app store.', icon: '💻' },
+    { title: 'Partners tecnológicos', desc: 'Integra checkout con tarjeta, envíos y marketing en el ecosistema ARVIX.', icon: '⚙️' },
+  ],
+  advantagesTitle: 'Cuatro ventajas para partners',
+  advantages: [
+    { title: 'Alcance de clientes listo', desc: 'Aprovecha 600K merchants para bajar el coste de adquisición.' },
+    { title: 'Amplía tu alcance de servicio', desc: 'Combina con soluciones retail de ARVIX para abrir nuevas oportunidades.' },
+    { title: 'Ingresos ganar-ganar-ganar', desc: 'Merchants, partners y ARVIX crecen juntos con ingresos estables.' },
+    { title: 'Coaching de éxito dedicado', desc: 'Un equipo de partner success te ayuda a arrancar y optimizar resultados.' },
+  ],
+  contactTitle: '¿Quieres asociarte con nosotros?',
+  contactDesc: 'Escríbenos y nuestro equipo te responderá pronto.',
+  contactCta: 'Contactar al equipo de partnerships',
+  ctaTitle: 'Más de 600.000 merchants confían en ARVIX en todo el mundo',
+  trialCta: 'Empezar prueba gratis',
+}
+
+const pt: CooperateCopy = {
+  title: 'Entre no ecossistema de parceiros ARVIX',
+  subtitle: 'Faça parceria com uma plataforma de comércio confiada por mais de 600.000 merchants e ajude a moldar o futuro do varejo',
+  cta: 'Candidatar-se a parceiro',
+  typesTitle: 'Formas de fazer parceria com a ARVIX',
+  types: [
+    { title: 'Parceiros estratégicos', desc: 'Co-desenvolva mercados com produtos complementares e valor compartilhado.', icon: '🤝' },
+    { title: 'Revendedores e afiliados', desc: 'Revenda a ARVIX e ajude merchants a adotar soluções de comércio com comissões atrativas.', icon: '🏢' },
+    { title: 'Parceiros desenvolvedores', desc: 'Crie apps nas APIs da ARVIX e alcance 600K merchants na app store.', icon: '💻' },
+    { title: 'Parceiros de tecnologia', desc: 'Integre checkout com cartão, frete e marketing ao ecossistema ARVIX.', icon: '⚙️' },
+  ],
+  advantagesTitle: 'Quatro vantagens para parceiros',
+  advantages: [
+    { title: 'Alcance de clientes pronto', desc: 'Use a base de 600K merchants para reduzir o custo de aquisição.' },
+    { title: 'Amplie o escopo do serviço', desc: 'Combine com soluções de varejo ARVIX para abrir novas oportunidades.' },
+    { title: 'Receita ganha-ganha-ganha', desc: 'Merchants, parceiros e ARVIX crescem juntos com renda estável.' },
+    { title: 'Coaching de sucesso dedicado', desc: 'Uma equipe de partner success ajuda a acelerar e otimizar resultados.' },
+  ],
+  contactTitle: 'Quer fazer parceria conosco?',
+  contactDesc: 'Entre em contato e nossa equipe responderá em breve.',
+  contactCta: 'Contatar a equipe de parcerias',
+  ctaTitle: 'Mais de 600.000 merchants confiam na ARVIX no mundo',
+  trialCta: 'Começar teste grátis',
+}
+
+const de: CooperateCopy = {
+  title: 'Werden Sie Teil des ARVIX-Partner-Ökosystems',
+  subtitle: 'Partnerschaft mit einer Commerce-Plattform, der über 600.000 Händler vertrauen — und die Zukunft des Handels mitgestalten',
+  cta: 'Partnerschaft beantragen',
+  typesTitle: 'Wege zur Partnerschaft mit ARVIX',
+  types: [
+    { title: 'Strategische Partner', desc: 'Erschließen Sie Märkte gemeinsam mit komplementären Produkten und geteiltem Mehrwert.', icon: '🤝' },
+    { title: 'Wiederverkäufer & Affiliates', desc: 'Verkaufen Sie ARVIX weiter und helfen Sie Händlern bei Commerce-Lösungen — mit starken Provisionen.', icon: '🏢' },
+    { title: 'Entwickler-Partner', desc: 'Bauen Sie Apps auf ARVIX-APIs und erreichen Sie 600K Händler im App Store.', icon: '💻' },
+    { title: 'Technologie-Partner', desc: 'Integrieren Sie Kartencheckout, Versand und Marketing in das ARVIX-Ökosystem.', icon: '⚙️' },
+  ],
+  advantagesTitle: 'Vier Partner-Vorteile',
+  advantages: [
+    { title: 'Fertige Kundenreichweite', desc: 'Nutzen Sie 600K Händler, um Akquisekosten zu senken.' },
+    { title: 'Serviceumfang erweitern', desc: 'Kombinieren Sie mit ARVIX-Retail-Lösungen für neue Chancen.' },
+    { title: 'Win-win-win-Umsatz', desc: 'Händler, Partner und ARVIX wachsen gemeinsam mit stabilem Einkommen.' },
+    { title: 'Dediziertes Success-Coaching', desc: 'Ein Partner-Success-Team hilft beim Ramp-up und bei der Optimierung.' },
+  ],
+  contactTitle: 'Möchten Sie Partner werden?',
+  contactDesc: 'Melden Sie sich — unser Team antwortet zeitnah.',
+  contactCta: 'Partnership-Team kontaktieren',
+  ctaTitle: 'Über 600.000 Händler weltweit vertrauen ARVIX',
+  trialCta: 'Kostenlos testen',
+}
+
+const fr: CooperateCopy = {
+  title: 'Rejoignez l’écosystème partenaires ARVIX',
+  subtitle: 'Associez-vous à une plateforme commerce de confiance pour plus de 600 000 marchands et façonnez l’avenir du retail',
+  cta: 'Postuler comme partenaire',
+  typesTitle: 'Façons de s’associer à ARVIX',
+  types: [
+    { title: 'Partenaires stratégiques', desc: 'Co-développez des marchés avec des produits complémentaires et une valeur partagée.', icon: '🤝' },
+    { title: 'Revendeurs & affiliés', desc: 'Revendez ARVIX et aidez les marchands à adopter le commerce avec de solides commissions.', icon: '🏢' },
+    { title: 'Partenaires développeurs', desc: 'Créez des apps sur les API ARVIX et touchez 600K marchands dans l’app store.', icon: '💻' },
+    { title: 'Partenaires technologiques', desc: 'Intégrez le paiement par carte, la livraison et le marketing dans l’écosystème ARVIX.', icon: '⚙️' },
+  ],
+  advantagesTitle: 'Quatre avantages partenaires',
+  advantages: [
+    { title: 'Portée clients prête à l’emploi', desc: 'Tirez parti de 600K marchands pour réduire le coût d’acquisition.' },
+    { title: 'Élargissez votre périmètre de service', desc: 'Combinez avec les solutions retail ARVIX pour de nouvelles opportunités.' },
+    { title: 'Revenus gagnant-gagnant-gagnant', desc: 'Marchands, partenaires et ARVIX grandissent ensemble avec des revenus stables.' },
+    { title: 'Coaching succès dédié', desc: 'Une équipe partner success vous aide à démarrer et à optimiser les résultats.' },
+  ],
+  contactTitle: 'Envie de devenir partenaire ?',
+  contactDesc: 'Contactez-nous — notre équipe vous répondra bientôt.',
+  contactCta: 'Contacter l’équipe partenariats',
+  ctaTitle: 'Plus de 600 000 marchands dans le monde font confiance à ARVIX',
+  trialCta: 'Démarrer l’essai gratuit',
+}
+
 const copy: Partial<Record<Locale, CooperateCopy>> & { 'zh-TW': CooperateCopy; en: CooperateCopy } = {
   'zh-TW': zhTW,
   'zh-CN': zhCN,
   en,
-  ko: en,
-  ja: en,
-  vi: en,
-  es: en,
-  pt: en,
-  de: en,
-  fr: en,
+  ko,
+  ja,
+  vi,
+  es,
+  pt,
+  de,
+  fr,
 }
 
 export default function CooperatePage() {

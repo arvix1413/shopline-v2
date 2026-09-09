@@ -204,17 +204,584 @@ const en: SolutionsCopy = {
   ],
 }
 
+const ko: SolutionsCopy = {
+  title: '풀스택 리테일 솔루션\nOMO, 한 단계 진화',
+  subtitle: 'ARVIX는 이커머스와 오프라인 리테일을 아우르며, 스타트업부터 글로벌 브랜드까지 끊김 없는 쇼핑 경험으로 시장을 확장할 수 있게 합니다.',
+  cta: '무료 체험 시작',
+  stats: [
+    { label: '옴니채널 런칭에 필요한 모든 것', num: '5', unit: '', sub: '핵심 솔루션' },
+    { label: 'ARVIX로 운영', num: '600', unit: 'K+', sub: '셀러' },
+    { label: '매출 성장을 위해 설계', num: '3', unit: 'x', sub: '성장 잠재력' },
+  ],
+  problemsTitle: '스토어를 열 때 이런 상황, 익숙하신가요?',
+  problems: [
+    { title: '옴니채널 비용이 너무 큼', desc: '채널 통합은 어렵고 비쌉니다 — 더 가벼운 방법은 없을까요?' },
+    { title: '고객 데이터를 얻기 어려움', desc: '신규·재방문 쇼핑 데이터 없이, 다음 기회를 어떻게 찾을까요?' },
+    { title: '매출이 천장에 부딪힘', desc: '성장이 정체됩니다 — 다음 돌파구는 어디에 있을까요?' },
+  ],
+  learnMore: '자세히 보기',
+  ctaTitle: '전 세계 600,000+ 셀러가 신뢰하는 ARVIX',
+  ctaSubtitle: '합류하고 옴니채널 여정을 시작하세요',
+  questionsTitle: '궁금한 점이 있으신가요?',
+  questionsSubtitle: '어드바이저가 적합한 솔루션을 고르도록 도와드립니다',
+  bookConsult: '무료 상담 예약',
+  solutions: [
+    {
+      title: '트래픽 & 전환', subtitle: '트래픽을 매출로',
+      desc: '크로스 채널 커버리지, 전환 도구, 하나의 허브로 트래픽 천장을 깨세요.',
+      items: [
+        { title: '크로스 채널 커버리지', desc: '소셜·사이트·매장 트래픽을 파편화 없이 통합합니다.' },
+        { title: '전환 툴킷', desc: '광고부터 소셜 쇼핑까지 — 전환을 올리는 도구.' },
+        { title: '하나의 통합 레이어', desc: '모든 소스를 관리해 방문마다 더 큰 가치를 만듭니다.' },
+      ],
+      href: '/solutions/traffic-and-conversion',
+      img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80',
+    },
+    {
+      title: 'OMO 옴니채널', subtitle: '비용은 낮추고, 효율은 높이고',
+      desc: '매장 디지털화든 온라인 브랜드의 오프라인 확장이든, 시스템·채널·데이터를 하나로.',
+      items: [
+        { title: '채널 통합', desc: 'Smart OMO와 회원 앱이 있는 온라인 스토어 + POS.' },
+        { title: '데이터 통합', desc: '온·오프라인 하나의 고객 프로필.' },
+        { title: '시스템 통합', desc: 'ERP/CRM을 연결하고 진정한 옴니채널 운영을 실행.' },
+      ],
+      href: '/solutions/omo',
+      img: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80',
+    },
+    {
+      title: '스토어 운영', subtitle: '비용 절감, 효율 상승',
+      desc: '런칭 준비부터 주문·애프터까지 — 인력을 아끼고 더 빠르게 움직이세요.',
+      items: [
+        { title: '런칭 준비', desc: '카탈로그, 결제, 물류, 멀티채널 판매를 한곳에서.' },
+        { title: '판매 & 주문', desc: '색으로 구분된 주문과 체크아웃을 올리는 장바구니 리마인더.' },
+        { title: '출고 & 지원', desc: '배송을 자동화하고 애프터를 중앙화.' },
+      ],
+      href: '/solutions/shop-efficiency',
+      img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80',
+    },
+    {
+      title: '회원 재구매', subtitle: '재구매 루프를 구축',
+      desc: '세그먼트, 오퍼, 자동 메시징으로 생애 가치를 높입니다.',
+      items: [
+        { title: '정밀 세그먼트', desc: '재구매를 이끄는 RFIM 기반 스마트 코호트.' },
+        { title: '유연한 리워드', desc: '포인트, 할인, 회원 전용 혜택.' },
+        { title: '자동 아웃리치', desc: '올바른 시간에 올바른 메시지를 보내세요.' },
+        { title: '회원 인사이트', desc: '선호를 이해하고 정밀하게 마케팅하세요.' },
+      ],
+      href: '/solutions/member-repurchase',
+      img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80',
+    },
+    {
+      title: '데이터 임파워먼트', subtitle: '성장을 이끄는 인사이트',
+      desc: '사람·상품·장소에 걸친 자사 데이터 — 어드바이저와 산업 리포트까지.',
+      items: [
+        { title: '사람', desc: 'Shoplytics + RFIM으로 올바른 구매자에게 도달.' },
+        { title: '상품', desc: '셀스루를 추적하고 이기는 상품을 보충.' },
+        { title: '장소', desc: '채널 ROI를 비교하고 더 스마트하게 배분.' },
+      ],
+      href: '/solutions/data-analysis',
+      img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80',
+    },
+  ],
+}
+
+const ja: SolutionsCopy = {
+  title: 'フルスタック小売ソリューション\n進化した OMO',
+  subtitle: 'ARVIX は EC と実店舗リテールを横断し、スタートアップからグローバルブランドまでシームレスな購買体験で市場を広げられます。',
+  cta: '無料トライアルを開始',
+  stats: [
+    { label: 'オムニチャネル立ち上げに必要なすべて', num: '5', unit: '', sub: 'コアソリューション' },
+    { label: 'ARVIX が支える', num: '600', unit: 'K+', sub: 'マーチャント' },
+    { label: '売上成長のために設計', num: '3', unit: 'x', sub: '成長ポテンシャル' },
+  ],
+  problemsTitle: 'ストア開設時、こんな状況に心当たりは？',
+  problems: [
+    { title: 'オムニチャネルのコストが高すぎる', desc: 'チャネル統合は難しく高額 — もっとリーンな方法は？' },
+    { title: '顧客データを得にくい', desc: '新規・リピートの買い物データなしに、次の機会をどう見つける？' },
+    { title: '売上が天井にぶつかる', desc: '成長が停滞 — 次の突破口はどこ？' },
+  ],
+  learnMore: '詳しく見る',
+  ctaTitle: '世界中の 600,000+ のマーチャントに信頼されています',
+  ctaSubtitle: '参加してオムニチャネルの旅を始めましょう',
+  questionsTitle: 'ご質問はありますか？',
+  questionsSubtitle: 'アドバイザーが最適なソリューション選びをお手伝いします',
+  bookConsult: '無料相談を予約',
+  solutions: [
+    {
+      title: 'トラフィック＆コンバージョン', subtitle: 'トラフィックを売上へ',
+      desc: 'クロスチャネルカバレッジ、転換ツール、一つのハブでトラフィックの天井を突破。',
+      items: [
+        { title: 'クロスチャネルカバレッジ', desc: 'ソーシャル・サイト・店舗のトラフィックを断片化なく統合。' },
+        { title: 'コンバージョンツールキット', desc: '広告からソーシャルショッピングまで — 転換を押し上げるツール。' },
+        { title: '一つの統合レイヤー', desc: 'すべてのソースを管理し、訪問ごとの価値を高めます。' },
+      ],
+      href: '/solutions/traffic-and-conversion',
+      img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80',
+    },
+    {
+      title: 'OMO オムニチャネル', subtitle: 'コストを下げ、効率を上げる',
+      desc: '店舗のデジタル化でもオンラインブランドのオフライン展開でも、システム・チャネル・データを統合。',
+      items: [
+        { title: 'チャネル統合', desc: 'Smart OMO と会員アプリ付きのオンラインストア + POS。' },
+        { title: 'データ統合', desc: 'オンラインとオフラインで一つの顧客プロファイル。' },
+        { title: 'システム統合', desc: 'ERP/CRM をつなぎ、真のオムニチャネル運用を実行。' },
+      ],
+      href: '/solutions/omo',
+      img: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80',
+    },
+    {
+      title: 'ストア運営', subtitle: 'コスト削減、効率向上',
+      desc: '立ち上げ準備から注文・アフターまで — 人件費を抑え、より速く動く。',
+      items: [
+        { title: '立ち上げ準備', desc: 'カタログ、決済、物流、マルチチャネル販売を一箇所で。' },
+        { title: '販売＆注文', desc: '色分け注文とチェックアウトを押し上げるカートリマインダー。' },
+        { title: '出荷＆サポート', desc: '配送を自動化し、アフターを一元化。' },
+      ],
+      href: '/solutions/shop-efficiency',
+      img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80',
+    },
+    {
+      title: '会員リピート購入', subtitle: 'リピートループを構築',
+      desc: 'セグメント、オファー、自動メッセージでライフタイムバリューを向上。',
+      items: [
+        { title: '精密セグメント', desc: 'リピートを駆動する RFIM ベースのスマートコホート。' },
+        { title: '柔軟なリワード', desc: 'ポイント、割引、会員限定特典。' },
+        { title: '自動アウトリーチ', desc: '正しいタイミングで正しいメッセージを送る。' },
+        { title: '会員インサイト', desc: '好みを理解し、精密にマーケティング。' },
+      ],
+      href: '/solutions/member-repurchase',
+      img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80',
+    },
+    {
+      title: 'データエンパワーメント', subtitle: '成長を駆動するインサイト',
+      desc: '人・商品・場所にわたるファーストパーティデータ — アドバイザーと業界レポートも。',
+      items: [
+        { title: '人', desc: 'Shoplytics + RFIM で正しい購入者に到達。' },
+        { title: '商品', desc: 'セルスルーを追跡し、勝つ商品を補充。' },
+        { title: '場所', desc: 'チャネル ROI を比較し、よりスマートに配分。' },
+      ],
+      href: '/solutions/data-analysis',
+      img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80',
+    },
+  ],
+}
+
+const vi: SolutionsCopy = {
+  title: 'Giải pháp bán lẻ full-stack\nOMO, nâng cấp',
+  subtitle: 'ARVIX bao phủ thương mại điện tử và bán lẻ vật lý để startup và thương hiệu toàn cầu mở rộng với trải nghiệm mua sắm liền mạch.',
+  cta: 'Bắt đầu dùng thử miễn phí',
+  stats: [
+    { label: 'Mọi thứ cho ra mắt omnichannel', num: '5', unit: '', sub: 'giải pháp cốt lõi' },
+    { label: 'Được hỗ trợ bởi ARVIX', num: '600', unit: 'K+', sub: 'thương nhân' },
+    { label: 'Thiết kế để tăng doanh thu', num: '3', unit: 'x', sub: 'tiềm năng tăng trưởng' },
+  ],
+  problemsTitle: 'Nghe quen khi bạn mở cửa hàng?',
+  problems: [
+    { title: 'Omnichannel quá đắt', desc: 'Thống nhất kênh khó và tốn kém — có cách gọn hơn không?' },
+    { title: 'Khó lấy dữ liệu khách', desc: 'Không có dữ liệu khách mới và quay lại, làm sao tìm cơ hội tiếp theo?' },
+    { title: 'Doanh thu chạm trần', desc: 'Tăng trưởng đình trệ — điểm mở khóa tiếp theo ở đâu?' },
+  ],
+  learnMore: 'Tìm hiểu thêm',
+  ctaTitle: 'Được hơn 600.000 thương nhân trên thế giới tin dùng',
+  ctaSubtitle: 'Tham gia và bắt đầu hành trình omnichannel của bạn',
+  questionsTitle: 'Có câu hỏi?',
+  questionsSubtitle: 'Cố vấn của chúng tôi có thể giúp bạn chọn giải pháp phù hợp',
+  bookConsult: 'Đặt tư vấn miễn phí',
+  solutions: [
+    {
+      title: 'Traffic & chuyển đổi', subtitle: 'Biến traffic thành doanh thu',
+      desc: 'Phủ đa kênh, công cụ chuyển đổi và một hub để phá trần traffic.',
+      items: [
+        { title: 'Phủ đa kênh', desc: 'Thống nhất traffic social, site và cửa hàng không phân mảnh.' },
+        { title: 'Bộ công cụ chuyển đổi', desc: 'Từ ads đến social shopping — công cụ nâng chuyển đổi.' },
+        { title: 'Một lớp tích hợp', desc: 'Quản lý mọi nguồn để mỗi lượt truy cập hiệu quả hơn.' },
+      ],
+      href: '/solutions/traffic-and-conversion',
+      img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80',
+    },
+    {
+      title: 'OMO đa kênh', subtitle: 'Chi phí thấp hơn, hiệu quả cao hơn',
+      desc: 'Dù số hóa cửa hàng hay mở rộng thương hiệu online xuống offline, thống nhất hệ thống, kênh và dữ liệu.',
+      items: [
+        { title: 'Tích hợp kênh', desc: 'Cửa hàng online + POS với Smart OMO và app thành viên.' },
+        { title: 'Tích hợp dữ liệu', desc: 'Một hồ sơ khách trên online và offline.' },
+        { title: 'Tích hợp hệ thống', desc: 'Kết nối ERP/CRM và vận hành omnichannel thực sự.' },
+      ],
+      href: '/solutions/omo',
+      img: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80',
+    },
+    {
+      title: 'Vận hành cửa hàng', subtitle: 'Cắt chi phí, tăng hiệu quả',
+      desc: 'Từ chuẩn bị ra mắt đến đơn hàng và hậu mãi — tiết kiệm nhân sự và nhanh hơn.',
+      items: [
+        { title: 'Chuẩn bị ra mắt', desc: 'Catalog, thanh toán, logistics và bán đa kênh tại một nơi.' },
+        { title: 'Bán hàng & đơn', desc: 'Đơn mã màu và nhắc giỏ hàng nâng checkout.' },
+        { title: 'Giao hàng & hỗ trợ', desc: 'Tự động hóa vận chuyển và tập trung hậu mãi.' },
+      ],
+      href: '/solutions/shop-efficiency',
+      img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80',
+    },
+    {
+      title: 'Tái mua thành viên', subtitle: 'Xây vòng lặp tái mua',
+      desc: 'Phân khúc, ưu đãi và nhắn tin tự động nâng lifetime value.',
+      items: [
+        { title: 'Phân khúc chính xác', desc: 'Cohort thông minh RFIM thúc đẩy tái mua.' },
+        { title: 'Phần thưởng linh hoạt', desc: 'Điểm, giảm giá và đặc quyền chỉ dành cho thành viên.' },
+        { title: 'Outreach tự động', desc: 'Gửi đúng thông điệp đúng lúc.' },
+        { title: 'Insight thành viên', desc: 'Hiểu sở thích và marketing chính xác.' },
+      ],
+      href: '/solutions/member-repurchase',
+      img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80',
+    },
+    {
+      title: 'Trao quyền dữ liệu', subtitle: 'Insight thúc đẩy tăng trưởng',
+      desc: 'Dữ liệu first-party trên người, sản phẩm và địa điểm — kèm cố vấn và báo cáo ngành.',
+      items: [
+        { title: 'Người', desc: 'Shoplytics + RFIM để tiếp cận đúng người mua.' },
+        { title: 'Sản phẩm', desc: 'Theo dõi sell-through và bổ sung hàng thắng.' },
+        { title: 'Địa điểm', desc: 'So sánh ROI kênh và phân bổ thông minh hơn.' },
+      ],
+      href: '/solutions/data-analysis',
+      img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80',
+    },
+  ],
+}
+
+const es: SolutionsCopy = {
+  title: 'Soluciones retail full-stack\nOMO, evolucionada',
+  subtitle: 'ARVIX abarca ecommerce y retail físico para que startups y marcas globales expandan con una experiencia de compra fluida.',
+  cta: 'Empieza la prueba gratis',
+  stats: [
+    { label: 'Todo para el lanzamiento omnicanal', num: '5', unit: '', sub: 'soluciones core' },
+    { label: 'Impulsado por ARVIX', num: '600', unit: 'K+', sub: 'comercios' },
+    { label: 'Hecho para crecer ingresos', num: '3', unit: 'x', sub: 'potencial de crecimiento' },
+  ],
+  problemsTitle: '¿Te suena al abrir una tienda?',
+  problems: [
+    { title: 'Lo omnicanal cuesta demasiado', desc: 'Unificar canales es difícil y caro — ¿hay una vía más lean?' },
+    { title: 'Los datos de clientes son difíciles de obtener', desc: 'Sin datos de compradores nuevos y recurrentes, ¿cómo hallar la siguiente oportunidad?' },
+    { title: 'Los ingresos tocan techo', desc: 'El crecimiento se estanca — ¿dónde está el siguiente desbloqueo?' },
+  ],
+  learnMore: 'Saber más',
+  ctaTitle: 'Más de 600.000 comercios en el mundo confían en ARVIX',
+  ctaSubtitle: 'Únete y comienza tu viaje omnicanal',
+  questionsTitle: '¿Preguntas?',
+  questionsSubtitle: 'Nuestros asesores pueden ayudarte a elegir la solución adecuada',
+  bookConsult: 'Reservar consulta gratis',
+  solutions: [
+    {
+      title: 'Tráfico y conversión', subtitle: 'Convierte tráfico en ingresos',
+      desc: 'Cobertura cross-channel, herramientas de conversión y un hub para romper techos de tráfico.',
+      items: [
+        { title: 'Cobertura cross-channel', desc: 'Unifica tráfico social, web y tienda sin fragmentación.' },
+        { title: 'Toolkit de conversión', desc: 'De ads a social shopping — herramientas que suben la conversión.' },
+        { title: 'Una capa de integración', desc: 'Gestiona cada fuente para que cada visita rinda más.' },
+      ],
+      href: '/solutions/traffic-and-conversion',
+      img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80',
+    },
+    {
+      title: 'OMO omnicanal', subtitle: 'Menor coste, mayor eficiencia',
+      desc: 'Ya digitalices tiendas o expandas marcas online al offline, unifica sistemas, canales y datos.',
+      items: [
+        { title: 'Integración de canales', desc: 'Tienda online + POS con Smart OMO y apps de miembros.' },
+        { title: 'Integración de datos', desc: 'Un perfil de cliente online y offline.' },
+        { title: 'Integración de sistemas', desc: 'Conecta ERP/CRM y opera omnicanal de verdad.' },
+      ],
+      href: '/solutions/omo',
+      img: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80',
+    },
+    {
+      title: 'Operaciones de tienda', subtitle: 'Corta costes, sube eficiencia',
+      desc: 'Desde la prep de lanzamiento hasta pedidos y posventa — ahorra mano de obra y muévete más rápido.',
+      items: [
+        { title: 'Prep de lanzamiento', desc: 'Catálogo, pagos, logística y venta multicanal en un solo lugar.' },
+        { title: 'Ventas y pedidos', desc: 'Pedidos por color y recordatorios de carrito que suben el checkout.' },
+        { title: 'Cumplimiento y soporte', desc: 'Automatiza envíos y centraliza la posventa.' },
+      ],
+      href: '/solutions/shop-efficiency',
+      img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80',
+    },
+    {
+      title: 'Recompra de miembros', subtitle: 'Construye el bucle de recompra',
+      desc: 'Segmentación, ofertas y mensajería automatizada que elevan el lifetime value.',
+      items: [
+        { title: 'Segmentos precisos', desc: 'Cohortes inteligentes con RFIM que impulsan la recompra.' },
+        { title: 'Recompensas flexibles', desc: 'Puntos, descuentos y ventajas solo para miembros.' },
+        { title: 'Outreach automatizado', desc: 'Envía el mensaje correcto en el momento correcto.' },
+        { title: 'Insights de miembros', desc: 'Entiende preferencias y marketinga con precisión.' },
+      ],
+      href: '/solutions/member-repurchase',
+      img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80',
+    },
+    {
+      title: 'Empoderamiento de datos', subtitle: 'Insights que impulsan el crecimiento',
+      desc: 'Datos first-party en personas, productos y lugares — más asesores e informes de industria.',
+      items: [
+        { title: 'Personas', desc: 'Shoplytics + RFIM para llegar a los compradores correctos.' },
+        { title: 'Productos', desc: 'Rastrea sell-through y reabastece lo que gana.' },
+        { title: 'Lugares', desc: 'Compara ROI de canal y asigna con más inteligencia.' },
+      ],
+      href: '/solutions/data-analysis',
+      img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80',
+    },
+  ],
+}
+
+const pt: SolutionsCopy = {
+  title: 'Soluções de varejo full-stack\nOMO, evoluída',
+  subtitle: 'A ARVIX cobre e-commerce e varejo físico para que startups e marcas globais expandam com uma experiência de compra fluida.',
+  cta: 'Começar teste grátis',
+  stats: [
+    { label: 'Tudo para o lançamento omnichannel', num: '5', unit: '', sub: 'soluções core' },
+    { label: 'Impulsionado pela ARVIX', num: '600', unit: 'K+', sub: 'comerciantes' },
+    { label: 'Feito para crescer receita', num: '3', unit: 'x', sub: 'potencial de crescimento' },
+  ],
+  problemsTitle: 'Soa familiar ao abrir uma loja?',
+  problems: [
+    { title: 'Omnichannel custa demais', desc: 'Unificar canais é difícil e caro — há um caminho mais lean?' },
+    { title: 'Dados de clientes são difíceis de obter', desc: 'Sem dados de compradores novos e recorrentes, como achar a próxima oportunidade?' },
+    { title: 'Receita bate no teto', desc: 'O crescimento trava — onde está o próximo desbloqueio?' },
+  ],
+  learnMore: 'Saiba mais',
+  ctaTitle: 'Mais de 600.000 comerciantes no mundo confiam na ARVIX',
+  ctaSubtitle: 'Participe e comece sua jornada omnichannel',
+  questionsTitle: 'Dúvidas?',
+  questionsSubtitle: 'Nossos consultores podem ajudar você a escolher a solução certa',
+  bookConsult: 'Agendar consultoria grátis',
+  solutions: [
+    {
+      title: 'Tráfego e conversão', subtitle: 'Transforme tráfego em receita',
+      desc: 'Cobertura cross-channel, ferramentas de conversão e um hub para quebrar tetos de tráfego.',
+      items: [
+        { title: 'Cobertura cross-channel', desc: 'Unifique tráfego social, site e loja sem fragmentação.' },
+        { title: 'Toolkit de conversão', desc: 'De ads a social shopping — ferramentas que elevam a conversão.' },
+        { title: 'Uma camada de integração', desc: 'Gerencie cada fonte para que cada visita rende mais.' },
+      ],
+      href: '/solutions/traffic-and-conversion',
+      img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80',
+    },
+    {
+      title: 'OMO omnicanal', subtitle: 'Menor custo, maior eficiência',
+      desc: 'Seja digitalizando lojas ou expandindo marcas online para o offline, unifique sistemas, canais e dados.',
+      items: [
+        { title: 'Integração de canais', desc: 'Loja online + POS com Smart OMO e apps de membros.' },
+        { title: 'Integração de dados', desc: 'Um perfil de cliente online e offline.' },
+        { title: 'Integração de sistemas', desc: 'Conecte ERP/CRM e rode ops omnichannel de verdade.' },
+      ],
+      href: '/solutions/omo',
+      img: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80',
+    },
+    {
+      title: 'Operações da loja', subtitle: 'Corte custo, eleve eficiência',
+      desc: 'Da preparação de lançamento a pedidos e pós-venda — economize mão de obra e vá mais rápido.',
+      items: [
+        { title: 'Preparação de lançamento', desc: 'Catálogo, pagamentos, logística e venda multicanal em um lugar.' },
+        { title: 'Vendas e pedidos', desc: 'Pedidos por cor e lembretes de carrinho que elevam o checkout.' },
+        { title: 'Fulfillment e suporte', desc: 'Automatize envios e centralize o pós-venda.' },
+      ],
+      href: '/solutions/shop-efficiency',
+      img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80',
+    },
+    {
+      title: 'Recompra de membros', subtitle: 'Construa o loop de recompra',
+      desc: 'Segmentação, ofertas e mensageria automatizada que elevam o lifetime value.',
+      items: [
+        { title: 'Segmentos precisos', desc: 'Cohorts inteligentes com RFIM que impulsionam a recompra.' },
+        { title: 'Recompensas flexíveis', desc: 'Pontos, descontos e benefícios só para membros.' },
+        { title: 'Outreach automatizado', desc: 'Envie a mensagem certa na hora certa.' },
+        { title: 'Insights de membros', desc: 'Entenda preferências e faça marketing com precisão.' },
+      ],
+      href: '/solutions/member-repurchase',
+      img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80',
+    },
+    {
+      title: 'Empoderamento de dados', subtitle: 'Insights que impulsionam o crescimento',
+      desc: 'Dados first-party em pessoas, produtos e lugares — mais consultores e relatórios de indústria.',
+      items: [
+        { title: 'Pessoas', desc: 'Shoplytics + RFIM para alcançar os compradores certos.' },
+        { title: 'Produtos', desc: 'Acompanhe sell-through e reponha o que vence.' },
+        { title: 'Lugares', desc: 'Compare ROI de canal e aloque com mais inteligência.' },
+      ],
+      href: '/solutions/data-analysis',
+      img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80',
+    },
+  ],
+}
+
+const de: SolutionsCopy = {
+  title: 'Full-Stack-Retail-Lösungen\nOMO, weiterentwickelt',
+  subtitle: 'ARVIX spannt Ecommerce und physischen Retail, damit Startups und globale Marken mit einer nahtlosen Shopping-Erfahrung expandieren.',
+  cta: 'Kostenlos testen',
+  stats: [
+    { label: 'Alles für den Omnichannel-Launch', num: '5', unit: '', sub: 'Kernlösungen' },
+    { label: 'Angetrieben von ARVIX', num: '600', unit: 'K+', sub: 'Händler' },
+    { label: 'Für Umsatzwachstum gebaut', num: '3', unit: 'x', sub: 'Wachstumspotenzial' },
+  ],
+  problemsTitle: 'Kommt Ihnen das beim Store-Launch bekannt vor?',
+  problems: [
+    { title: 'Omnichannel kostet zu viel', desc: 'Kanäle zu vereinen ist schwer und teuer — gibt es einen schlankeren Weg?' },
+    { title: 'Kundendaten sind schwer zu bekommen', desc: 'Ohne Daten neuer und wiederkehrender Shopper — wo ist die nächste Chance?' },
+    { title: 'Umsatz stößt an die Decke', desc: 'Wachstum stagniert — wo liegt der nächste Unlock?' },
+  ],
+  learnMore: 'Mehr erfahren',
+  ctaTitle: 'Mehr als 600.000 Händler weltweit vertrauen ARVIX',
+  ctaSubtitle: 'Mitmachen und deine Omnichannel-Reise starten',
+  questionsTitle: 'Fragen?',
+  questionsSubtitle: 'Unsere Berater helfen Ihnen, die richtige Lösung zu wählen',
+  bookConsult: 'Kostenlose Beratung buchen',
+  solutions: [
+    {
+      title: 'Traffic & Conversion', subtitle: 'Traffic in Umsatz verwandeln',
+      desc: 'Cross-Channel-Coverage, Conversion-Tools und ein Hub, um Traffic-Decken zu durchbrechen.',
+      items: [
+        { title: 'Cross-Channel-Coverage', desc: 'Social-, Site- und Store-Traffic ohne Fragmentierung vereinen.' },
+        { title: 'Conversion-Toolkit', desc: 'Von Ads bis Social Shopping — Tools, die Conversion heben.' },
+        { title: 'Eine Integrationsschicht', desc: 'Jede Quelle managen, damit jeder Besuch härter arbeitet.' },
+      ],
+      href: '/solutions/traffic-and-conversion',
+      img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80',
+    },
+    {
+      title: 'OMO Omnichannel', subtitle: 'Niedrigere Kosten, höhere Effizienz',
+      desc: 'Ob Stores digitalisieren oder Online-Marken offline erweitern — Systeme, Kanäle und Daten vereinen.',
+      items: [
+        { title: 'Kanalintegration', desc: 'Online-Store + POS mit Smart OMO und Member-Apps.' },
+        { title: 'Datenintegration', desc: 'Ein Kundenprofil online und offline.' },
+        { title: 'Systemintegration', desc: 'ERP/CRM verbinden und echte Omnichannel-Ops fahren.' },
+      ],
+      href: '/solutions/omo',
+      img: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80',
+    },
+    {
+      title: 'Store-Betrieb', subtitle: 'Kosten senken, Effizienz steigern',
+      desc: 'Von Launch-Prep bis Bestellungen und After-Sales — Personal sparen und schneller werden.',
+      items: [
+        { title: 'Launch-Prep', desc: 'Katalog, Payments, Logistics und Multichannel-Verkauf an einem Ort.' },
+        { title: 'Verkauf & Bestellungen', desc: 'Farbcodierte Bestellungen und Warenkorb-Reminders, die Checkout heben.' },
+        { title: 'Fulfillment & Support', desc: 'Versand automatisieren und After-Sales zentralisieren.' },
+      ],
+      href: '/solutions/shop-efficiency',
+      img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80',
+    },
+    {
+      title: 'Mitglieder-Wiederkauf', subtitle: 'Den Wiederkauf-Loop bauen',
+      desc: 'Segmentierung, Angebote und automatisierte Messaging, die Lifetime Value heben.',
+      items: [
+        { title: 'Präzise Segmente', desc: 'RFIM-gestützte Smart-Cohorts, die Wiederkauf treiben.' },
+        { title: 'Flexible Rewards', desc: 'Punkte, Rabatte und Member-only-Perks.' },
+        { title: 'Automatisierte Outreach', desc: 'Die richtige Nachricht zur richtigen Zeit senden.' },
+        { title: 'Mitglieder-Insights', desc: 'Präferenzen verstehen und präzise vermarkten.' },
+      ],
+      href: '/solutions/member-repurchase',
+      img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80',
+    },
+    {
+      title: 'Daten-Empowerment', subtitle: 'Insights, die Wachstum treiben',
+      desc: 'First-Party-Daten zu Menschen, Produkten und Orten — plus Berater und Branchenreports.',
+      items: [
+        { title: 'Menschen', desc: 'Shoplytics + RFIM, um die richtigen Käufer zu erreichen.' },
+        { title: 'Produkte', desc: 'Sell-through tracken und Gewinner nachbestücken.' },
+        { title: 'Orte', desc: 'Kanal-ROI vergleichen und smarter allokieren.' },
+      ],
+      href: '/solutions/data-analysis',
+      img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80',
+    },
+  ],
+}
+
+const fr: SolutionsCopy = {
+  title: 'Solutions retail full-stack\nOMO, évoluée',
+  subtitle: 'ARVIX couvre l’e-commerce et le retail physique pour que startups et marques mondiales s’étendent avec une expérience d’achat fluide.',
+  cta: 'Démarrer l’essai gratuit',
+  stats: [
+    { label: 'Tout pour le lancement omnicanal', num: '5', unit: '', sub: 'solutions cœur' },
+    { label: 'Propulsé par ARVIX', num: '600', unit: 'K+', sub: 'marchands' },
+    { label: 'Conçu pour faire croître le chiffre', num: '3', unit: 'x', sub: 'potentiel de croissance' },
+  ],
+  problemsTitle: 'Ça vous parle quand vous lancez une boutique ?',
+  problems: [
+    { title: 'L’omnicanal coûte trop cher', desc: 'Unifier les canaux est difficile et cher — y a-t-il une voie plus lean ?' },
+    { title: 'Les données clients sont dures à obtenir', desc: 'Sans données des acheteurs nouveaux et récurrents, comment trouver la prochaine opportunité ?' },
+    { title: 'Le chiffre d’affaires plafonne', desc: 'La croissance stagne — où est le prochain déblocage ?' },
+  ],
+  learnMore: 'En savoir plus',
+  ctaTitle: 'Plus de 600 000 marchands dans le monde font confiance à ARVIX',
+  ctaSubtitle: 'Rejoignez-nous et démarrez votre parcours omnicanal',
+  questionsTitle: 'Des questions ?',
+  questionsSubtitle: 'Nos conseillers peuvent vous aider à choisir la bonne solution',
+  bookConsult: 'Réserver une consultation gratuite',
+  solutions: [
+    {
+      title: 'Trafic & conversion', subtitle: 'Transformez le trafic en revenus',
+      desc: 'Couverture cross-canal, outils de conversion et un hub pour briser les plafonds de trafic.',
+      items: [
+        { title: 'Couverture cross-canal', desc: 'Unifiez le trafic social, site et magasin sans fragmentation.' },
+        { title: 'Toolkit de conversion', desc: 'Des ads au social shopping — des outils qui haussent la conversion.' },
+        { title: 'Une couche d’intégration', desc: 'Gérez chaque source pour que chaque visite travaille plus fort.' },
+      ],
+      href: '/solutions/traffic-and-conversion',
+      img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80',
+    },
+    {
+      title: 'OMO omnicanal', subtitle: 'Coût plus bas, efficacité plus haute',
+      desc: 'Que vous digitalisiez des magasins ou étendiez des marques online offline, unifiez systèmes, canaux et données.',
+      items: [
+        { title: 'Intégration des canaux', desc: 'Boutique online + POS avec Smart OMO et apps membres.' },
+        { title: 'Intégration des données', desc: 'Un profil client online et offline.' },
+        { title: 'Intégration des systèmes', desc: 'Connectez ERP/CRM et menez de vraies ops omnicanales.' },
+      ],
+      href: '/solutions/omo',
+      img: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80',
+    },
+    {
+      title: 'Opérations boutique', subtitle: 'Coupez les coûts, haussez l’efficacité',
+      desc: 'De la préparation au lancement aux commandes et à l’après-vente — économisez la main-d’œuvre et allez plus vite.',
+      items: [
+        { title: 'Préparation au lancement', desc: 'Catalogue, paiements, logistique et vente multicanale au même endroit.' },
+        { title: 'Ventes & commandes', desc: 'Commandes codées couleur et rappels panier qui haussent le checkout.' },
+        { title: 'Expédition & support', desc: 'Automatisez l’expédition et centralisez l’après-vente.' },
+      ],
+      href: '/solutions/shop-efficiency',
+      img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80',
+    },
+    {
+      title: 'Rachat membre', subtitle: 'Construisez la boucle de rachat',
+      desc: 'Segmentation, offres et messagerie automatisée qui haussent la lifetime value.',
+      items: [
+        { title: 'Segments précis', desc: 'Cohortes intelligentes RFIM qui pilotent le rachat.' },
+        { title: 'Récompenses flexibles', desc: 'Points, remises et avantages réservés aux membres.' },
+        { title: 'Diffusion automatisée', desc: 'Envoyez le bon message au bon moment.' },
+        { title: 'Analyses membres', desc: 'Comprenez les préférences et marketez avec précision.' },
+      ],
+      href: '/solutions/member-repurchase',
+      img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80',
+    },
+    {
+      title: 'Valorisation des données', subtitle: 'Des insights qui pilotent la croissance',
+      desc: 'Données first-party sur personnes, produits et lieux — plus conseillers et rapports sectoriels.',
+      items: [
+        { title: 'Personnes', desc: 'Shoplytics + RFIM pour atteindre les bons acheteurs.' },
+        { title: 'Produits', desc: 'Suivez le sell-through et réapprovisionnez ce qui gagne.' },
+        { title: 'Lieux', desc: 'Comparez le ROI canal et allouez plus intelligemment.' },
+      ],
+      href: '/solutions/data-analysis',
+      img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80',
+    },
+  ],
+}
+
 const copy: Partial<Record<Locale, SolutionsCopy>> & { 'zh-TW': SolutionsCopy; en: SolutionsCopy } = {
   'zh-TW': zhTW,
   'zh-CN': zhCN,
   en,
-  ko: en,
-  ja: en,
-  vi: en,
-  es: en,
-  pt: en,
-  de: en,
-  fr: en,
+  ko,
+  ja,
+  vi,
+  es,
+  pt,
+  de,
+  fr,
 }
 
 export default function SolutionsPage() {

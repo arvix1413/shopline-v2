@@ -61,17 +61,102 @@ const en: AppsCopy = {
   ctaSubtitle: 'Full-featured demos — free trial, no credit card required',
 }
 
+const ko: AppsCopy = {
+  title: '앱 스토어',
+  subtitle: '다양한 이커머스 솔루션의 체험 시스템을 살펴보세요',
+  ctaLoggedIn: '체험 허브로 이동',
+  ctaGuest: '14일 무료 체험',
+  allTag: '전체',
+  empty: '아직 이용 가능한 체험 시스템이 없습니다',
+  tryNow: '지금 체험 →',
+  ctaTitle: '전체 기능을 경험하세요',
+  ctaSubtitle: '전체 기능 데모 — 무료 체험, 신용카드 불필요',
+}
+
+const ja: AppsCopy = {
+  title: 'アプリストア',
+  subtitle: 'さまざまな EC ソリューションのトライアルを体験',
+  ctaLoggedIn: 'トライアルハブへ',
+  ctaGuest: '14日間無料トライアル',
+  allTag: 'すべて',
+  empty: '利用可能なトライアルはまだありません',
+  tryNow: '今すぐ試す →',
+  ctaTitle: 'フル機能を体験',
+  ctaSubtitle: 'フル機能デモ — 無料トライアル、クレジットカード不要',
+}
+
+const vi: AppsCopy = {
+  title: 'Cửa hàng ứng dụng',
+  subtitle: 'Khám phá hệ thống dùng thử trên các giải pháp thương mại điện tử',
+  ctaLoggedIn: 'Đến trung tâm dùng thử',
+  ctaGuest: 'Dùng thử miễn phí 14 ngày',
+  allTag: 'Tất cả',
+  empty: 'Chưa có hệ thống dùng thử',
+  tryNow: 'Dùng thử ngay →',
+  ctaTitle: 'Trải nghiệm sản phẩm đầy đủ',
+  ctaSubtitle: 'Demo đầy đủ tính năng — dùng thử miễn phí, không cần thẻ tín dụng',
+}
+
+const es: AppsCopy = {
+  title: 'Tienda de apps',
+  subtitle: 'Explora sistemas de prueba en soluciones de ecommerce',
+  ctaLoggedIn: 'Ir al centro de pruebas',
+  ctaGuest: 'Prueba gratis de 14 días',
+  allTag: 'Todas',
+  empty: 'Aún no hay sistemas de prueba disponibles',
+  tryNow: 'Probar ahora →',
+  ctaTitle: 'Experimenta el producto completo',
+  ctaSubtitle: 'Demos completas — prueba gratis, sin tarjeta de crédito',
+}
+
+const pt: AppsCopy = {
+  title: 'Loja de apps',
+  subtitle: 'Explore sistemas de teste em soluções de ecommerce',
+  ctaLoggedIn: 'Ir ao hub de testes',
+  ctaGuest: 'Teste grátis de 14 dias',
+  allTag: 'Todas',
+  empty: 'Ainda não há sistemas de teste disponíveis',
+  tryNow: 'Experimentar agora →',
+  ctaTitle: 'Experimente o produto completo',
+  ctaSubtitle: 'Demos completas — teste grátis, sem cartão de crédito',
+}
+
+const de: AppsCopy = {
+  title: 'App-Store',
+  subtitle: 'Testsysteme für Ecommerce-Lösungen entdecken',
+  ctaLoggedIn: 'Zum Trial-Hub',
+  ctaGuest: '14 Tage kostenlos testen',
+  allTag: 'Alle',
+  empty: 'Noch keine Testsysteme verfügbar',
+  tryNow: 'Jetzt testen →',
+  ctaTitle: 'Das volle Produkt erleben',
+  ctaSubtitle: 'Vollständige Demos — kostenlose Testphase, keine Kreditkarte nötig',
+}
+
+const fr: AppsCopy = {
+  title: 'Boutique d’apps',
+  subtitle: 'Explorez les systèmes d’essai des solutions ecommerce',
+  ctaLoggedIn: 'Aller au hub d’essai',
+  ctaGuest: 'Essai gratuit de 14 jours',
+  allTag: 'Tout',
+  empty: 'Aucun système d’essai disponible pour le moment',
+  tryNow: 'Essayer maintenant →',
+  ctaTitle: 'Découvrez le produit complet',
+  ctaSubtitle: 'Démos complètes — essai gratuit, sans carte bancaire',
+}
+
+
 const copy: Partial<Record<Locale, AppsCopy>> & { 'zh-TW': AppsCopy; en: AppsCopy } = {
   'zh-TW': zhTW,
   'zh-CN': zhCN,
   en,
-  ko: en,
-  ja: en,
-  vi: en,
-  es: en,
-  pt: en,
-  de: en,
-  fr: en,
+  ko,
+  ja,
+  vi,
+  es,
+  pt,
+  de,
+  fr,
 }
 
 export default function AppsPage() {

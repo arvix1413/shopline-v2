@@ -101,17 +101,206 @@ const en: TrafficCopy = {
   ctaSubtitle: 'Join and start your omnichannel journey',
 }
 
+const ko: TrafficCopy = {
+  title: '트래픽 확보 & 전환',
+  subtitle: '주의가 파편화되고 광고 ROI가 하락합니다. ARVIX는 멀티 풀 확보와 크로스 플랫폼 분석으로 브랜드가 앞서게 돕습니다.',
+  cta: '무료 체험 시작',
+  problemsTitle: '리테일러가 맞닥뜨리는 3가지 트래픽 과제',
+  problems: [
+    { title: '파편화된 트래픽', desc: '트래픽이 Meta·숏폼·검색 등으로 갈라져 — 단일 채널 지출 효율이 떨어집니다.' },
+    { title: '복잡한 의사결정 경로', desc: '많은 접점에 걸친 긴 여정은 어트리뷰션 통합을 어렵게 만듭니다.' },
+    { title: '데이터 사일로', desc: '서로 다른 플랫폼과 UI가 분석을 막아 크로스 채널 최적화가 약해집니다.' },
+  ],
+  layoutTitle: '가장 완성도 높은 트래픽 플레이북',
+  layoutSubtitle: '확보·통합·전환 — 처음부터 끝까지',
+  tabs: [
+    { title: '멀티 장면 전환을 위한 풀 툴킷', desc: '장면별 기능으로 각 트래픽 소스에 맞는 전환 플레이를 짜고 주문량을 키우세요.' },
+    { title: '모든 장면의 트래픽을 장악', desc: '멀티 장면 트래픽 풀을 구축해 브랜드가 채널 전반에서 확보·전환을 주도하세요.' },
+    { title: '옴니채널 트래픽 가치 통합', desc: '광고와 소셜로 유입된 뒤, ARVIX가 관리·심층 분석·리타겟팅을 하나로 묶습니다.' },
+  ],
+  toolsTitle: 'ARVIX 2025 트래픽 도구',
+  tools: [
+    { title: '인플루언서 공동구매', desc: '전용 제휴 스토어프론트가 코드 없이 할인을 적용하고, 파트너 성과를 추적합니다.', img: 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=1200&q=80' },
+    { title: '상품 크라우드펀딩', desc: 'SHOP Builder로 사이트에서 프리오더 캠페인을 열고 — 판매량·잔여 재고로 긴급감을 만드세요.', img: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=1200&q=80' },
+    { title: 'POS 팝업', desc: '몰 팝업·이벤트용 휴대 ARVIX POS — 주문/재고를 동기화하고 오프라인 트래픽을 OMO 풀에 담습니다.', img: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=1200&q=80' },
+  ],
+  ctaTitle: '전 세계 600,000+ 셀러가 신뢰하는 ARVIX',
+  ctaSubtitle: '합류하고 옴니채널 여정을 시작하세요',
+}
+
+const ja: TrafficCopy = {
+  title: 'トラフィック獲得＆コンバージョン',
+  subtitle: '注意力は断片化し、広告 ROI は低下。ARVIX はマルチプール獲得とクロスプラットフォーム分析でブランドの勝ち筋を支えます。',
+  cta: '無料トライアルを開始',
+  problemsTitle: '小売が直面する 3 つのトラフィック課題',
+  problems: [
+    { title: '断片化したトラフィック', desc: 'トラフィックは Meta・ショート動画・検索などに分散 — 単一チャネル投下は効率を落とします。' },
+    { title: '複雑な意思決定パス', desc: '多くの接点にわたる長いジャーニーはアトリビューションの統合を難しくします。' },
+    { title: 'データサイロ', desc: '異なるプラットフォームと UI が分析を阻み、クロスチャネル最適化が弱まります。' },
+  ],
+  layoutTitle: '最も完成度の高いトラフィックプレイブック',
+  layoutSubtitle: '獲得・統合・転換 — エンドツーエンド',
+  tabs: [
+    { title: 'マルチシーン転換のためのフルツールキット', desc: 'シーン対応機能で各トラフィック源に合わせた転換施策を設計し、注文量を伸ばせます。' },
+    { title: 'あらゆるシーンのトラフィックを握る', desc: 'マルチシーントラフィックプールを構築し、ブランドがチャネル横断で獲得・転換を主導。' },
+    { title: 'オムニチャネルのトラフィック価値を統合', desc: '広告とソーシャルで流入したあと、ARVIX が管理・深掘り分析・リターゲティングを一本化。' },
+  ],
+  toolsTitle: 'ARVIX 2025 トラフィックツール',
+  tools: [
+    { title: 'インフルエンサー共同購入', desc: '専用アフィリエイトストアがコードなしで割引を適用し、パートナー成果を追跡。', img: 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=1200&q=80' },
+    { title: '商品クラウドファンディング', desc: 'SHOP Builder でサイト上に先行予約キャンペーンを展開 — 売上と残在庫で緊迫感を演出。', img: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=1200&q=80' },
+    { title: 'POS ポップアップ', desc: 'モール・イベント向けポータブル ARVIX POS — 注文/在庫を同期し、オフライン流入を OMO プールへ。', img: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=1200&q=80' },
+  ],
+  ctaTitle: '世界中の 600,000+ のマーチャントに信頼されています',
+  ctaSubtitle: '参加してオムニチャネルの旅を始めましょう',
+}
+
+const vi: TrafficCopy = {
+  title: 'Thu hút & chuyển đổi traffic',
+  subtitle: 'Sự chú ý bị phân mảnh và ROI quảng cáo đang giảm. ARVIX giúp thương hiệu thắng với thu hút đa pool và analytics đa nền tảng.',
+  cta: 'Bắt đầu dùng thử miễn phí',
+  problemsTitle: 'Ba thách thức traffic mà nhà bán lẻ gặp phải',
+  problems: [
+    { title: 'Traffic phân mảnh', desc: 'Traffic chia trên Meta, video ngắn, tìm kiếm và hơn nữa — chi tiêu một kênh mất hiệu quả.' },
+    { title: 'Đường quyết định phức tạp', desc: 'Hành trình dài qua nhiều điểm chạm khiến attribution khó thống nhất.' },
+    { title: 'Silo dữ liệu', desc: 'Nền tảng và UI khác nhau chặn phân tích, nên tối ưu đa kênh bị ảnh hưởng.' },
+  ],
+  layoutTitle: 'Playbook traffic hoàn thiện nhất',
+  layoutSubtitle: 'Thu hút, thống nhất và chuyển đổi — đầu đến cuối',
+  tabs: [
+    { title: 'Bộ công cụ đầy đủ cho chuyển đổi đa cảnh', desc: 'Tính năng sẵn cho từng cảnh giúp bạn tùy chỉnh play chuyển đổi theo nguồn traffic và tăng đơn.' },
+    { title: 'Làm chủ traffic mọi cảnh', desc: 'Xây pool traffic đa cảnh để thương hiệu thu hút và chuyển đổi đa kênh có kiểm soát.' },
+    { title: 'Thống nhất giá trị traffic omnichannel', desc: 'Sau khi ads và social đưa khách vào, ARVIX thống nhất quản lý, phân tích sâu và retargeting.' },
+  ],
+  toolsTitle: 'Công cụ traffic ARVIX 2025',
+  tools: [
+    { title: 'Group-buy influencer', desc: 'Storefront affiliate riêng áp dụng giảm giá không cần mã, kèm theo dõi hiệu suất đối tác.', img: 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=1200&q=80' },
+    { title: 'Gây quỹ sản phẩm', desc: 'Chạy chiến dịch preorder trên site với SHOP Builder — hiện doanh số và tồn còn lại để tạo urgency.', img: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=1200&q=80' },
+    { title: 'POS pop-up', desc: 'ARVIX POS di động cho pop-up mall và sự kiện — đồng bộ đơn/tồn và đưa traffic offline vào pool OMO.', img: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=1200&q=80' },
+  ],
+  ctaTitle: 'Được hơn 600.000 thương nhân trên thế giới tin dùng',
+  ctaSubtitle: 'Tham gia và bắt đầu hành trình omnichannel của bạn',
+}
+
+const es: TrafficCopy = {
+  title: 'Adquisición y conversión de tráfico',
+  subtitle: 'La atención está fragmentada y el ROI publicitario cae. ARVIX ayuda a las marcas a ganar con adquisición multi-pool y analítica cross-platform.',
+  cta: 'Empieza la prueba gratis',
+  problemsTitle: 'Tres retos de tráfico que enfrentan los retailers',
+  problems: [
+    { title: 'Tráfico fragmentado', desc: 'El tráfico se reparte en Meta, vídeo corto, búsqueda y más — el gasto de un solo canal pierde eficiencia.' },
+    { title: 'Rutas de decisión complejas', desc: 'Viajes más largos en muchos touchpoints hacen difícil unificar la atribución.' },
+    { title: 'Silos de datos', desc: 'Distintas plataformas y UIs bloquean el análisis, y la optimización cross-channel sufre.' },
+  ],
+  layoutTitle: 'El playbook de tráfico más completo',
+  layoutSubtitle: 'Adquirir, unificar y convertir — de punta a punta',
+  tabs: [
+    { title: 'Toolkit completo para conversión multi-escena', desc: 'Funciones listas por escena te permiten adaptar plays de conversión a cada fuente y crecer el volumen de pedidos.' },
+    { title: 'Domina el tráfico de cada escena', desc: 'Construye un pool multi-escena para que las marcas adquieran y conviertan en canales con control.' },
+    { title: 'Unifica el valor del tráfico omnicanal', desc: 'Tras ads y social, ARVIX unifica gestión, análisis profundo y retargeting.' },
+  ],
+  toolsTitle: 'Herramientas de tráfico ARVIX 2025',
+  tools: [
+    { title: 'Group-buy de influencers', desc: 'Vitrinas afiliadas dedicadas aplican descuentos sin códigos, con seguimiento de rendimiento de partners.', img: 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=1200&q=80' },
+    { title: 'Crowdfunding de producto', desc: 'Lanza campañas de preventa en tu sitio con SHOP Builder — muestra ventas y stock restante para urgencia.', img: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=1200&q=80' },
+    { title: 'POS pop-up', desc: 'ARVIX POS portátil para pop-ups en malls y eventos — sincroniza pedidos/inventario y alimenta tu pool OMO.', img: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=1200&q=80' },
+  ],
+  ctaTitle: 'Más de 600.000 comercios en el mundo confían en ARVIX',
+  ctaSubtitle: 'Únete y comienza tu viaje omnicanal',
+}
+
+const pt: TrafficCopy = {
+  title: 'Aquisição e conversão de tráfego',
+  subtitle: 'A atenção está fragmentada e o ROI de ads cai. A ARVIX ajuda marcas a vencer com aquisição multi-pool e analytics cross-platform.',
+  cta: 'Começar teste grátis',
+  problemsTitle: 'Três desafios de tráfego que varejistas enfrentam',
+  problems: [
+    { title: 'Tráfego fragmentado', desc: 'O tráfego se divide em Meta, vídeo curto, busca e mais — gasto em canal único perde eficiência.' },
+    { title: 'Caminhos de decisão complexos', desc: 'Jornadas mais longas em muitos touchpoints dificultam unificar a atribuição.' },
+    { title: 'Silos de dados', desc: 'Plataformas e UIs diferentes bloqueiam a análise, e a otimização cross-channel sofre.' },
+  ],
+  layoutTitle: 'O playbook de tráfego mais completo',
+  layoutSubtitle: 'Adquirir, unificar e converter — ponta a ponta',
+  tabs: [
+    { title: 'Toolkit completo para conversão multi-cena', desc: 'Recursos prontos por cena permitem adaptar plays de conversão a cada fonte e crescer o volume de pedidos.' },
+    { title: 'Domine o tráfego de cada cena', desc: 'Construa um pool multi-cena para marcas adquirirem e converterem nos canais com controle.' },
+    { title: 'Unifique o valor do tráfego omnichannel', desc: 'Depois que ads e social trazem visitantes, a ARVIX unifica gestão, análise profunda e retargeting.' },
+  ],
+  toolsTitle: 'Ferramentas de tráfego ARVIX 2025',
+  tools: [
+    { title: 'Group-buy de influencers', desc: 'Vitrines afiliadas dedicadas aplicam descontos sem códigos, com tracking de performance de parceiros.', img: 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=1200&q=80' },
+    { title: 'Crowdfunding de produto', desc: 'Lance campanhas de pré-venda no site com SHOP Builder — mostre vendas e estoque restante para urgência.', img: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=1200&q=80' },
+    { title: 'POS pop-up', desc: 'ARVIX POS portátil para pop-ups em malls e eventos — sincronize pedidos/estoque e alimente seu pool OMO.', img: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=1200&q=80' },
+  ],
+  ctaTitle: 'Mais de 600.000 comerciantes no mundo confiam na ARVIX',
+  ctaSubtitle: 'Participe e comece sua jornada omnichannel',
+}
+
+const de: TrafficCopy = {
+  title: 'Traffic-Akquise & Conversion',
+  subtitle: 'Aufmerksamkeit ist fragmentiert und Ad-ROI fällt. ARVIX hilft Marken mit Multi-Pool-Akquise und Cross-Platform-Analytics zu gewinnen.',
+  cta: 'Kostenlos testen',
+  problemsTitle: 'Drei Traffic-Herausforderungen für Retailer',
+  problems: [
+    { title: 'Fragmentierter Traffic', desc: 'Traffic ist über Meta, Short Video, Search und mehr verteilt — Single-Channel-Spend verliert Effizienz.' },
+    { title: 'Komplexe Entscheidungspfade', desc: 'Längere Journeys über viele Touchpoints machen Attribution schwer zu vereinheitlichen.' },
+    { title: 'Datensilos', desc: 'Unterschiedliche Plattformen und UIs blockieren Analyse — Cross-Channel-Optimierung leidet.' },
+  ],
+  layoutTitle: 'Das vollständigste Traffic-Playbook',
+  layoutSubtitle: 'Akquirieren, vereinheitlichen und konvertieren — End-to-End',
+  tabs: [
+    { title: 'Volles Toolkit für Multi-Scene-Conversion', desc: 'Scene-ready Features lassen Sie Conversion-Plays je Traffic-Quelle zuschneiden und Bestellvolumen steigern.' },
+    { title: 'Traffic jeder Scene besitzen', desc: 'Bauen Sie einen Multi-Scene-Traffic-Pool, damit Marken kanalübergreifend mit Kontrolle akquirieren und konvertieren.' },
+    { title: 'Omnichannel-Traffic-Wert vereinheitlichen', desc: 'Nachdem Ads und Social Besucher bringen, vereint ARVIX Management, Tiefenanalyse und Retargeting.' },
+  ],
+  toolsTitle: 'ARVIX 2025 Traffic-Tools',
+  tools: [
+    { title: 'Influencer-Group-Buy', desc: 'Dedizierte Affiliate-Storefronts wenden Rabatte ohne Codes an — mit Partner-Performance-Tracking.', img: 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=1200&q=80' },
+    { title: 'Produkt-Crowdfunding', desc: 'Starten Sie Preorder-Kampagnen auf Ihrer Site mit SHOP Builder — zeigen Sie Sales und Restbestand für Urgency.', img: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=1200&q=80' },
+    { title: 'POS-Pop-up', desc: 'Portables ARVIX POS für Mall-Pop-ups und Events — sync Orders/Inventory und speist Offline-Traffic in Ihren OMO-Pool.', img: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=1200&q=80' },
+  ],
+  ctaTitle: 'Mehr als 600.000 Händler weltweit vertrauen ARVIX',
+  ctaSubtitle: 'Mitmachen und deine Omnichannel-Reise starten',
+}
+
+const fr: TrafficCopy = {
+  title: 'Acquisition & conversion de trafic',
+  subtitle: 'L’attention est fragmentée et le ROI pubs baisse. ARVIX aide les marques à gagner avec une acquisition multi-pool et des analytics cross-platform.',
+  cta: 'Démarrer l’essai gratuit',
+  problemsTitle: 'Trois défis trafic auxquels font face les retailers',
+  problems: [
+    { title: 'Trafic fragmenté', desc: 'Le trafic se répartit sur Meta, short video, search et plus — le spend mono-canal perd en efficacité.' },
+    { title: 'Parcours de décision complexes', desc: 'Des journeys plus longs sur de nombreux touchpoints rendent l’attribution difficile à unifier.' },
+    { title: 'Silos de données', desc: 'Plateformes et UI différentes bloquent l’analyse, donc l’optimisation cross-canal en pâtit.' },
+  ],
+  layoutTitle: 'Le playbook trafic le plus complet',
+  layoutSubtitle: 'Acquérir, unifier et convertir — de bout en bout',
+  tabs: [
+    { title: 'Toolkit complet pour la conversion multi-scène', desc: 'Des fonctions prêtes par scène permettent d’adapter les plays de conversion à chaque source et de faire croître le volume de commandes.' },
+    { title: 'Maîtrisez le trafic de chaque scène', desc: 'Construisez un pool multi-scène pour que les marques acquièrent et convertissent sur les canaux avec contrôle.' },
+    { title: 'Unifiez la valeur du trafic omnicanal', desc: 'Après ads et social, ARVIX unifie gestion, analyse profonde et retargeting.' },
+  ],
+  toolsTitle: 'Outils trafic ARVIX 2025',
+  tools: [
+    { title: 'Group-buy influenceurs', desc: 'Vitrines affiliées dédiées appliquent des remises sans codes, avec suivi de performance partenaires.', img: 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=1200&q=80' },
+    { title: 'Crowdfunding produit', desc: 'Lancez des campagnes précommande sur votre site avec SHOP Builder — affichez ventes et stock restant pour l’urgence.', img: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=1200&q=80' },
+    { title: 'POS pop-up', desc: 'ARVIX POS portable pour pop-ups mall et événements — sync commandes/stock et alimente votre pool OMO.', img: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=1200&q=80' },
+  ],
+  ctaTitle: 'Plus de 600 000 marchands dans le monde font confiance à ARVIX',
+  ctaSubtitle: 'Rejoignez-nous et démarrez votre parcours omnicanal',
+}
+
 const copy: Partial<Record<Locale, TrafficCopy>> & { 'zh-TW': TrafficCopy; en: TrafficCopy } = {
   'zh-TW': zhTW,
   'zh-CN': zhCN,
   en,
-  ko: en,
-  ja: en,
-  vi: en,
-  es: en,
-  pt: en,
-  de: en,
-  fr: en,
+  ko,
+  ja,
+  vi,
+  es,
+  pt,
+  de,
+  fr,
 }
 
 export default function TrafficConversionPage() {

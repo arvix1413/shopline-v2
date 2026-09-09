@@ -139,17 +139,304 @@ const en: ContactCopy = {
   ctaButton: 'Start free store',
 }
 
+const ko: ContactCopy = {
+  title: '문의하기',
+  subtitle: '스토어 개설, 제품 지원, 파트너십 상담까지 — ARVIX 팀이 도와드립니다.',
+  channelsTitle: '연락 방법',
+  channels: [
+    {
+      icon: '💬',
+      title: 'LINE 지원',
+      desc: '영업일에는 제품·개설 관련 질문을 실시간으로 문의하세요.',
+      cta: 'LINE으로 채팅',
+      href: 'https://line.me/R/ti/p/@kxh0647n',
+    },
+    {
+      icon: '📞',
+      title: '무료 상담 예약',
+      desc: '디지털 전환과 옴니채널 성장에 대해 1:1 어드바이저와 상담하세요.',
+      cta: '지금 예약',
+      href: '/consultation',
+    },
+    {
+      icon: '🤝',
+      title: '파트너십',
+      desc: '리셀러, 어필리에이트, 개발자, 기술 파트너 — 함께 만들어 가요.',
+      cta: '파트너십 살펴보기',
+      href: '/cooperate',
+    },
+    {
+      icon: '✉️',
+      title: 'Email',
+      desc: '급하지 않은 문의는 이메일로 보내 주세요. 빠르게 답변드리겠습니다.',
+      cta: 'arvix1413@gmail.com',
+      href: 'mailto:arvix1413@gmail.com',
+    },
+  ],
+  hoursTitle: '서비스 시간',
+  hours: '월–금 10:00–19:00 (대만 시간, 공휴일 제외)',
+  ctaTitle: '판매를 시작할 준비가 되셨나요?',
+  ctaSubtitle: '14일 무료 체험 — 부담 없이 브랜드 스토어를 런칭하세요.',
+  ctaButton: '무료로 스토어 시작',
+}
+
+const ja: ContactCopy = {
+  title: 'お問い合わせ',
+  subtitle: 'ストア開設、製品サポート、パートナーシップのご相談まで — ARVIX チームが対応します。',
+  channelsTitle: 'ご連絡方法',
+  channels: [
+    {
+      icon: '💬',
+      title: 'LINE サポート',
+      desc: '営業日は製品・開設に関するご質問をリアルタイムでどうぞ。',
+      cta: 'LINE でチャット',
+      href: 'https://line.me/R/ti/p/@kxh0647n',
+    },
+    {
+      icon: '📞',
+      title: '無料相談を予約',
+      desc: 'デジタル変革とオムニチャネル成長について、アドバイザーと 1:1 で話せます。',
+      cta: '今すぐ予約',
+      href: '/consultation',
+    },
+    {
+      icon: '🤝',
+      title: 'パートナーシップ',
+      desc: 'リセラー、アフィリエイト、開発者、技術パートナー — 一緒に築きましょう。',
+      cta: 'パートナーシップを見る',
+      href: '/cooperate',
+    },
+    {
+      icon: '✉️',
+      title: 'Email',
+      desc: '急ぎでないご依頼はメールで。できるだけ早くご返信します。',
+      cta: 'arvix1413@gmail.com',
+      href: 'mailto:arvix1413@gmail.com',
+    },
+  ],
+  hoursTitle: '受付時間',
+  hours: '月–金 10:00–19:00（台湾時間、祝日を除く）',
+  ctaTitle: '販売を始める準備はできましたか？',
+  ctaSubtitle: '14 日間無料トライアル — スムーズにブランドストアを開設。',
+  ctaButton: '無料でストアを開始',
+}
+
+const vi: ContactCopy = {
+  title: 'Liên hệ',
+  subtitle: 'Dù bạn cần hỗ trợ mở cửa hàng, hỗ trợ sản phẩm hay trao đổi hợp tác — đội ngũ ARVIX sẵn sàng.',
+  channelsTitle: 'Cách liên hệ với chúng tôi',
+  channels: [
+    {
+      icon: '💬',
+      title: 'Hỗ trợ LINE',
+      desc: 'Hỏi về sản phẩm và thiết lập theo thời gian thực vào ngày làm việc.',
+      cta: 'Chat trên LINE',
+      href: 'https://line.me/R/ti/p/@kxh0647n',
+    },
+    {
+      icon: '📞',
+      title: 'Đặt tư vấn miễn phí',
+      desc: 'Trao đổi 1:1 với cố vấn về chuyển đổi số và tăng trưởng omnichannel.',
+      cta: 'Đặt lịch ngay',
+      href: '/consultation',
+    },
+    {
+      icon: '🤝',
+      title: 'Hợp tác',
+      desc: 'Đại lý, affiliate, nhà phát triển và đối tác công nghệ — hãy cùng xây dựng.',
+      cta: 'Khám phá hợp tác',
+      href: '/cooperate',
+    },
+    {
+      icon: '✉️',
+      title: 'Email',
+      desc: 'Với yêu cầu không gấp, hãy gửi email — chúng tôi sẽ phản hồi sớm.',
+      cta: 'arvix1413@gmail.com',
+      href: 'mailto:arvix1413@gmail.com',
+    },
+  ],
+  hoursTitle: 'Giờ làm việc',
+  hours: 'T2–T6 10:00–19:00 (giờ Đài Loan, trừ ngày lễ)',
+  ctaTitle: 'Sẵn sàng bắt đầu bán hàng?',
+  ctaSubtitle: 'Dùng thử miễn phí 14 ngày — mở cửa hàng thương hiệu không rào cản.',
+  ctaButton: 'Bắt đầu cửa hàng miễn phí',
+}
+
+const es: ContactCopy = {
+  title: 'Contáctanos',
+  subtitle: 'Ya sea ayuda para abrir tienda, soporte de producto o una conversación de partnership — el equipo ARVIX está aquí.',
+  channelsTitle: 'Formas de contactarnos',
+  channels: [
+    {
+      icon: '💬',
+      title: 'Soporte LINE',
+      desc: 'Pregunta sobre producto y configuración en tiempo real en días laborables.',
+      cta: 'Chatear en LINE',
+      href: 'https://line.me/R/ti/p/@kxh0647n',
+    },
+    {
+      icon: '📞',
+      title: 'Reserva una consulta gratis',
+      desc: 'Habla 1:1 con un asesor sobre transformación digital y crecimiento omnicanal.',
+      cta: 'Reservar ahora',
+      href: '/consultation',
+    },
+    {
+      icon: '🤝',
+      title: 'Partnerships',
+      desc: 'Revendedores, afiliados, desarrolladores y partners tech — construyamos juntos.',
+      cta: 'Explorar partnerships',
+      href: '/cooperate',
+    },
+    {
+      icon: '✉️',
+      title: 'Email',
+      desc: 'Para solicitudes no urgentes, escríbenos y te responderemos.',
+      cta: 'arvix1413@gmail.com',
+      href: 'mailto:arvix1413@gmail.com',
+    },
+  ],
+  hoursTitle: 'Horario de atención',
+  hours: 'Lun–Vie 10:00–19:00 (hora de Taiwán, excepto festivos)',
+  ctaTitle: '¿Listo para empezar a vender?',
+  ctaSubtitle: 'Prueba gratis de 14 días — lanza tu tienda de marca sin fricción.',
+  ctaButton: 'Abrir tienda gratis',
+}
+
+const pt: ContactCopy = {
+  title: 'Fale conosco',
+  subtitle: 'Seja ajuda para abrir loja, suporte de produto ou uma conversa de parceria — a equipe ARVIX está aqui.',
+  channelsTitle: 'Formas de nos contactar',
+  channels: [
+    {
+      icon: '💬',
+      title: 'Suporte LINE',
+      desc: 'Tire dúvidas de produto e configuração em tempo real em dias úteis.',
+      cta: 'Conversar no LINE',
+      href: 'https://line.me/R/ti/p/@kxh0647n',
+    },
+    {
+      icon: '📞',
+      title: 'Agende uma consultoria grátis',
+      desc: 'Fale 1:1 com um consultor sobre transformação digital e crescimento omnichannel.',
+      cta: 'Agendar agora',
+      href: '/consultation',
+    },
+    {
+      icon: '🤝',
+      title: 'Parcerias',
+      desc: 'Revendedores, afiliados, desenvolvedores e parceiros tech — vamos construir juntos.',
+      cta: 'Explorar parcerias',
+      href: '/cooperate',
+    },
+    {
+      icon: '✉️',
+      title: 'Email',
+      desc: 'Para pedidos não urgentes, envie um e-mail e responderemos em breve.',
+      cta: 'arvix1413@gmail.com',
+      href: 'mailto:arvix1413@gmail.com',
+    },
+  ],
+  hoursTitle: 'Horário de atendimento',
+  hours: 'Seg–Sex 10:00–19:00 (horário de Taiwan, exceto feriados)',
+  ctaTitle: 'Pronto para começar a vender?',
+  ctaSubtitle: 'Teste grátis de 14 dias — lance sua loja de marca sem atrito.',
+  ctaButton: 'Começar loja grátis',
+}
+
+const de: ContactCopy = {
+  title: 'Kontakt',
+  subtitle: 'Ob Shop-Setup, Produktsupport oder Partnerschaftsgespräch — das ARVIX-Team ist für Sie da.',
+  channelsTitle: 'So erreichen Sie uns',
+  channels: [
+    {
+      icon: '💬',
+      title: 'LINE-Support',
+      desc: 'Stellen Sie Produkt- und Setup-Fragen an Werktagen in Echtzeit.',
+      cta: 'Auf LINE chatten',
+      href: 'https://line.me/R/ti/p/@kxh0647n',
+    },
+    {
+      icon: '📞',
+      title: 'Kostenlose Beratung buchen',
+      desc: 'Sprechen Sie 1:1 mit einem Berater über digitale Transformation und Omnichannel-Wachstum.',
+      cta: 'Jetzt buchen',
+      href: '/consultation',
+    },
+    {
+      icon: '🤝',
+      title: 'Partnerschaften',
+      desc: 'Resellerspartner, Affiliates, Entwickler und Tech-Partner — lassen Sie uns gemeinsam bauen.',
+      cta: 'Partnerschaften entdecken',
+      href: '/cooperate',
+    },
+    {
+      icon: '✉️',
+      title: 'Email',
+      desc: 'Bei nicht dringenden Anfragen mailen Sie uns — wir melden uns.',
+      cta: 'arvix1413@gmail.com',
+      href: 'mailto:arvix1413@gmail.com',
+    },
+  ],
+  hoursTitle: 'Servicezeiten',
+  hours: 'Mo–Fr 10:00–19:00 (Taiwan-Zeit, ohne Feiertage)',
+  ctaTitle: 'Bereit, mit dem Verkauf zu starten?',
+  ctaSubtitle: '14 Tage kostenlos testen — starten Sie Ihren Markenshop ohne Hürden.',
+  ctaButton: 'Kostenlosen Shop starten',
+}
+
+const fr: ContactCopy = {
+  title: 'Nous contacter',
+  subtitle: 'Aide à l’ouverture de boutique, support produit ou discussion partenariat — l’équipe ARVIX est là.',
+  channelsTitle: 'Comment nous joindre',
+  channels: [
+    {
+      icon: '💬',
+      title: 'Support LINE',
+      desc: 'Posez vos questions produit et configuration en temps réel les jours ouvrés.',
+      cta: 'Discuter sur LINE',
+      href: 'https://line.me/R/ti/p/@kxh0647n',
+    },
+    {
+      icon: '📞',
+      title: 'Réserver une consultation gratuite',
+      desc: 'Échangez 1:1 avec un conseiller sur la transformation digitale et la croissance omnicanale.',
+      cta: 'Réserver maintenant',
+      href: '/consultation',
+    },
+    {
+      icon: '🤝',
+      title: 'Partenariats',
+      desc: 'Revendeurs, affiliés, développeurs et partenaires tech — construisons ensemble.',
+      cta: 'Découvrir les partenariats',
+      href: '/cooperate',
+    },
+    {
+      icon: '✉️',
+      title: 'Email',
+      desc: 'Pour les demandes non urgentes, écrivez-nous — nous vous répondrons.',
+      cta: 'arvix1413@gmail.com',
+      href: 'mailto:arvix1413@gmail.com',
+    },
+  ],
+  hoursTitle: 'Horaires',
+  hours: 'Lun–Ven 10:00–19:00 (heure de Taïwan, hors jours fériés)',
+  ctaTitle: 'Prêt à commencer à vendre ?',
+  ctaSubtitle: 'Essai gratuit de 14 jours — lancez votre boutique de marque sans friction.',
+  ctaButton: 'Ouvrir une boutique gratuite',
+}
+
 const copy: Partial<Record<Locale, ContactCopy>> & { 'zh-TW': ContactCopy; en: ContactCopy } = {
   'zh-TW': zhTW,
   'zh-CN': zhCN,
   en,
-  ko: en,
-  ja: en,
-  vi: en,
-  es: en,
-  pt: en,
-  de: en,
-  fr: en,
+  ko,
+  ja,
+  vi,
+  es,
+  pt,
+  de,
+  fr,
 }
 
 export default function ContactPage() {

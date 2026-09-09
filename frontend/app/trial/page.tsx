@@ -54,17 +54,80 @@ const en: TrialCopy = {
   tryNow: 'Try now',
 }
 
+const ko: TrialCopy = {
+  loading: '로딩 중...',
+  badge: '체험 시스템 허브 (관리자)',
+  title: '체험할 시스템을 선택하세요',
+  subtitle: '관리자 전용입니다. 일반 판매자는 「내 스토어」를 이용해 주세요.',
+  empty: '아직 사용 가능한 체험 시스템이 없습니다. 나중에 다시 확인해 주세요.',
+  tryNow: '지금 체험',
+}
+
+const ja: TrialCopy = {
+  loading: '読み込み中...',
+  badge: 'トライアルシステムハブ（管理者）',
+  title: '試したいシステムを選ぶ',
+  subtitle: '管理者専用です。一般の店舗は「マイストア」をご利用ください。',
+  empty: '現在利用可能なトライアルシステムはありません。後でもう一度ご確認ください。',
+  tryNow: '今すぐ体験',
+}
+
+const vi: TrialCopy = {
+  loading: 'Đang tải...',
+  badge: 'Trung tâm hệ thống dùng thử (quản trị)',
+  title: 'Chọn hệ thống muốn dùng thử',
+  subtitle: 'Chỉ dành cho quản trị viên. Nhà bán hàng vui lòng dùng 「Cửa hàng của tôi」.',
+  empty: 'Chưa có hệ thống dùng thử nào. Vui lòng quay lại sau.',
+  tryNow: 'Dùng thử ngay',
+}
+
+const es: TrialCopy = {
+  loading: 'Cargando...',
+  badge: 'Centro de sistemas de prueba (admin)',
+  title: 'Elige un sistema para probar',
+  subtitle: 'Solo administradores. Los comerciantes deben usar Mi tienda.',
+  empty: 'Aún no hay sistemas de prueba disponibles. Vuelve más tarde.',
+  tryNow: 'Probar ahora',
+}
+
+const pt: TrialCopy = {
+  loading: 'Carregando...',
+  badge: 'Central de sistemas de teste (admin)',
+  title: 'Escolha um sistema para testar',
+  subtitle: 'Apenas administradores. Comerciantes devem usar Minha loja.',
+  empty: 'Ainda não há sistemas de teste disponíveis. Volte mais tarde.',
+  tryNow: 'Testar agora',
+}
+
+const de: TrialCopy = {
+  loading: 'Wird geladen...',
+  badge: 'Testsysteme-Hub (Admin)',
+  title: 'System zum Testen auswählen',
+  subtitle: 'Nur für Administratoren. Händler sollten Mein Shop nutzen.',
+  empty: 'Noch keine Testsysteme verfügbar. Bitte später erneut prüfen.',
+  tryNow: 'Jetzt testen',
+}
+
+const fr: TrialCopy = {
+  loading: 'Chargement...',
+  badge: 'Hub des systèmes d’essai (admin)',
+  title: 'Choisissez un système à essayer',
+  subtitle: 'Réservé aux administrateurs. Les marchands doivent utiliser Ma boutique.',
+  empty: 'Aucun système d’essai disponible pour le moment. Réessayez plus tard.',
+  tryNow: 'Essayer maintenant',
+}
+
 const copy: Partial<Record<Locale, TrialCopy>> & { 'zh-TW': TrialCopy; en: TrialCopy } = {
   'zh-TW': zhTW,
   'zh-CN': zhCN,
   en,
-  ko: en,
-  ja: en,
-  vi: en,
-  es: en,
-  pt: en,
-  de: en,
-  fr: en,
+  ko,
+  ja,
+  vi,
+  es,
+  pt,
+  de,
+  fr,
 }
 
 export default function TrialPage() {

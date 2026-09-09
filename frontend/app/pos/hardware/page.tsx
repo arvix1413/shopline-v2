@@ -80,17 +80,164 @@ const en: PosHardwareCopy = {
   consult: 'Free consultation',
 }
 
+const ko: PosHardwareCopy = {
+  title: 'POS 주변 하드웨어',
+  subtitle: '패션·리테일을 위해 설계된 iPad POS — 결제, 재고, 입출고, 멤버십을 직관적인 UI로 쉽게 운영하세요.',
+  tags: ['유연한 구매', '빠른 연결', '컴팩트 디자인', '무료 상담'],
+  howTitle: '하드웨어는 어떻게 쓰나요?',
+  steps: [
+    { num: 'STEP 1', desc: '입고 후 iPad에서 상품을 등록하고, 라벨 프린터로 바코드를 인쇄해 행택을 제작합니다' },
+    { num: 'STEP 2', desc: '결제 시 스캐너로 바코드를 읽고, 금전함과 전자 영수증 프린터로 계산을 완료합니다' },
+    { num: 'STEP 3', desc: '재고 조사·입고·이동 시 스캐너로 바코드를 읽어 iPad에서 처리합니다' },
+  ],
+  hardware: [
+    { name: '금전함 (소 / 대)', img: 'https://images.unsplash.com/photo-1556742111-a301076d9d18?w=1200&q=80', desc: '어떤 매장 규모에도 맞는 안전한 현금 보관' },
+    { name: '무선 바코드 라벨 프린터', img: 'https://images.unsplash.com/photo-1556742111-a301076d9d18?w=1200&q=80', desc: '상품 라벨과 행택을 더 빠르게 인쇄' },
+    { name: '무선 블루투스 스캐너', img: 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=1200&q=80', desc: '결제·재고 조사·입고를 가속' },
+    { name: '전자 영수증 프린터', img: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=1200&q=80', desc: '규격에 맞는 전자 영수증 하드웨어, 바로 연결' },
+  ],
+  ctaTitle: '리테일용 iPad POS — 매장 관리가 쉬워집니다',
+  ctaSubtitle: 'ARVIX 어드바이저와 무료 1:1 통화를 예약하세요.',
+  consult: '무료 상담',
+}
+
+const ja: PosHardwareCopy = {
+  title: 'POS 周辺ハードウェア',
+  subtitle: 'ファッション・小売向け iPad POS — レジ・在庫・仕入・会員を直感 UI でかんたんに運用。',
+  tags: ['柔軟な購入', 'すばやい接続', 'コンパクトデザイン', '無料相談'],
+  howTitle: 'ハードウェアの使い方',
+  steps: [
+    { num: 'STEP 1', desc: '入荷後に iPad で商品登録し、ラベルプリンターでバーコードを印刷して下げ札を作成' },
+    { num: 'STEP 2', desc: '会計時にスキャナーでバーコードを読み取り、ドロワーと電子インボイスプリンターで完了' },
+    { num: 'STEP 3', desc: '棚卸・入荷・移動時にスキャナーでバーコードを読み、iPad 上で処理' },
+  ],
+  hardware: [
+    { name: 'キャッシュドロワー（S / L）', img: 'https://images.unsplash.com/photo-1556742111-a301076d9d18?w=1200&q=80', desc: 'どの店舗規模にも合う安全な現金保管' },
+    { name: '無線バーコードラベルプリンター', img: 'https://images.unsplash.com/photo-1556742111-a301076d9d18?w=1200&q=80', desc: '商品ラベルと下げ札をより速く印刷' },
+    { name: '無線 Bluetooth スキャナー', img: 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=1200&q=80', desc: '会計・棚卸・入荷をスピードアップ' },
+    { name: '電子インボイスプリンター', img: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=1200&q=80', desc: '準拠した電子インボイス機器、すぐ接続' },
+  ],
+  ctaTitle: '小売向け iPad POS — 店舗管理がかんたんに',
+  ctaSubtitle: 'ARVIX アドバイザーとの無料 1:1 通話を予約。',
+  consult: '無料相談',
+}
+
+const vi: PosHardwareCopy = {
+  title: 'Phần cứng ngoại vi POS',
+  subtitle: 'iPad POS dành cho thời trang và bán lẻ — thanh toán, tồn kho, nhập hàng và hội viên với UI trực quan giúp vận hành cửa hàng dễ dàng.',
+  tags: ['Mua linh hoạt', 'Kết nối nhanh', 'Thiết kế gọn', 'Tư vấn miễn phí'],
+  howTitle: 'Phần cứng dùng thế nào?',
+  steps: [
+    { num: 'STEP 1', desc: 'Nhận hàng, tạo sản phẩm trên iPad và in mã vạch bằng máy in nhãn để làm thẻ treo' },
+    { num: 'STEP 2', desc: 'Quét mã vạch khi thanh toán kèm ngăn kéo tiền và máy in hóa đơn điện tử' },
+    { num: 'STEP 3', desc: 'Dùng máy quét trên iPad cho kiểm kê, nhận hàng và chuyển kho' },
+  ],
+  hardware: [
+    { name: 'Ngăn kéo tiền (S / L)', img: 'https://images.unsplash.com/photo-1556742111-a301076d9d18?w=1200&q=80', desc: 'Cất tiền an toàn phù hợp mọi quy mô cửa hàng' },
+    { name: 'Máy in nhãn mã vạch không dây', img: 'https://images.unsplash.com/photo-1556742111-a301076d9d18?w=1200&q=80', desc: 'In nhãn sản phẩm và thẻ treo nhanh hơn' },
+    { name: 'Máy quét Bluetooth không dây', img: 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=1200&q=80', desc: 'Tăng tốc thanh toán, kiểm kê và nhận hàng' },
+    { name: 'Máy in hóa đơn điện tử', img: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=1200&q=80', desc: 'Phần cứng hóa đơn điện tử chuẩn, sẵn sàng kết nối' },
+  ],
+  ctaTitle: 'iPad POS sẵn sàng bán lẻ — quản lý cửa hàng thật dễ',
+  ctaSubtitle: 'Đặt cuộc gọi 1:1 miễn phí với cố vấn ARVIX.',
+  consult: 'Tư vấn miễn phí',
+}
+
+const es: PosHardwareCopy = {
+  title: 'Periféricos de hardware POS',
+  subtitle: 'Un iPad POS pensado para moda y retail — checkout, inventario, compras y membresía con una UI intuitiva que facilita la operación.',
+  tags: ['Compra flexible', 'Emparejamiento rápido', 'Diseño compacto', 'Consulta gratis'],
+  howTitle: 'Cómo funciona el hardware',
+  steps: [
+    { num: 'STEP 1', desc: 'Recibe mercancía, crea productos en el iPad e imprime códigos de barras con la impresora de etiquetas para colgantes' },
+    { num: 'STEP 2', desc: 'Escanea códigos en el checkout con el cajón de efectivo y la impresora de e-factura' },
+    { num: 'STEP 3', desc: 'Usa el escáner en el iPad para inventarios, recepciones y transferencias' },
+  ],
+  hardware: [
+    { name: 'Cajón de efectivo (S / L)', img: 'https://images.unsplash.com/photo-1556742111-a301076d9d18?w=1200&q=80', desc: 'Almacenamiento seguro de efectivo para cualquier tamaño de tienda' },
+    { name: 'Impresora de etiquetas de código de barras inalámbrica', img: 'https://images.unsplash.com/photo-1556742111-a301076d9d18?w=1200&q=80', desc: 'Imprime etiquetas de producto y colgantes más rápido' },
+    { name: 'Escáner Bluetooth inalámbrico', img: 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=1200&q=80', desc: 'Acelera checkout, inventarios y recepciones' },
+    { name: 'Impresora de e-factura', img: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=1200&q=80', desc: 'Hardware de facturación electrónica conforme, listo para conectar' },
+  ],
+  ctaTitle: 'iPad POS listo para retail — gestión de tienda fácil',
+  ctaSubtitle: 'Agenda una llamada 1:1 gratis con un asesor ARVIX.',
+  consult: 'Consulta gratis',
+}
+
+const pt: PosHardwareCopy = {
+  title: 'Periféricos de hardware POS',
+  subtitle: 'Um iPad POS feito para moda e varejo — checkout, estoque, compras e associação com UI intuitiva que facilita a operação.',
+  tags: ['Compra flexível', 'Pareamento rápido', 'Design compacto', 'Consultoria grátis'],
+  howTitle: 'Como o hardware funciona',
+  steps: [
+    { num: 'STEP 1', desc: 'Receba mercadorias, crie produtos no iPad e imprima códigos de barras com a impressora de etiquetas para tags' },
+    { num: 'STEP 2', desc: 'Escaneie códigos no checkout com a gaveta de dinheiro e a impressora de e-fatura' },
+    { num: 'STEP 3', desc: 'Use o scanner no iPad para inventários, recebimentos e transferências' },
+  ],
+  hardware: [
+    { name: 'Gaveta de dinheiro (S / L)', img: 'https://images.unsplash.com/photo-1556742111-a301076d9d18?w=1200&q=80', desc: 'Armazenamento seguro de dinheiro para qualquer tamanho de loja' },
+    { name: 'Impressora de etiquetas de código de barras sem fio', img: 'https://images.unsplash.com/photo-1556742111-a301076d9d18?w=1200&q=80', desc: 'Imprima etiquetas de produto e tags mais rápido' },
+    { name: 'Scanner Bluetooth sem fio', img: 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=1200&q=80', desc: 'Acelere checkout, inventários e recebimentos' },
+    { name: 'Impressora de e-fatura', img: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=1200&q=80', desc: 'Hardware de faturação eletrônica em conformidade, pronto para conectar' },
+  ],
+  ctaTitle: 'iPad POS pronto para varejo — gestão de loja fácil',
+  ctaSubtitle: 'Agende uma ligação 1:1 grátis com um consultor ARVIX.',
+  consult: 'Consultoria grátis',
+}
+
+const de: PosHardwareCopy = {
+  title: 'POS-Hardware-Peripherie',
+  subtitle: 'Ein iPad-POS für Fashion und Retail — Checkout, Bestand, Einkauf und Mitgliedschaft mit intuitiver UI für einfachen Ladenbetrieb.',
+  tags: ['Flexibler Kauf', 'Schnelle Kopplung', 'Kompaktes Design', 'Kostenlose Beratung'],
+  howTitle: 'So funktioniert die Hardware',
+  steps: [
+    { num: 'STEP 1', desc: 'Ware annehmen, Produkte auf dem iPad anlegen und Barcodes mit dem Etikettendrucker für Hangtags drucken' },
+    { num: 'STEP 2', desc: 'Barcodes am Checkout mit Kassenschublade und E-Invoice-Drucker scannen' },
+    { num: 'STEP 3', desc: 'Scanner am iPad für Inventuren, Wareneingang und Umlagerungen nutzen' },
+  ],
+  hardware: [
+    { name: 'Kassenschublade (S / L)', img: 'https://images.unsplash.com/photo-1556742111-a301076d9d18?w=1200&q=80', desc: 'Sichere Bargeldaufbewahrung für jede Ladengröße' },
+    { name: 'Kabelloser Barcode-Etikettendrucker', img: 'https://images.unsplash.com/photo-1556742111-a301076d9d18?w=1200&q=80', desc: 'Produktetiketten und Hangtags schneller drucken' },
+    { name: 'Kabelloser Bluetooth-Scanner', img: 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=1200&q=80', desc: 'Checkout, Inventuren und Wareneingang beschleunigen' },
+    { name: 'E-Invoice-Drucker', img: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=1200&q=80', desc: 'Konforme E-Invoice-Hardware, sofort anschließbar' },
+  ],
+  ctaTitle: 'Retail-fertiges iPad-POS — Ladenmanagement leicht gemacht',
+  ctaSubtitle: 'Buchen Sie ein kostenloses 1:1-Gespräch mit einem ARVIX-Berater.',
+  consult: 'Kostenlose Beratung',
+}
+
+const fr: PosHardwareCopy = {
+  title: 'Périphériques matériels POS',
+  subtitle: 'Un iPad POS conçu pour la mode et le retail — checkout, stock, achats et adhésion avec une UI intuitive qui simplifie l’exploitation.',
+  tags: ['Achat flexible', 'Appairage rapide', 'Design compact', 'Conseil gratuit'],
+  howTitle: 'Comment fonctionne le matériel',
+  steps: [
+    { num: 'STEP 1', desc: 'Réceptionnez la marchandise, créez les produits sur iPad et imprimez les codes-barres avec l’imprimante d’étiquettes pour les hang tags' },
+    { num: 'STEP 2', desc: 'Scannez les codes au checkout avec le tiroir-caisse et l’imprimante de facture électronique' },
+    { num: 'STEP 3', desc: 'Utilisez le scanner sur iPad pour inventaires, réceptions et transferts' },
+  ],
+  hardware: [
+    { name: 'Tiroir-caisse (S / L)', img: 'https://images.unsplash.com/photo-1556742111-a301076d9d18?w=1200&q=80', desc: 'Stockage d’espèces sécurisé pour toute taille de magasin' },
+    { name: 'Imprimante d’étiquettes codes-barres sans fil', img: 'https://images.unsplash.com/photo-1556742111-a301076d9d18?w=1200&q=80', desc: 'Imprimez étiquettes produits et hang tags plus vite' },
+    { name: 'Scanner Bluetooth sans fil', img: 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=1200&q=80', desc: 'Accélérez checkout, inventaires et réceptions' },
+    { name: 'Imprimante de facture électronique', img: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=1200&q=80', desc: 'Matériel de facturation électronique conforme, prêt à connecter' },
+  ],
+  ctaTitle: 'iPad POS prêt pour le retail — gestion magasin simplifiée',
+  ctaSubtitle: 'Réservez un appel 1:1 gratuit avec un conseiller ARVIX.',
+  consult: 'Conseil gratuit',
+}
+
 const copy: Partial<Record<Locale, PosHardwareCopy>> & { 'zh-TW': PosHardwareCopy; en: PosHardwareCopy } = {
   'zh-TW': zhTW,
   'zh-CN': zhCN,
   en,
-  ko: en,
-  ja: en,
-  vi: en,
-  es: en,
-  pt: en,
-  de: en,
-  fr: en,
+  ko,
+  ja,
+  vi,
+  es,
+  pt,
+  de,
+  fr,
 }
 
 export default function PosHardwarePage() {

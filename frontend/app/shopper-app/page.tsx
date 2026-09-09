@@ -73,17 +73,137 @@ const en: ShopperCopy = {
   ctaTitle: 'Trusted by 600,000+ merchants worldwide',
 }
 
+const ko: ShopperCopy = {
+  title: '주머니 속 스토어\n브랜드 멤버 쇼핑 앱',
+  subtitle: '왜 브랜드 멤버 앱을 운영할까요? Shopper App이 로열티와 경험을 강화해 — 판매자는 매출 약 70% 성장을 봅니다.',
+  cta: '무료 체험 시작',
+  highlightsTitle: '세 가지 핵심 기능\n브랜드 쇼핑 앱을 빠르게 론칭',
+  highlightsDesc: '간단한 디자인 도구로 브랜드 앱을 출시하고 고객 밀착도를 높이세요.',
+  highlights: ['쉬운 디자인 도구', '앱 푸시 알림', '더 깊은 OMO 통합'],
+  designTitle: '쉬운 디자인 도구',
+  designDesc: '브랜드 룩에 맞추는 직관적 빌더 — 엔지니어링 불필요.',
+  pathTitle: 'Shopper App으로 구매 경로를 줄이세요',
+  pathDesc: '정밀 푸시로 혜택과 이벤트를 알리고 재구매와 옴니채널 매출을 높이세요.',
+  pathItems: ['앱 푸시 알림', '소셜 커머스'],
+  omoTitle: '더 깊은 OMO 임팩트',
+  omoDesc: '온·오프라인을 통합해 끊김 없는 옴니채널 여정을 제공하세요.',
+  ctaTitle: '전 세계 60만+ 판매자가 신뢰합니다',
+}
+
+const ja: ShopperCopy = {
+  title: 'ポケットの中のストア\nブランド会員ショッピングアプリ',
+  subtitle: 'なぜブランド会員アプリを運営するのか？Shopper App がロイヤルティと体験を強化 — 加盟店は売上約 70% 成長を実感。',
+  cta: '無料トライアルを開始',
+  highlightsTitle: '3 つの注目機能\nブランドショッピングアプリをすばやく公開',
+  highlightsDesc: 'シンプルなデザインツールでブランドアプリを出荷し、顧客の定着を高める。',
+  highlights: ['かんたんデザインツール', 'アプリプッシュ通知', 'より深い OMO 統合'],
+  designTitle: 'かんたんデザインツール',
+  designDesc: 'ブランドの見た目に合わせる直感的なビルダー — エンジニアリング不要。',
+  pathTitle: 'Shopper App で購買パスを短縮',
+  pathDesc: '精密なプッシュでオファーとイベントを届け、リピートとオムニチャネル売上を向上。',
+  pathItems: ['アプリプッシュ通知', 'ソーシャルコマース'],
+  omoTitle: 'より深い OMO インパクト',
+  omoDesc: 'オンラインとオフラインを統合し、シームレスなオムニチャネル体験を。',
+  ctaTitle: '世界中 60 万以上の加盟店が信頼',
+}
+
+const vi: ShopperCopy = {
+  title: 'Cửa hàng trong túi\nApp mua sắm thành viên thương hiệu',
+  subtitle: 'Vì sao chạy app thành viên thương hiệu? Shopper App củng cố lòng trung thành và trải nghiệm — người bán thấy doanh số tăng gần 70%.',
+  cta: 'Bắt đầu dùng thử miễn phí',
+  highlightsTitle: 'Ba tính năng nổi bật\nRa mắt app mua sắm thương hiệu nhanh',
+  highlightsDesc: 'Công cụ thiết kế đơn giản để phát hành app thương hiệu và tăng độ gắn kết.',
+  highlights: ['Công cụ thiết kế dễ dùng', 'Thông báo đẩy app', 'Tích hợp OMO sâu hơn'],
+  designTitle: 'Công cụ thiết kế dễ dùng',
+  designDesc: 'Trình dựng trực quan khớp phong cách thương hiệu — không cần kỹ thuật.',
+  pathTitle: 'Rút ngắn đường đến mua hàng với Shopper App',
+  pathDesc: 'Push chính xác giữ khách trên ưu đãi và sự kiện, nâng mua lại và doanh số omnichannel.',
+  pathItems: ['Thông báo đẩy app', 'Thương mại xã hội'],
+  omoTitle: 'Tác động OMO sâu hơn',
+  omoDesc: 'Hợp nhất online và offline để khách tận hưởng hành trình omnichannel liền mạch.',
+  ctaTitle: 'Được hơn 600.000 người bán trên thế giới tin dùng',
+}
+
+const es: ShopperCopy = {
+  title: 'Una tienda en el bolsillo\nApp de compra para miembros de marca',
+  subtitle: '¿Por qué una app de miembros? Shopper App refuerza lealtad y experiencia — los comercios ven casi 70% más ventas.',
+  cta: 'Empezar prueba gratis',
+  highlightsTitle: 'Tres funciones destacadas\nLanza una app de compra de marca rápido',
+  highlightsDesc: 'Herramientas de diseño simples para lanzar una app de marca y subir la adherencia.',
+  highlights: ['Herramientas de diseño fáciles', 'Notificaciones push de la app', 'Integración OMO más profunda'],
+  designTitle: 'Herramientas de diseño fáciles',
+  designDesc: 'Constructores intuitivos para el look de tu marca — sin ingeniería.',
+  pathTitle: 'Acorta el camino a la compra con Shopper App',
+  pathDesc: 'Pushes precisos mantienen a los compradores en ofertas y eventos, subiendo recompra y ventas omnicanal.',
+  pathItems: ['Notificaciones push de la app', 'Social commerce'],
+  omoTitle: 'Mayor impacto OMO',
+  omoDesc: 'Unifica online y offline para journeys omnicanal fluidos.',
+  ctaTitle: 'Más de 600.000 comercios confían en ARVIX',
+}
+
+const pt: ShopperCopy = {
+  title: 'Uma loja no bolso\nApp de compras para membros da marca',
+  subtitle: 'Por que um app de membros? O Shopper App reforça lealdade e experiência — comerciantes veem quase 70% de crescimento em vendas.',
+  cta: 'Começar teste grátis',
+  highlightsTitle: 'Três recursos em destaque\nLance um app de compras da marca rápido',
+  highlightsDesc: 'Ferramentas de design simples para publicar um app da marca e aumentar a adesão.',
+  highlights: ['Ferramentas de design fáceis', 'Notificações push do app', 'Integração OMO mais profunda'],
+  designTitle: 'Ferramentas de design fáceis',
+  designDesc: 'Construtores intuitivos para o visual da marca — sem engenharia.',
+  pathTitle: 'Encurte o caminho até a compra com o Shopper App',
+  pathDesc: 'Pushes precisos mantêm compradores em ofertas e eventos, elevando recompra e vendas omnichannel.',
+  pathItems: ['Notificações push do app', 'Social commerce'],
+  omoTitle: 'Maior impacto OMO',
+  omoDesc: 'Unifique online e offline para jornadas omnichannel sem atrito.',
+  ctaTitle: 'Mais de 600.000 comerciantes confiam na ARVIX',
+}
+
+const de: ShopperCopy = {
+  title: 'Ein Store in der Tasche\nMarken-Mitglieder-Shopping-App',
+  subtitle: 'Warum eine Marken-Mitglieder-App? Shopper App stärkt Loyalität und Erlebnis — Händler sehen fast 70% Umsatzwachstum.',
+  cta: 'Kostenlose Testphase starten',
+  highlightsTitle: 'Drei Highlights\nSchnell eine Marken-Shopping-App launchen',
+  highlightsDesc: 'Einfache Design-Tools für eine Marken-App und mehr Kundenbindung.',
+  highlights: ['Einfache Design-Tools', 'App-Push-Benachrichtigungen', 'Tiefere OMO-Integration'],
+  designTitle: 'Einfache Design-Tools',
+  designDesc: 'Intuitive Builder für Ihren Markenlook — ohne Engineering.',
+  pathTitle: 'Verkürzen Sie den Kaufweg mit Shopper App',
+  pathDesc: 'Präzise Pushes halten Shopper bei Angeboten und Events — mehr Wiederkauf und Omnichannel-Umsatz.',
+  pathItems: ['App-Push-Benachrichtigungen', 'Social Commerce'],
+  omoTitle: 'Tiefere OMO-Wirkung',
+  omoDesc: 'Online und Offline vereinen für nahtlose Omnichannel-Journeys.',
+  ctaTitle: 'Über 600.000 Händler weltweit vertrauen ARVIX',
+}
+
+const fr: ShopperCopy = {
+  title: 'Une boutique dans la poche\nApp shopping membres de marque',
+  subtitle: 'Pourquoi une app membres de marque ? Shopper App renforce fidélité et expérience — les marchands voient près de 70 % de croissance des ventes.',
+  cta: 'Démarrer l’essai gratuit',
+  highlightsTitle: 'Trois atouts\nLancez vite une app shopping de marque',
+  highlightsDesc: 'Outils de design simples pour publier une app de marque et renforcer l’attachement.',
+  highlights: ['Outils de design faciles', 'Notifications push de l’app', 'Intégration OMO plus profonde'],
+  designTitle: 'Outils de design faciles',
+  designDesc: 'Constructeurs intuitifs pour le look de votre marque — sans ingénierie.',
+  pathTitle: 'Raccourcissez le chemin d’achat avec Shopper App',
+  pathDesc: 'Des pushes précis gardent les acheteurs sur offres et événements, boostant rachat et ventes omnicanales.',
+  pathItems: ['Notifications push de l’app', 'Social commerce'],
+  omoTitle: 'Impact OMO plus profond',
+  omoDesc: 'Unifiez online et offline pour des parcours omnicanaux fluides.',
+  ctaTitle: 'Plus de 600 000 marchands font confiance à ARVIX',
+}
+
+
 const copy: Partial<Record<Locale, ShopperCopy>> & { 'zh-TW': ShopperCopy; en: ShopperCopy } = {
   'zh-TW': zhTW,
   'zh-CN': zhCN,
   en,
-  ko: en,
-  ja: en,
-  vi: en,
-  es: en,
-  pt: en,
-  de: en,
-  fr: en,
+  ko,
+  ja,
+  vi,
+  es,
+  pt,
+  de,
+  fr,
 }
 
 export default function ShopperAppPage() {

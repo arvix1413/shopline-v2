@@ -103,17 +103,213 @@ const en: MemberRepurchaseCopy = {
   ctaSubtitle: 'Join and start your omnichannel journey',
 }
 
+const ko: MemberRepurchaseCopy = {
+  title: '회원 재구매 솔루션\n고반복 루프를 만드는 4단계',
+  subtitle: '트래픽 보너스가 사라지는 시대, ARVIX의 네 기둥 — 세그먼트, 오퍼, 재구매 트리거, 분석 — 으로 고전환 로열티 루프를 만드세요.',
+  cta: '무료 체험 시작',
+  advantagesTitle: '멤버십 성장의 네 기둥',
+  whyTitle: '멤버십이 중요한 이유',
+  whyStats: [
+    { stat: '5x', title: '재방문 구매자는 신규 대비 전환이 5배' },
+    { stat: '↑', title: '충성 고객의 평균 지출이 더 높음' },
+    { stat: '+Profit', title: '충성 고객 5% 더 유지하면 이익 상승' },
+  ],
+  loopTitle: '고순환·고정밀·고효율 로열티 루프를 구축하세요',
+  steps: [
+    { step: 'STEP 01', title: '세그먼트: 고객 프로필을 파악하고 더 스마트하게 타깃팅', img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80', alt: '9개 스마트 세그먼트의 RFIM 모델' },
+    { step: 'STEP 02', title: '오퍼: 재구매를 끌어올리는 205+ 프로모션 플레이', img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80', alt: '유연한 프로모션 설정' },
+    { step: 'STEP 03', title: '트리거: 노출을 낭비하지 않는 옴니채널 푸시', img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80', alt: '자동화된 멀티채널 메시징' },
+    { step: 'STEP 04', title: '분석: 마케팅 ROI를 극대화하는 55개 리포트', img: 'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=1200&q=80', alt: 'Shoplytics 전문 리포트' },
+  ],
+  driveTitle: '지속 재구매를 드라이브\n트래픽 파편화 시대의 경쟁 우위',
+  driveItems: [
+    { title: '멤버십을 더 효율적으로 운영', desc: '마케팅을 자동화해 팀이 전략에 집중하게 하세요.' },
+    { title: '고순환 루프를 닫기', desc: '획득부터 유지까지 — 생애 가치를 키우세요.' },
+    { title: '마케팅 ROI 최적화', desc: '데이터 기반 지출로 예산의 모든 원을 극대화합니다.' },
+  ],
+  ctaTitle: '전 세계 600,000+ 셀러가 신뢰하는 ARVIX',
+  ctaSubtitle: '합류하고 옴니채널 여정을 시작하세요',
+}
+
+const ja: MemberRepurchaseCopy = {
+  title: '会員リピート購入ソリューション\n高リピートループへの 4 ステップ',
+  subtitle: 'トラフィックボーナスが消える時代、ARVIX の 4 本柱 — セグメント、オファー、リピートトリガー、分析 — で高コンバージョンのロイヤルティループを構築。',
+  cta: '無料トライアルを開始',
+  advantagesTitle: '会員成長の 4 本柱',
+  whyTitle: '会員施策が重要な理由',
+  whyStats: [
+    { stat: '5x', title: 'リピーターの転換は新規の 5 倍' },
+    { stat: '↑', title: 'ロイヤル顧客の平均支出はより高い' },
+    { stat: '+Profit', title: 'ロイヤル顧客を 5% 多く維持すると利益が向上' },
+  ],
+  loopTitle: '高サイクル・高精度・高効率のロイヤルティループを構築',
+  steps: [
+    { step: 'STEP 01', title: 'セグメント：顧客プロファイルを把握し、よりスマートにターゲティング', img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80', alt: '9 のスマートセグメントを持つ RFIM モデル' },
+    { step: 'STEP 02', title: 'オファー：リピートを押し上げる 205+ のプロモーション', img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80', alt: '柔軟なプロモーション設定' },
+    { step: 'STEP 03', title: 'トリガー：インプレッションを無駄にしないオムニチャネルプッシュ', img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80', alt: '自動化されたマルチチャネルメッセージ' },
+    { step: 'STEP 04', title: '分析：マーケティング ROI を最大化する 55 のレポート', img: 'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=1200&q=80', alt: 'Shoplytics プロフェッショナルレポート' },
+  ],
+  driveTitle: '継続リピートをドライブ\nトラフィック断片化時代の優位性',
+  driveItems: [
+    { title: '会員運営をより効率的に', desc: 'マーケティングを自動化し、チームは戦略に集中。' },
+    { title: '高サイクルのループを閉じる', desc: '獲得から定着まで — ライフタイムバリューを伸ばす。' },
+    { title: 'マーケティング ROI を最適化', desc: 'データに基づく支出で予算の一円を最大化。' },
+  ],
+  ctaTitle: '世界中の 600,000+ のマーチャントに信頼されています',
+  ctaSubtitle: '参加してオムニチャネルの旅を始めましょう',
+}
+
+const vi: MemberRepurchaseCopy = {
+  title: 'Giải pháp tái mua thành viên\n4 bước tới vòng lặp tái mua cao',
+  subtitle: 'Khi bonus traffic phai nhạt, bốn trụ cột của ARVIX — phân khúc, ưu đãi, kích hoạt tái mua và phân tích — xây vòng lặp trung thành chuyển đổi cao.',
+  cta: 'Bắt đầu dùng thử miễn phí',
+  advantagesTitle: 'Bốn trụ cột tăng trưởng thành viên',
+  whyTitle: 'Vì sao thành viên quan trọng',
+  whyStats: [
+    { stat: '5x', title: 'Người mua quay lại chuyển đổi gấp 5 lần khách mới' },
+    { stat: '↑', title: 'Khách trung thành chi tiêu trung bình cao hơn' },
+    { stat: '+Profit', title: 'Giữ thêm 5% khách trung thành để tăng lợi nhuận' },
+  ],
+  loopTitle: 'Xây vòng lặp trung thành chu kỳ cao, chính xác cao, hiệu quả cao',
+  steps: [
+    { step: 'STEP 01', title: 'Phân khúc: nắm hồ sơ khách và nhắm mục tiêu thông minh hơn', img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80', alt: 'Mô hình RFIM với 9 phân khúc thông minh' },
+    { step: 'STEP 02', title: 'Ưu đãi: 205+ cách khuyến mãi để tăng tái mua', img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80', alt: 'Cài đặt khuyến mãi linh hoạt' },
+    { step: 'STEP 03', title: 'Kích hoạt: push omnichannel không lãng phí impression', img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80', alt: 'Nhắn tin đa kênh tự động' },
+    { step: 'STEP 04', title: 'Phân tích: 55 báo cáo để tối đa ROI marketing', img: 'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=1200&q=80', alt: 'Báo cáo chuyên nghiệp Shoplytics' },
+  ],
+  driveTitle: 'Thúc đẩy tái mua liên tục\nLợi thế trong kỷ nguyên traffic phân mảnh',
+  driveItems: [
+    { title: 'Vận hành thành viên hiệu quả hơn', desc: 'Tự động hóa marketing để đội ngũ tập trung chiến lược.' },
+    { title: 'Khép vòng lặp chu kỳ cao', desc: 'Từ thu hút đến giữ chân — tăng lifetime value.' },
+    { title: 'Tối ưu ROI marketing', desc: 'Chi tiêu dựa trên dữ liệu để tối đa từng đồng ngân sách.' },
+  ],
+  ctaTitle: 'Được hơn 600.000 thương nhân trên thế giới tin dùng',
+  ctaSubtitle: 'Tham gia và bắt đầu hành trình omnichannel của bạn',
+}
+
+const es: MemberRepurchaseCopy = {
+  title: 'Solución de recompra de miembros\n4 pasos a un bucle de alta repetición',
+  subtitle: 'Cuando los bonus de tráfico se desvanecen, los cuatro pilares de ARVIX — segmentos, ofertas, triggers de recompra y analítica — construyen un bucle de lealtad de alta conversión.',
+  cta: 'Empieza la prueba gratis',
+  advantagesTitle: 'Cuatro pilares del crecimiento de membresía',
+  whyTitle: 'Por qué importa la membresía',
+  whyStats: [
+    { stat: '5x', title: 'Los compradores recurrentes convierten 5x vs nuevos visitantes' },
+    { stat: '↑', title: 'Los clientes leales gastan más de media' },
+    { stat: '+Profit', title: 'Retén un 5% más de leales para subir el beneficio' },
+  ],
+  loopTitle: 'Construye un bucle de lealtad de alto ciclo, alta precisión y alta eficiencia',
+  steps: [
+    { step: 'STEP 01', title: 'Segmentar: conoce perfiles y apunta con más inteligencia', img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80', alt: 'Modelo RFIM con 9 segmentos inteligentes' },
+    { step: 'STEP 02', title: 'Ofertas: más de 205 jugadas promocionales para subir la recompra', img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80', alt: 'Configuración flexible de promociones' },
+    { step: 'STEP 03', title: 'Triggers: pushes omnicanal que no desperdician impresión', img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80', alt: 'Mensajería multicanal automatizada' },
+    { step: 'STEP 04', title: 'Analítica: 55 informes para maximizar el ROI de marketing', img: 'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=1200&q=80', alt: 'Informes profesionales Shoplytics' },
+  ],
+  driveTitle: 'Impulsa la recompra continua\nLa ventaja en la era del tráfico fragmentado',
+  driveItems: [
+    { title: 'Opera la membresía con más eficiencia', desc: 'Automatiza el marketing para que el equipo se centre en la estrategia.' },
+    { title: 'Cierra un bucle de alto ciclo', desc: 'De adquisición a retención — crece el lifetime value.' },
+    { title: 'Optimiza el ROI de marketing', desc: 'Gasto respaldado por datos que maximiza cada euro de presupuesto.' },
+  ],
+  ctaTitle: 'Más de 600.000 comercios en el mundo confían en ARVIX',
+  ctaSubtitle: 'Únete y comienza tu viaje omnicanal',
+}
+
+const pt: MemberRepurchaseCopy = {
+  title: 'Solução de recompra de membros\n4 passos para um loop de alta repetição',
+  subtitle: 'Com o bônus de tráfego sumindo, os quatro pilares da ARVIX — segmentos, ofertas, gatilhos de recompra e analytics — constroem um loop de fidelidade de alta conversão.',
+  cta: 'Começar teste grátis',
+  advantagesTitle: 'Quatro pilares do crescimento de membership',
+  whyTitle: 'Por que membership importa',
+  whyStats: [
+    { stat: '5x', title: 'Compradores recorrentes convertem 5x vs novos visitantes' },
+    { stat: '↑', title: 'Clientes fiéis gastam mais em média' },
+    { stat: '+Profit', title: 'Retenha 5% mais fiéis para elevar o lucro' },
+  ],
+  loopTitle: 'Construa um loop de fidelidade de alto ciclo, alta precisão e alta eficiência',
+  steps: [
+    { step: 'STEP 01', title: 'Segmentar: conheça perfis e direcione com mais inteligência', img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80', alt: 'Modelo RFIM com 9 segmentos inteligentes' },
+    { step: 'STEP 02', title: 'Ofertas: 205+ jogadas promocionais para elevar a recompra', img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80', alt: 'Configurações flexíveis de promoção' },
+    { step: 'STEP 03', title: 'Gatilhos: pushes omnichannel que não desperdiçam impressão', img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80', alt: 'Mensageria multicanal automatizada' },
+    { step: 'STEP 04', title: 'Analytics: 55 relatórios para maximizar o ROI de marketing', img: 'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=1200&q=80', alt: 'Relatórios profissionais Shoplytics' },
+  ],
+  driveTitle: 'Impulse a recompra contínua\nA vantagem na era do tráfego fragmentado',
+  driveItems: [
+    { title: 'Opere membership com mais eficiência', desc: 'Automatize o marketing para a equipe focar em estratégia.' },
+    { title: 'Feche um loop de alto ciclo', desc: 'Da aquisição à retenção — cresça o lifetime value.' },
+    { title: 'Otimize o ROI de marketing', desc: 'Gasto baseado em dados que maximiza cada real do orçamento.' },
+  ],
+  ctaTitle: 'Mais de 600.000 comerciantes no mundo confiam na ARVIX',
+  ctaSubtitle: 'Participe e comece sua jornada omnichannel',
+}
+
+const de: MemberRepurchaseCopy = {
+  title: 'Mitglieder-Wiederkauf-Lösung\n4 Schritte zu einem High-Repeat-Loop',
+  subtitle: 'Wenn Traffic-Boni schwinden, bauen ARVIX’ vier Säulen — Segmente, Angebote, Wiederkauf-Trigger und Analytics — einen hochkonvertierenden Loyalty-Loop.',
+  cta: 'Kostenlos testen',
+  advantagesTitle: 'Vier Säulen des Mitgliedschaftswachstums',
+  whyTitle: 'Warum Mitgliedschaft zählt',
+  whyStats: [
+    { stat: '5x', title: 'Wiederkehrer konvertieren 5× vs. neue Besucher' },
+    { stat: '↑', title: 'Loyale Kunden geben im Schnitt mehr aus' },
+    { stat: '+Profit', title: '5% mehr Loyale halten, um den Gewinn zu steigern' },
+  ],
+  loopTitle: 'Einen High-Cycle-, High-Precision-, High-Efficiency-Loyalty-Loop bauen',
+  steps: [
+    { step: 'STEP 01', title: 'Segmentieren: Kundenprofile kennen und smarter targeten', img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80', alt: 'RFIM-Modell mit 9 Smart-Segmenten' },
+    { step: 'STEP 02', title: 'Angebote: 205+ Promo-Plays für mehr Wiederkauf', img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80', alt: 'Flexible Promo-Einstellungen' },
+    { step: 'STEP 03', title: 'Trigger: Omnichannel-Pushes, die keine Impression verschwenden', img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80', alt: 'Automatisierte Multichannel-Messaging' },
+    { step: 'STEP 04', title: 'Analytics: 55 Reports zur Maximierung des Marketing-ROI', img: 'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=1200&q=80', alt: 'Shoplytics-Professional-Reports' },
+  ],
+  driveTitle: 'Laufenden Wiederkauf antreiben\nDer Vorsprung im fragmentierten Traffic-Zeitalter',
+  driveItems: [
+    { title: 'Mitgliedschaft effizienter betreiben', desc: 'Marketing automatisieren, damit das Team auf Strategie fokussiert.' },
+    { title: 'Einen High-Cycle-Loop schließen', desc: 'Von Akquise bis Retention — Lifetime Value steigern.' },
+    { title: 'Marketing-ROI optimieren', desc: 'Datenbasierte Ausgaben, die jeden Budget-Euro maximieren.' },
+  ],
+  ctaTitle: 'Mehr als 600.000 Händler weltweit vertrauen ARVIX',
+  ctaSubtitle: 'Mitmachen und deine Omnichannel-Reise starten',
+}
+
+const fr: MemberRepurchaseCopy = {
+  title: 'Solution de rachat membre\n4 étapes vers une boucle à forte répétition',
+  subtitle: 'Quand les bonus de trafic s’effacent, les quatre piliers ARVIX — segments, offres, déclencheurs de rachat et analytics — construisent une boucle de fidélité à forte conversion.',
+  cta: 'Démarrer l’essai gratuit',
+  advantagesTitle: 'Quatre piliers de la croissance membership',
+  whyTitle: 'Pourquoi le membership compte',
+  whyStats: [
+    { stat: '5x', title: 'Les acheteurs récurrents convertissent 5× vs nouveaux visiteurs' },
+    { stat: '↑', title: 'Les clients fidèles dépensent plus en moyenne' },
+    { stat: '+Profit', title: 'Retenez 5% de fidèles en plus pour hausser le profit' },
+  ],
+  loopTitle: 'Construisez une boucle de fidélité à haut cycle, haute précision et haute efficacité',
+  steps: [
+    { step: 'STEP 01', title: 'Segmenter : connaître les profils et cibler plus intelligemment', img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80', alt: 'Modèle RFIM avec 9 segments intelligents' },
+    { step: 'STEP 02', title: 'Offres : 205+ mécan promotionnels pour hausser le rachat', img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80', alt: 'Réglages promotion flexibles' },
+    { step: 'STEP 03', title: 'Déclencheurs : pushes omnicanaux qui ne gaspillent aucune impression', img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=1200&q=80', alt: 'Messagerie multicanale automatisée' },
+    { step: 'STEP 04', title: 'Analytics : 55 rapports pour maximiser le ROI marketing', img: 'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=1200&q=80', alt: 'Rapports professionnels Shoplytics' },
+  ],
+  driveTitle: 'Pilotez le rachat continu\nL’avantage à l’ère du trafic fragmenté',
+  driveItems: [
+    { title: 'Gérez le membership plus efficacement', desc: 'Automatisez le marketing pour que l’équipe se concentre sur la stratégie.' },
+    { title: 'Fermez une boucle à haut cycle', desc: 'De l’acquisition à la rétention — faites croître la lifetime value.' },
+    { title: 'Optimisez le ROI marketing', desc: 'Dépenses data-driven qui maximisent chaque euro de budget.' },
+  ],
+  ctaTitle: 'Plus de 600 000 marchands dans le monde font confiance à ARVIX',
+  ctaSubtitle: 'Rejoignez-nous et démarrez votre parcours omnicanal',
+}
+
 const copy: Partial<Record<Locale, MemberRepurchaseCopy>> & { 'zh-TW': MemberRepurchaseCopy; en: MemberRepurchaseCopy } = {
   'zh-TW': zhTW,
   'zh-CN': zhCN,
   en,
-  ko: en,
-  ja: en,
-  vi: en,
-  es: en,
-  pt: en,
-  de: en,
-  fr: en,
+  ko,
+  ja,
+  vi,
+  es,
+  pt,
+  de,
+  fr,
 }
 
 export default function MemberRepurchasePage() {

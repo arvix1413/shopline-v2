@@ -5,6 +5,11 @@ import type { LayoutStyle, StoreLayout, StoreSection, StoreTheme } from '../../l
 import { SECTION_LABELS, parseHeroImages, DEFAULT_STYLE } from '../../lib/storeLayout'
 import { storeHomeUrl, storePageUrl, storeProductsUrl } from '../../lib/storefrontUrl'
 import type { StorePage } from '../../lib/storePages'
+import { useI18n } from '../../contexts/I18nContext'
+import { locales, type Locale } from '../../lib/i18n'
+import { getCheckoutCopy } from '../../lib/checkoutCopy'
+
+const ALL_CATEGORY = '__all__'
 
 type Product = {
   id: number
@@ -91,13 +96,22 @@ export default function StoreLayoutView({
   chromeOnly = false,
   children,
 }: Props) {
+  const { locale, setLocale } = useI18n()
+  const cx = getCheckoutCopy(locale)
   const { theme, sections } = layout
   const style = layout.style || DEFAULT_STYLE
-  const categories = ['全部', ...Array.from(new Set(products.map((p) => p.category).filter(Boolean) as string[]))]
-  const visible = category === '全部' ? products : products.filter((p) => p.category === category)
+  const categories = [ALL_CATEGORY, ...Array.from(new Set(products.map((p) => p.category).filter(Boolean) as string[]))]
+  const visible = category === ALL_CATEGORY || category === '全部' || category === cx.allCategory
+    ? products
+    : products.filter((p) => p.category === category)
   const [dragFrom, setDragFrom] = useState<number | null>(null)
   const r = radiusPx(style.radius)
   const editing = editorMode && !staticPreview
+
+  // Normalize legacy localized "all" values into sentinel
+  useEffect(() => {
+    if (category === '全部' || category === cx.allCategory) onCategory(ALL_CATEGORY)
+  }, [category, cx.allCategory, onCategory])
 
   const headerBg =
     style.header === 'transparent' ? `${theme.background}cc` :
@@ -124,14 +138,14 @@ export default function StoreLayoutView({
             )}
             <div className="text-[11px] tracking-wide" style={{ color: theme.muted }}>Powered by ARVIX</div>
           </div>
-          <nav className="flex items-center gap-4 sm:gap-6 text-sm font-medium overflow-x-auto max-w-[55%] sm:max-w-none" style={{ color: theme.muted }}>
+          <nav className="flex items-center gap-3 sm:gap-5 text-sm font-medium overflow-x-auto max-w-[55%] sm:max-w-none" style={{ color: theme.muted }}>
             {storeSlug && !editing && !staticPreview ? (
               <>
-                <a href={storeHomeUrl(storeSlug)} className="hover:opacity-70 transition whitespace-nowrap">首頁</a>
-                <a href={storeProductsUrl(storeSlug)} className="hover:opacity-70 transition whitespace-nowrap">全部商品</a>
+                <a href={storeHomeUrl(storeSlug)} className="hover:opacity-70 transition whitespace-nowrap">{cx.homeNav}</a>
+                <a href={storeProductsUrl(storeSlug)} className="hover:opacity-70 transition whitespace-nowrap">{cx.productsNav}</a>
                 {(pages.length
                   ? pages
-                  : [{ key: 'about', title: '關於我們', body: '', published: true }]
+                  : [{ key: 'about', title: cx.aboutNav, body: '', published: true }]
                 )
                   .filter((p) => p.published)
                   .slice(0, 5)
@@ -143,9 +157,22 @@ export default function StoreLayoutView({
               </>
             ) : (
               <>
-                <a href="#products" className="hover:opacity-70 transition whitespace-nowrap" onClick={(e) => (editing || staticPreview) && e.preventDefault()}>商品</a>
-                <a href="#about" className="hover:opacity-70 transition whitespace-nowrap" onClick={(e) => (editing || staticPreview) && e.preventDefault()}>關於我們</a>
+                <a href="#products" className="hover:opacity-70 transition whitespace-nowrap" onClick={(e) => (editing || staticPreview) && e.preventDefault()}>{cx.productFallback}</a>
+                <a href="#about" className="hover:opacity-70 transition whitespace-nowrap" onClick={(e) => (editing || staticPreview) && e.preventDefault()}>{cx.aboutNav}</a>
               </>
+            )}
+            {!editing && !staticPreview && (
+              <select
+                aria-label="Language"
+                className="text-xs bg-transparent outline-none cursor-pointer max-w-[5.5rem]"
+                style={{ color: theme.muted }}
+                value={locale}
+                onChange={(e) => setLocale(e.target.value as Locale)}
+              >
+                {locales.map((l) => (
+                  <option key={l.code} value={l.code}>{l.label}</option>
+                ))}
+              </select>
             )}
           </nav>
           <button
@@ -154,7 +181,7 @@ export default function StoreLayoutView({
             className="relative text-sm font-semibold px-4 py-2 transition hover:opacity-90"
             style={{ background: theme.primary, color: contrastOn(theme.primary, theme.background), borderRadius: r }}
           >
-            購物車{cartCount > 0 ? ` (${cartCount})` : ''}
+            {cx.cart}{cartCount > 0 ? ` (${cartCount})` : ''}
           </button>
         </div>
       </header>
@@ -375,6 +402,8 @@ function SectionBlock({
   onSelectProduct: (p: Product) => void
   staticPreview?: boolean
 }) {
+  const { locale } = useI18n()
+  const cx = getCheckoutCopy(locale)
   const p = section.props
   const r = radiusPx(style.radius)
   const py = padY(style.density)
@@ -398,7 +427,7 @@ function SectionBlock({
               <button
                 key={item}
                 type="button"
-                onClick={() => onCategory(item === '熱銷' || item === '新品' || item === '經典' || item === '限定' ? (allCategories.includes(item) ? item : '全部') : item)}
+                onClick={() => onCategory(item === '熱銷' || item === '新品' || item === '經典' || item === '限定' ? (allCategories.includes(item) ? item : ALL_CATEGORY) : item)}
                 className="py-6 text-sm font-bold"
                 style={{ background: theme.background, color: theme.text, borderRadius: r, border: `1px solid ${theme.text}14` }}
               >
@@ -417,7 +446,7 @@ function SectionBlock({
         <div className="max-w-6xl mx-auto px-5">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold mb-1">{p.title || '商品'}</h2>
+              <h2 className="text-2xl md:text-3xl font-bold mb-1">{p.title || cx.productFallback}</h2>
               <p className="text-sm" style={{ color: theme.muted }}>{p.subtitle}</p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -433,13 +462,13 @@ function SectionBlock({
                       : { background: `${theme.text}0d`, color: theme.muted, borderRadius: r }
                   }
                 >
-                  {c}
+                  {c === ALL_CATEGORY ? cx.allCategory : c}
                 </button>
               ))}
             </div>
           </div>
           {products.length === 0 ? (
-            <div className="py-16 text-center text-sm" style={{ color: theme.muted }}>尚無商品</div>
+            <div className="py-16 text-center text-sm" style={{ color: theme.muted }}>{cx.noProducts}</div>
           ) : (
             <div className={`grid ${cols} gap-4 md:gap-6`}>
               {products.map((product) => {
@@ -456,10 +485,10 @@ function SectionBlock({
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-xs" style={{ color: theme.muted }}>暫無圖片</div>
+                        <div className="w-full h-full flex items-center justify-center text-xs" style={{ color: theme.muted }}>—</div>
                       )}
                     </div>
-                    <div className="text-[11px] font-semibold tracking-wide mb-1" style={{ color: theme.primary }}>{product.category || '商品'}</div>
+                    <div className="text-[11px] font-semibold tracking-wide mb-1" style={{ color: theme.primary }}>{product.category || cx.productFallback}</div>
                     <h3 className="text-sm font-semibold leading-snug mb-2 line-clamp-2">{product.name}</h3>
                     <div className="flex items-baseline gap-2 flex-wrap">
                       <span className="text-sm font-bold">{formatPrice(product.price)}</span>
