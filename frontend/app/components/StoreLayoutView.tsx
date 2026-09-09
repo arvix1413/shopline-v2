@@ -5,6 +5,7 @@ import type { LayoutStyle, StoreLayout, StoreSection, StoreTheme } from '../../l
 import { parseHeroImages, DEFAULT_STYLE } from '../../lib/storeLayout'
 import { storeHomeUrl, storePageUrl, storeProductsUrl } from '../../lib/storefrontUrl'
 import type { StorePage } from '../../lib/storePages'
+import { displayStorePageTitle } from '../../lib/storePages'
 import { useI18n } from '../../contexts/I18nContext'
 import { locales, type Locale } from '../../lib/i18n'
 import { getCheckoutCopy } from '../../lib/checkoutCopy'
@@ -151,7 +152,7 @@ export default function StoreLayoutView({
                   .slice(0, 5)
                   .map((p) => (
                     <a key={p.key} href={storePageUrl(storeSlug, p.key)} className="hover:opacity-70 transition whitespace-nowrap">
-                      {p.title}
+                    {displayStorePageTitle(p.key, p.title, cx)}
                     </a>
                   ))}
               </>
@@ -237,7 +238,7 @@ export default function StoreLayoutView({
           <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 mb-4 text-sm">
             {pages.filter((p) => p.published).map((p) => (
               <a key={p.key} href={storePageUrl(storeSlug, p.key)} className="hover:opacity-70 transition">
-                {p.title}
+                {displayStorePageTitle(p.key, p.title, cx)}
               </a>
             ))}
           </div>

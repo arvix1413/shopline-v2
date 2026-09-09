@@ -1,5 +1,7 @@
 /** Merchant storefront content pages (custom pages with own URLs). */
 
+import type { CheckoutCopy } from './checkoutCopy'
+
 export type StorePage = {
   key: string
   title: string
@@ -69,4 +71,52 @@ export function parseStorePages(raw: unknown, storeName: string): StorePage[] {
 export function findStorePage(pages: StorePage[], key: string): StorePage | null {
   const k = slugifyPageKey(key)
   return pages.find((p) => p.key === k && p.published) || null
+}
+
+const STOCK_TITLES: Record<string, string[]> = {
+  about: ['關於我們', '关于我们', 'About', 'About us', '소개', '私たちについて', 'Giới thiệu', 'Sobre nosotros', 'Sobre', 'Über uns', 'À propos'],
+  contact: ['聯絡我們', '联系我们', 'Contact', 'Contact us', '문의', 'お問い合わせ', 'Liên hệ', 'Contacto', 'Fale conosco', 'Kontakt', 'Nous contacter'],
+  shipping: ['配送政策', 'Shipping', 'Shipping policy', '배송 정책', '配送ポリシー', 'Chính sách giao hàng', 'Política de envío', 'Política de envio', 'Versandrichtlinie', 'Politique de livraison'],
+  returns: ['退換貨政策', '退换货政策', 'Returns', 'Returns policy', 'Return policy', '교환·반품 정책', '返品・交換ポリシー', 'Đổi trả', 'Devoluciones', 'Trocas e devoluções', 'Rückgabe', 'Retours'],
+}
+
+const STOCK_BODY_MARKERS: Record<string, string[]> = {
+  about: ['用心挑選每一件商品', '用心挑选每一件商品', 'carefully selects every product', '상품을 신중히 고릅니다', '商品を丁寧に選んでいます'],
+  contact: ['如需協助，請透過訂單備註', '如需协助，请通过订单备注', 'Leave a note on your order', '주문 메모를 남기거나', '注文メモを残すか'],
+  shipping: ['台灣出貨商店可選 7-11', '台湾出货商店可选 7-11', 'Taiwan-shipping stores can offer 7-11', '대만 출고 스토어는 7-11', '台湾発送のストアは 7-11'],
+  returns: ['若商品有瑕疵或與描述不符', '若商品有瑕疵或与描述不符', 'If an item is defective', '상품에 하자가 있거나', '不良や記載違いがある場合'],
+}
+
+function pageLabel(key: string, cx: CheckoutCopy): string | null {
+  if (key === 'about') return cx.aboutNav
+  if (key === 'contact') return cx.contactNav
+  if (key === 'shipping') return cx.shippingPage
+  if (key === 'returns') return cx.returnsPage
+  return null
+}
+
+function pageBodyTemplate(key: string, cx: CheckoutCopy): string | null {
+  if (key === 'about') return cx.aboutBody
+  if (key === 'contact') return cx.contactBody
+  if (key === 'shipping') return cx.shippingBody
+  if (key === 'returns') return cx.returnsBody
+  return null
+}
+
+export function displayStorePageTitle(key: string, storedTitle: string, cx: CheckoutCopy): string {
+  const label = pageLabel(key, cx)
+  if (!label) return storedTitle
+  const stock = STOCK_TITLES[key] || []
+  if (!storedTitle || stock.includes(storedTitle)) return label
+  return storedTitle
+}
+
+export function displayStorePageBody(key: string, storedBody: string, storeName: string, cx: CheckoutCopy): string {
+  const template = pageBodyTemplate(key, cx)
+  if (!template) return storedBody
+  const markers = STOCK_BODY_MARKERS[key] || []
+  if (markers.some((m) => storedBody.includes(m)) || !storedBody.trim()) {
+    return template.replace(/\{name\}/g, storeName || cx.storeFallback)
+  }
+  return storedBody
 }

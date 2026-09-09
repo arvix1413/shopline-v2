@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { RESERVED_STORE_SLUGS } from '../../../lib/storeSlug'
 import StoreLayoutView from '../../components/StoreLayoutView'
 import { parseStoreLayout, type StoreLayout } from '../../../lib/storeLayout'
-import { findStorePage, parseStorePages, type StorePage } from '../../../lib/storePages'
+import { findStorePage, parseStorePages, displayStorePageTitle, displayStorePageBody, type StorePage } from '../../../lib/storePages'
 import { storeHomeUrl } from '../../../lib/storefrontUrl'
 import { useI18n } from '../../../contexts/I18nContext'
 import { getCheckoutCopy } from '../../../lib/checkoutCopy'
@@ -572,11 +572,11 @@ export default function BrandStoreClient({
                   <p className="text-xs font-semibold tracking-widest mb-3" style={{ color: layout.theme.muted }}>
                     <a href={storeHomeUrl(store.slug)} className="hover:opacity-70">{cx.homeNav}</a>
                     <span className="mx-2">/</span>
-                    {activePage.title}
+                    {displayStorePageTitle(activePage.key, activePage.title, cx)}
                   </p>
-                  <h1 className="text-3xl sm:text-4xl font-bold mb-6">{activePage.title}</h1>
+                  <h1 className="text-3xl sm:text-4xl font-bold mb-6">{displayStorePageTitle(activePage.key, activePage.title, cx)}</h1>
                   <div className="text-base leading-relaxed whitespace-pre-wrap" style={{ color: layout.theme.muted }}>
-                    {activePage.body}
+                    {displayStorePageBody(activePage.key, activePage.body, store.name || '', cx)}
                   </div>
                 </>
               ) : (

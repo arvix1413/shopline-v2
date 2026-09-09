@@ -8,10 +8,12 @@ import Footer from '../../components/Footer'
 import { useAuth } from '../../../contexts/AuthContext'
 import { useI18n } from '../../../contexts/I18nContext'
 import { getMerchantStudioCopy, mapStudioApiError } from '../../../lib/merchantStudioCopy'
+import { getCheckoutCopy } from '../../../lib/checkoutCopy'
 import {
   defaultStorePages,
   parseStorePages,
   slugifyPageKey,
+  displayStorePageTitle,
   type StorePage,
 } from '../../../lib/storePages'
 import { storePageUrl } from '../../../lib/storefrontUrl'
@@ -22,6 +24,7 @@ export default function StorePagesEditor() {
   const { user, token, isLoading } = useAuth()
   const { locale } = useI18n()
   const c = getMerchantStudioCopy(locale)
+  const cx = getCheckoutCopy(locale)
   const router = useRouter()
   const [pages, setPages] = useState<StorePage[]>([])
   const [storeSlug, setStoreSlug] = useState('')
@@ -179,7 +182,7 @@ export default function StorePagesEditor() {
                       color: selectedKey === p.key ? '#3730A3' : '#12131F',
                     }}
                   >
-                    {p.title}
+                    {displayStorePageTitle(p.key, p.title, cx)}
                     {!p.published && <span className="text-xs text-gray-400 ml-1">{c.hidden}</span>}
                   </button>
                 ))}
@@ -202,7 +205,7 @@ export default function StorePagesEditor() {
                 <div>
                   <label className="text-xs font-bold text-gray-500 block mb-1">{c.pageTitle}</label>
                   <input
-                    value={selected.title}
+                    value={displayStorePageTitle(selected.key, selected.title, cx)}
                     onChange={(e) => updateSelected({ title: e.target.value })}
                     className="w-full border rounded-lg px-3 py-2.5 text-sm font-semibold"
                   />

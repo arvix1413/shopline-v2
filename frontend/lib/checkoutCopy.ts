@@ -72,6 +72,13 @@ export type CheckoutCopy = {
   browseProducts: string
   slideN: string
   editingPrefix: string
+  contactNav: string
+  shippingPage: string
+  returnsPage: string
+  aboutBody: string
+  contactBody: string
+  shippingBody: string
+  returnsBody: string
 }
 
 const zhTW: CheckoutCopy = {
@@ -146,6 +153,13 @@ const zhTW: CheckoutCopy = {
   browseProducts: '瀏覽商品',
   slideN: '第 {n} 張',
   editingPrefix: '編輯中 ·',
+  contactNav: '聯絡我們',
+  shippingPage: '配送政策',
+  returnsPage: '退換貨政策',
+  aboutBody: '{name} 用心挑選每一件商品，希望帶給顧客更好的生活體驗。\n\n我們相信好產品值得被好好介紹——歡迎在這裡認識我們的品牌故事與理念。',
+  contactBody: '如需協助，請透過訂單備註留下聯絡方式，或於結帳時填寫正確的 Email／電話，我們會盡快回覆。\n\n店名：{name}',
+  shippingBody: '台灣出貨商店可選 7-11 超商取貨（含貨到付款）或宅配。非台灣出貨商店目前僅支援宅配與信用卡付款。運費與到貨時間以店家說明為準。',
+  returnsBody: '若商品有瑕疵或與描述不符，請於收貨後盡快與我們聯繫。未拆封／未使用之商品，依個案協助退換。',
 }
 
 const zhCN: CheckoutCopy = {
@@ -220,6 +234,13 @@ const zhCN: CheckoutCopy = {
   browseProducts: '浏览商品',
   slideN: '第 {n} 张',
   editingPrefix: '编辑中 ·',
+  contactNav: '联系我们',
+  shippingPage: '配送政策',
+  returnsPage: '退换货政策',
+  aboutBody: '{name} 用心挑选每一件商品，希望带给顾客更好的生活体验。\n\n我们相信好产品值得被好好介绍——欢迎在这里认识我们的品牌故事与理念。',
+  contactBody: '如需协助，请通过订单备注留下联系方式，或于结账时填写正确的 Email／电话，我们会尽快回复。\n\n店名：{name}',
+  shippingBody: '台湾出货商店可选 7-11 超商取货（含货到付款）或宅配。非台湾出货商店目前仅支持宅配与信用卡付款。运费与到货时间以店家说明为准。',
+  returnsBody: '若商品有瑕疵或与描述不符，请于收货后尽快与我们联系。未拆封／未使用的商品，依个案协助退换。',
 }
 
 const en: CheckoutCopy = {
@@ -294,6 +315,13 @@ const en: CheckoutCopy = {
   browseProducts: 'Shop now',
   slideN: 'Slide {n}',
   editingPrefix: 'Editing ·',
+  contactNav: 'Contact us',
+  shippingPage: 'Shipping policy',
+  returnsPage: 'Returns policy',
+  aboutBody: '{name} carefully selects every product so customers get a better everyday experience.\n\nGood products deserve a clear story — this page is where you meet the brand.',
+  contactBody: 'Need help? Leave a note on your order, or use a valid email / phone at checkout. We will reply as soon as we can.\n\nStore: {name}',
+  shippingBody: 'Taiwan-shipping stores can offer 7-11 pickup (including cash on delivery) or home delivery. Other stores currently support home delivery and card payment. Fees and timing follow the merchant’s instructions.',
+  returnsBody: 'If an item is defective or not as described, contact us soon after delivery. Unopened / unused items can be reviewed case by case.',
 }
 
 const ko: CheckoutCopy = {
@@ -368,6 +396,13 @@ const ko: CheckoutCopy = {
   browseProducts: '상품 보기',
   slideN: '{n}번째 슬라이드',
   editingPrefix: '편집 중 ·',
+  contactNav: '문의',
+  shippingPage: '배송 정책',
+  returnsPage: '교환·반품 정책',
+  aboutBody: '{name}는 더 나은 일상을 위해 상품을 신중히 고릅니다.\n\n좋은 제품은 제대로 소개되어야 합니다. 여기에서 브랜드 이야기를 만나 보세요.',
+  contactBody: '도움이 필요하면 주문 메모를 남기거나, 결제 시 올바른 이메일/전화를 적어 주세요. 최대한 빠르게 답변드립니다.\n\n스토어: {name}',
+  shippingBody: '대만 출고 스토어는 7-11 픽업(착불 포함) 또는 택배 배송을 제공할 수 있습니다. 그 외 스토어는 현재 택배와 카드 결제를 지원합니다. 배송비와 기간은 판매자 안내를 따릅니다.',
+  returnsBody: '상품에 하자가 있거나 설명과 다르면 수령 후 바로 연락해 주세요. 미개봉/미사용 상품은 건별로 도와드립니다.',
 }
 
 const ja: CheckoutCopy = {
@@ -442,6 +477,13 @@ const ja: CheckoutCopy = {
   browseProducts: '商品を見る',
   slideN: '{n}枚目',
   editingPrefix: '編集中 ·',
+  contactNav: 'お問い合わせ',
+  shippingPage: '配送ポリシー',
+  returnsPage: '返品・交換ポリシー',
+  aboutBody: '{name} は、より良い日常のために商品を丁寧に選んでいます。\n\n良い商品はきちんと紹介されるべきです。ここではブランドの物語をご覧ください。',
+  contactBody: 'ご不明点は注文メモを残すか、お会計時に正しいメール／電話をご記入ください。できるだけ早くご返信します。\n\nストア：{name}',
+  shippingBody: '台湾発送のストアは 7-11 受け取り（代金引換を含む）または宅配を選べます。その他のストアは現在、宅配とカード決済です。送料とお届け目安は販売者の案内に従ってください。',
+  returnsBody: '不良や記載違いがある場合は、到着後できるだけ早くご連絡ください。未開封／未使用の商品は個別に対応します。',
 }
 
 const vi: CheckoutCopy = {
@@ -516,6 +558,13 @@ const vi: CheckoutCopy = {
   browseProducts: 'Xem sản phẩm',
   slideN: 'Ảnh {n}',
   editingPrefix: 'Đang sửa ·',
+  contactNav: 'Liên hệ',
+  shippingPage: 'Chính sách giao hàng',
+  returnsPage: 'Đổi trả',
+  aboutBody: '{name} chọn từng sản phẩm để khách có trải nghiệm tốt hơn.\n\nSản phẩm tốt đáng được giới thiệu tử tế — trang này là câu chuyện thương hiệu.',
+  contactBody: 'Cần hỗ trợ? Để ghi chú trên đơn, hoặc điền email / điện thoại đúng khi thanh toán. Chúng tôi sẽ phản hồi sớm.\n\nCửa hàng: {name}',
+  shippingBody: 'Cửa hàng giao từ Đài Loan có thể dùng nhận hàng 7-11 (kể cả COD) hoặc giao tận nhà. Cửa hàng khác hiện hỗ trợ giao nhà và thanh toán thẻ. Phí và thời gian theo hướng dẫn của chủ shop.',
+  returnsBody: 'Nếu hàng lỗi hoặc khác mô tả, hãy liên hệ sớm sau khi nhận. Hàng chưa mở / chưa dùng sẽ được xem xét từng trường hợp.',
 }
 
 const es: CheckoutCopy = {
@@ -590,6 +639,13 @@ const es: CheckoutCopy = {
   browseProducts: 'Ver productos',
   slideN: 'Diapositiva {n}',
   editingPrefix: 'Editando ·',
+  contactNav: 'Contacto',
+  shippingPage: 'Política de envío',
+  returnsPage: 'Devoluciones',
+  aboutBody: '{name} elige cada producto para que la compra se sienta mejor.\n\nUn buen producto merece una historia clara; aquí conoces la marca.',
+  contactBody: '¿Necesitas ayuda? Deja una nota en el pedido o un email / teléfono válido al pagar. Responderemos lo antes posible.\n\nTienda: {name}',
+  shippingBody: 'Las tiendas que envían desde Taiwán pueden ofrecer recogida 7-11 (incluido contra reembolso) o envío a domicilio. Las demás ahora usan domicilio y pago con tarjeta. Gastos y plazos los indica el comercio.',
+  returnsBody: 'Si el artículo es defectuoso o no coincide con la descripción, contáctanos pronto. Los productos sin abrir / sin usar se revisan caso por caso.',
 }
 
 const pt: CheckoutCopy = {
@@ -664,6 +720,13 @@ const pt: CheckoutCopy = {
   browseProducts: 'Ver produtos',
   slideN: 'Slide {n}',
   editingPrefix: 'Editando ·',
+  contactNav: 'Fale conosco',
+  shippingPage: 'Política de envio',
+  returnsPage: 'Trocas e devoluções',
+  aboutBody: '{name} escolhe cada produto para uma experiência melhor no dia a dia.\n\nUm bom produto merece uma história clara — conheça a marca aqui.',
+  contactBody: 'Precisa de ajuda? Deixe um recado no pedido ou um e-mail / telefone válido no checkout. Responderemos o mais rápido possível.\n\nLoja: {name}',
+  shippingBody: 'Lojas que enviam de Taiwan podem oferecer retirada 7-11 (incluindo pagamento na entrega) ou entrega em casa. As demais hoje usam entrega e cartão. Frete e prazo seguem o anunciado pelo lojista.',
+  returnsBody: 'Se o item vier com defeito ou diferente da descrição, fale conosco logo após receber. Itens lacrados / não usados são analisados caso a caso.',
 }
 
 const de: CheckoutCopy = {
@@ -738,6 +801,13 @@ const de: CheckoutCopy = {
   browseProducts: 'Produkte ansehen',
   slideN: 'Folie {n}',
   editingPrefix: 'Bearbeitung ·',
+  contactNav: 'Kontakt',
+  shippingPage: 'Versandrichtlinie',
+  returnsPage: 'Rückgabe',
+  aboutBody: '{name} wählt jedes Produkt sorgfältig aus, damit der Alltag besser wird.\n\nGute Produkte verdienen eine klare Geschichte — hier lernen Sie die Marke kennen.',
+  contactBody: 'Hilfe nötig? Hinterlassen Sie eine Notiz zur Bestellung oder eine gültige E-Mail / Telefonnummer an der Kasse. Wir antworten so schnell wie möglich.\n\nShop: {name}',
+  shippingBody: 'Shops mit Versand aus Taiwan können 7-11-Abholung (inkl. Nachnahme) oder Hauslieferung anbieten. Andere Shops nutzen derzeit Hauslieferung und Kartenzahlung. Kosten und Zeitangaben macht der Händler.',
+  returnsBody: 'Bei Defekt oder Abweichung von der Beschreibung bitte bald nach Erhalt melden. Ungeöffnete / unbenutzte Artikel prüfen wir im Einzelfall.',
 }
 
 const fr: CheckoutCopy = {
@@ -812,6 +882,13 @@ const fr: CheckoutCopy = {
   browseProducts: 'Voir les produits',
   slideN: 'Diapositive {n}',
   editingPrefix: 'Édition ·',
+  contactNav: 'Nous contacter',
+  shippingPage: 'Politique de livraison',
+  returnsPage: 'Retours',
+  aboutBody: '{name} choisit chaque produit pour une meilleure expérience au quotidien.\n\nUn bon produit mérite une vraie présentation — découvrez la marque ici.',
+  contactBody: 'Besoin d’aide ? Laissez une note sur la commande, ou un e-mail / téléphone valide au paiement. Nous répondrons dès que possible.\n\nBoutique : {name}',
+  shippingBody: 'Les boutiques qui expédient depuis Taïwan peuvent proposer le retrait 7-11 (y compris contre remboursement) ou la livraison à domicile. Les autres proposent aujourd’hui domicile et paiement par carte. Frais et délais : selon le marchand.',
+  returnsBody: 'Si l’article est défectueux ou ne correspond pas à la description, contactez-nous rapidement. Les articles non ouverts / non utilisés sont examinés au cas par cas.',
 }
 
 export const checkoutCopyByLocale: Record<Locale, CheckoutCopy> = {
