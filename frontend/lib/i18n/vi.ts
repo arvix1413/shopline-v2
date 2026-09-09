@@ -87,7 +87,7 @@ const vi: Translations = {
   features: {
     eyebrow: 'Khởi nghiệp vẫn chuyên nghiệp',
     title: 'Từ đơn hàng đầu tiên đến mở rộng thương hiệu',
-    subtitle: 'Dựng site kéo thả, kết nối thanh toán–logistics một chạm, hội viên & marketing sẵn sàng — bạn bán hàng, hệ thống lo cửa hàng',
+    subtitle: 'Dựng site kéo thả, thanh toán thẻ và giao hàng, hội viên & marketing sẵn sàng — bạn bán hàng, hệ thống lo cửa hàng',
     learnMore: 'Xem tất cả gói',
     items: [
       {
