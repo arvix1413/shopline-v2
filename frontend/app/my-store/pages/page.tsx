@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation'
 import Header from '../../components/Header'
 import Footer from '../../components/Footer'
 import { useAuth } from '../../../contexts/AuthContext'
+import { useI18n } from '../../../contexts/I18nContext'
+import { getMerchantStudioCopy, mapStudioApiError } from '../../../lib/merchantStudioCopy'
 import {
   defaultStorePages,
   parseStorePages,
@@ -18,6 +20,8 @@ const API = process.env.NEXT_PUBLIC_API_URL || 'https://shopline-backend.arvix14
 
 export default function StorePagesEditor() {
   const { user, token, isLoading } = useAuth()
+  const { locale } = useI18n()
+  const c = getMerchantStudioCopy(locale)
   const router = useRouter()
   const [pages, setPages] = useState<StorePage[]>([])
   const [storeSlug, setStoreSlug] = useState('')
@@ -44,17 +48,17 @@ export default function StorePagesEditor() {
         const storeData = storeRes.ok ? await storeRes.json() : null
         const pagesData = pagesRes.ok ? await pagesRes.json() : null
         if (storeData?.slug) setStoreSlug(storeData.slug)
-        const parsed = parseStorePages(pagesData?.pages ?? storeData?.pages, storeData?.name || '本店')
+        const parsed = parseStorePages(pagesData?.pages ?? storeData?.pages, storeData?.name || c.storeFallback)
         setPages(parsed)
         setSelectedKey(parsed[0]?.key || 'about')
       } catch {
-        setError('載入失敗')
-        setPages(defaultStorePages('本店'))
+        setError(c.loadFail)
+        setPages(defaultStorePages(c.storeFallback))
       } finally {
         setLoading(false)
       }
     })()
-  }, [user, token, isLoading, router])
+  }, [user, token, isLoading, router, c.loadFail, c.storeFallback])
 
   const selected = pages.find((p) => p.key === selectedKey) || pages[0]
 
@@ -75,18 +79,18 @@ export default function StorePagesEditor() {
         body: JSON.stringify({ pages }),
       })
       const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data.error || '儲存失敗')
+      if (!res.ok) throw new Error(mapStudioApiError(data.code, c))
       setPages(data.pages || pages)
-      setMsg('已儲存頁面')
+      setMsg(c.savedPages)
     } catch (e: any) {
-      setError(e.message || '儲存失敗')
+      setError(e.message || c.saveFail)
     } finally {
       setSaving(false)
     }
   }
 
   const addPage = () => {
-    const title = newTitle.trim() || '新頁面'
+    const title = newTitle.trim() || c.newPage
     let key = slugifyPageKey(title)
     if (!key) key = `page-${Date.now().toString(36)}`
     if (pages.some((p) => p.key === key)) key = `${key}-${Date.now().toString(36).slice(-3)}`
@@ -99,10 +103,10 @@ export default function StorePagesEditor() {
   const removePage = () => {
     if (!selected) return
     if (pages.length <= 1) {
-      setError('至少保留一頁')
+      setError(c.keepOnePage)
       return
     }
-    if (!confirm(`確定刪除「${selected.title}」？`)) return
+    if (!confirm(c.confirmDeletePage.replace('{title}', selected.title))) return
     const next = pages.filter((p) => p.key !== selected.key)
     setPages(next)
     setSelectedKey(next[0].key)
@@ -114,14 +118,14 @@ export default function StorePagesEditor() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
           <div>
-            <p className="text-xs font-bold tracking-widest mb-2" style={{ color: '#5B5FF0' }}>STORE PAGES</p>
-            <h1 className="text-3xl font-black mb-2">商店頁面</h1>
+            <p className="text-xs font-bold tracking-widest mb-2" style={{ color: '#5B5FF0' }}>{c.pagesKicker}</p>
+            <h1 className="text-3xl font-black mb-2">{c.pagesTitle}</h1>
             <p className="text-sm" style={{ color: '#5C5F7A' }}>
-              編輯「關於我們」、聯絡、政策等獨立頁面。導覽會連到真實網址，不是首頁錨點。
+              {c.pagesSubtitle}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Link href="/my-store" className="px-4 py-2.5 rounded-full text-sm font-bold border">回我的商店</Link>
+            <Link href="/my-store" className="px-4 py-2.5 rounded-full text-sm font-bold border">{c.backDash}</Link>
             {storeSlug && selected && (
               <a
                 href={storePageUrl(storeSlug, selected.key)}
@@ -130,7 +134,7 @@ export default function StorePagesEditor() {
                 className="px-4 py-2.5 rounded-full text-sm font-bold text-white"
                 style={{ background: '#111827' }}
               >
-                預覽此頁
+                {c.previewPage}
               </a>
             )}
             <button
@@ -140,7 +144,7 @@ export default function StorePagesEditor() {
               className="px-5 py-2.5 rounded-full text-sm font-bold text-white disabled:opacity-60"
               style={{ background: '#5B5FF0' }}
             >
-              {saving ? '儲存中...' : '儲存'}
+              {saving ? c.saving : c.save}
             </button>
           </div>
         </div>
@@ -158,11 +162,11 @@ export default function StorePagesEditor() {
         )}
 
         {loading ? (
-          <div className="bg-white rounded-2xl border p-10 text-center text-sm text-gray-500">載入中...</div>
+          <div className="bg-white rounded-2xl border p-10 text-center text-sm text-gray-500">{c.loadingPages}</div>
         ) : (
           <div className="grid lg:grid-cols-[220px_1fr] gap-5">
             <aside className="bg-white rounded-2xl border p-4 h-fit">
-              <div className="text-xs font-bold text-gray-500 mb-3">頁面列表</div>
+              <div className="text-xs font-bold text-gray-500 mb-3">{c.pageList}</div>
               <div className="space-y-1 mb-4">
                 {pages.map((p) => (
                   <button
@@ -176,7 +180,7 @@ export default function StorePagesEditor() {
                     }}
                   >
                     {p.title}
-                    {!p.published && <span className="text-xs text-gray-400 ml-1">（隱藏）</span>}
+                    {!p.published && <span className="text-xs text-gray-400 ml-1">{c.hidden}</span>}
                   </button>
                 ))}
               </div>
@@ -184,11 +188,11 @@ export default function StorePagesEditor() {
                 <input
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  placeholder="新頁面標題"
+                  placeholder={c.newPagePh}
                   className="w-full border rounded-lg px-3 py-2 text-sm"
                 />
                 <button type="button" onClick={addPage} className="w-full text-sm font-bold py-2 rounded-lg border">
-                  新增頁面
+                  {c.addPage}
                 </button>
               </div>
             </aside>
@@ -196,7 +200,7 @@ export default function StorePagesEditor() {
             {selected && (
               <div className="bg-white rounded-2xl border p-5 sm:p-6 space-y-4">
                 <div>
-                  <label className="text-xs font-bold text-gray-500 block mb-1">標題</label>
+                  <label className="text-xs font-bold text-gray-500 block mb-1">{c.pageTitle}</label>
                   <input
                     value={selected.title}
                     onChange={(e) => updateSelected({ title: e.target.value })}
@@ -204,13 +208,13 @@ export default function StorePagesEditor() {
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-500 block mb-1">網址代碼</label>
+                  <label className="text-xs font-bold text-gray-500 block mb-1">{c.pageSlug}</label>
                   <code className="text-sm" style={{ color: '#5B5FF0' }}>
                     {storeSlug ? storePageUrl(storeSlug, selected.key) : selected.key}
                   </code>
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-500 block mb-1">內容</label>
+                  <label className="text-xs font-bold text-gray-500 block mb-1">{c.pageBody}</label>
                   <textarea
                     value={selected.body}
                     onChange={(e) => updateSelected({ body: e.target.value })}
@@ -224,10 +228,10 @@ export default function StorePagesEditor() {
                     checked={selected.published}
                     onChange={(e) => updateSelected({ published: e.target.checked })}
                   />
-                  公開此頁（導覽／頁尾會顯示）
+                  {c.pagePublic}
                 </label>
                 <button type="button" onClick={removePage} className="text-sm text-red-600 font-semibold">
-                  刪除此頁
+                  {c.deletePage}
                 </button>
               </div>
             )}

@@ -25,14 +25,14 @@ export default function LoginPage() {
         body: JSON.stringify({ email: form.email, password: form.password }),
       })
       const data = await res.json()
-      if (!res.ok) { setError(data.error || t.auth.loginCta); return }
+      if (!res.ok) { setError(t.auth.loginFail); return }
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
       const next = new URLSearchParams(window.location.search).get('next') || ''
       const safeNext = next.startsWith('/') && !next.startsWith('//') ? next : ''
       window.location.href = data.user?.isAdmin ? '/admin' : (safeNext || '/my-store')
     } catch {
-      setError('Network error')
+      setError(t.auth.network)
     } finally {
       setLoading(false)
     }

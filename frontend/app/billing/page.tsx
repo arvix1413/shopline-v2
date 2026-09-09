@@ -6,52 +6,28 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 import { useAuth } from '../../contexts/AuthContext'
 import { useRouter } from 'next/navigation'
+import { useI18n } from '../../contexts/I18nContext'
+import { getBillingCopy } from '../../lib/billingCopy'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://shopline-backend.arvix1413.workers.dev'
-
-const PLANS = [
-  {
-    id: 'starter',
-    name: '入門方案',
-    price: 'NT$990',
-    period: '/月',
-    desc: '適合一人創業、剛開始上架',
-    features: ['網路商店', '商品上架', '客人刷卡結帳', '14 天試用後續約'],
-  },
-  {
-    id: 'standard',
-    name: '成長方案',
-    price: 'NT$2,490',
-    period: '/月',
-    desc: '適合正在衝單的品牌電商',
-    features: ['入門方案全部功能', '行銷模組', '優先客服', '進階報表'],
-    highlight: true,
-  },
-  {
-    id: 'pro',
-    name: '專業方案',
-    price: 'NT$4,990',
-    period: '/月',
-    desc: '適合多通路與規模化團隊',
-    features: ['成長方案全部功能', '多通路整合', '專屬顧問', 'API 擴充'],
-  },
-]
 
 type TrialInfo = {
   planStatus: string
   daysLeft: number | null
   expired: boolean
   stage?: string
-  stageLabel?: string
   store?: { slug?: string; onboardingStage?: string } | null
 }
 
 export default function BillingPage() {
   const { user, token, isLoading } = useAuth()
+  const { locale } = useI18n()
+  const c = getBillingCopy(locale)
   const router = useRouter()
   const [trial, setTrial] = useState<TrialInfo | null>(null)
   const [loading, setLoading] = useState(false)
   const [msg, setMsg] = useState('')
+  const [ok, setOk] = useState(false)
   const [selected, setSelected] = useState('standard')
 
   const refreshTrial = async (authToken: string) => {
@@ -67,7 +43,8 @@ export default function BillingPage() {
     }
     const params = new URLSearchParams(window.location.search)
     if (params.get('paid') === '1') {
-      setMsg('付款成功！方案開通中，若狀態未更新請重新整理。')
+      setMsg(c.paidPending)
+      setOk(true)
       const sessionId = params.get('session_id')
       if (sessionId && token) {
         fetch(`${API}/api/me/confirm-subscription`, {
@@ -77,17 +54,19 @@ export default function BillingPage() {
         })
           .then(async (res) => {
             if (res.ok) {
-              setMsg('付款成功！方案已開通。')
+              setMsg(c.paidOk)
+              setOk(true)
               await refreshTrial(token)
             }
           })
           .catch(() => {})
       }
     } else if (params.get('checkout') === 'cancelled') {
-      setMsg('已取消付款，可稍後再選擇方案。')
+      setMsg(c.cancelled)
+      setOk(false)
     }
     refreshTrial(token).catch(() => {})
-  }, [user, token, isLoading, router])
+  }, [user, token, isLoading, router, c.paidPending, c.paidOk, c.cancelled])
 
   const activate = async () => {
     if (!token) return
@@ -100,15 +79,17 @@ export default function BillingPage() {
         body: JSON.stringify({ plan: selected }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || '開通失敗')
+      if (!res.ok) throw new Error(c.fail)
       if (data.url) {
         window.location.href = data.url
         return
       }
-      setMsg('開通成功！你的方案已啟用。')
+      setMsg(c.success)
+      setOk(true)
       setTrial((t) => (t ? { ...t, planStatus: 'paid', expired: false } : t))
     } catch (e: any) {
-      setMsg(e.message || '開通失敗')
+      setMsg(e.message || c.fail)
+      setOk(false)
     } finally {
       setLoading(false)
     }
@@ -120,25 +101,25 @@ export default function BillingPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
         <div className="text-center mb-10">
           <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#5B5FF0' }}>Billing</p>
-          <h1 className="text-3xl sm:text-4xl font-black mb-3" style={{ color: '#12131F' }}>開通 ARVIX 方案</h1>
+          <h1 className="text-3xl sm:text-4xl font-black mb-3" style={{ color: '#12131F' }}>{c.title}</h1>
           <p className="text-sm sm:text-base" style={{ color: '#5C5F7A' }}>
             {trial?.planStatus === 'paid'
-              ? '你已完成付款開通，可持續使用完整功能。'
+              ? c.paid
               : trial?.expired
-              ? '試用已結束，選擇方案並刷卡後即可繼續營業。'
-              : `試用剩餘 ${trial?.daysLeft ?? '—'} 天 · 目前進度：${trial?.stageLabel || '—'}`}
+              ? c.expired
+              : c.leftover.replace('{days}', String(trial?.daysLeft ?? '—'))}
           </p>
         </div>
 
         {msg && (
           <div className="mb-6 text-center text-sm font-medium px-4 py-3 rounded-xl"
-            style={{ background: msg.includes('成功') || msg.includes('付款成功') ? '#ECFDF5' : '#FEF2F2', color: msg.includes('成功') || msg.includes('付款成功') ? '#047857' : '#B91C1C' }}>
+            style={{ background: ok ? '#ECFDF5' : '#FEF2F2', color: ok ? '#047857' : '#B91C1C' }}>
             {msg}
           </div>
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-12">
-          {PLANS.map((p) => (
+          {c.plans.map((p) => (
             <button
               key={p.id}
               type="button"
@@ -151,7 +132,7 @@ export default function BillingPage() {
               }}
             >
               {p.highlight && (
-                <div className="text-xs font-bold mb-2" style={{ color: '#5B5FF0' }}>最受歡迎</div>
+                <div className="text-xs font-bold mb-2" style={{ color: '#5B5FF0' }}>{c.popular}</div>
               )}
               <h3 className="text-xl font-black mb-1" style={{ color: '#12131F' }}>{p.name}</h3>
               <p className="text-sm mb-4" style={{ color: '#5C5F7A' }}>{p.desc}</p>
@@ -176,17 +157,17 @@ export default function BillingPage() {
               onClick={activate}
               className="btn-brand text-white font-bold px-10 py-3.5 rounded-full disabled:opacity-60"
             >
-              {loading ? '處理中…' : '刷卡開通方案'}
+              {loading ? c.processing : c.payCta}
             </button>
             <p className="mt-3 text-xs" style={{ color: '#8A8DA8' }}>
-              將導向安全付款頁完成訂閱。開通後商店即可繼續營業。
+              {c.payHint}
             </p>
           </div>
         )}
 
         <div className="flex flex-wrap gap-3 justify-center">
           <Link href="/my-store" className="text-sm font-semibold px-5 py-2.5 rounded-full text-white" style={{ background: '#5B5FF0' }}>
-            回我的商店
+            {c.backStore}
           </Link>
           {trial?.store?.slug && (
             <Link
@@ -194,7 +175,7 @@ export default function BillingPage() {
               className="text-sm font-semibold px-5 py-2.5 rounded-full"
               style={{ background: '#15162A', color: '#fff' }}
             >
-              查看公開商店
+              {c.viewStore}
             </Link>
           )}
         </div>

@@ -1,17 +1,19 @@
 'use client'
 
 import Image from 'next/image'
+import { useI18n } from '../../contexts/I18nContext'
 
 const LINE_URL = 'https://line.me/R/ti/p/@kxh0647n'
 
 export default function LineChatBubble() {
+  const { t } = useI18n()
   return (
     <a
       href={LINE_URL}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="透過 LINE 聯繫客服"
-      title="LINE 客服"
+      aria-label={t.common.lineSupport}
+      title={t.common.lineSupport}
       className="fixed z-[60] block w-12 h-12 sm:w-[60px] sm:h-[60px] transition-all hover:scale-105 active:scale-95 opacity-90 hover:opacity-100"
       style={{
         right: 'max(10px, env(safe-area-inset-right))',
@@ -21,7 +23,7 @@ export default function LineChatBubble() {
     >
       <Image
         src="/line-chat.png"
-        alt="LINE 客服"
+        alt={t.common.lineSupport}
         width={60}
         height={60}
         className="w-full h-full object-contain"

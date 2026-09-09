@@ -2,7 +2,7 @@
 
 import { useState, useEffect, type ReactNode } from 'react'
 import type { LayoutStyle, StoreLayout, StoreSection, StoreTheme } from '../../lib/storeLayout'
-import { SECTION_LABELS, parseHeroImages, DEFAULT_STYLE } from '../../lib/storeLayout'
+import { parseHeroImages, DEFAULT_STYLE } from '../../lib/storeLayout'
 import { storeHomeUrl, storePageUrl, storeProductsUrl } from '../../lib/storefrontUrl'
 import type { StorePage } from '../../lib/storePages'
 import { useI18n } from '../../contexts/I18nContext'
@@ -157,7 +157,7 @@ export default function StoreLayoutView({
               </>
             ) : (
               <>
-                <a href="#products" className="hover:opacity-70 transition whitespace-nowrap" onClick={(e) => (editing || staticPreview) && e.preventDefault()}>{cx.productFallback}</a>
+                <a href="#products" className="hover:opacity-70 transition whitespace-nowrap" onClick={(e) => (editing || staticPreview) && e.preventDefault()}>{cx.productsNav}</a>
                 <a href="#about" className="hover:opacity-70 transition whitespace-nowrap" onClick={(e) => (editing || staticPreview) && e.preventDefault()}>{cx.aboutNav}</a>
               </>
             )}
@@ -212,7 +212,7 @@ export default function StoreLayoutView({
                 className="absolute left-3 top-3 z-20 px-2.5 py-1 rounded-full text-[11px] font-bold text-white"
                 style={{ background: '#5B5FF0' }}
               >
-                編輯中 · {SECTION_LABELS[section.type] || section.type}
+                {cx.editingPrefix} {section.type}
               </div>
             )}
             <SectionBlock
@@ -259,6 +259,8 @@ function HeroCarousel({
   style: LayoutStyle
   staticPreview?: boolean
 }) {
+  const { locale } = useI18n()
+  const cx = getCheckoutCopy(locale)
   const images = parseHeroImages(props)
   const hasImage = images.length > 0
   const [idx, setIdx] = useState(0)
@@ -288,7 +290,7 @@ function HeroCarousel({
           color: hasImage && style.heroStyle !== 'split' ? '#FAFBFA' : theme.text,
         }}
       >
-        {props.title || '我的商店'}
+        {props.title || cx.storeFallback}
       </h1>
       <p
         className="text-base md:text-lg mb-8"
@@ -311,7 +313,7 @@ function HeroCarousel({
           margin: style.heroStyle === 'center' ? '0 auto' : undefined,
         }}
       >
-        {props.cta || '瀏覽商品'}
+        {props.cta || cx.browseProducts}
       </a>
       {images.length > 1 && (
         <div className={`flex items-center gap-2 mt-8 ${style.heroStyle === 'center' ? 'justify-center' : ''}`}>
@@ -319,7 +321,7 @@ function HeroCarousel({
             <button
               key={i}
               type="button"
-              aria-label={`第 ${i + 1} 張`}
+              aria-label={cx.slideN.replace('{n}', String(i + 1))}
               onClick={() => setIdx(i)}
               className="rounded-full transition-all"
               style={{
@@ -421,7 +423,7 @@ function SectionBlock({
     return (
       <section style={{ padding: `${py} 0`, background: `${theme.primary}10` }}>
         <div className="max-w-6xl mx-auto px-5">
-          <h2 className="text-xl font-bold mb-6 text-center">{p.title || '熱門分類'}</h2>
+          <h2 className="text-xl font-bold mb-6 text-center">{p.title || cx.catalogTitle}</h2>
           <div className={`grid gap-3 ${items.length >= 4 ? 'grid-cols-2 md:grid-cols-4' : 'grid-cols-3'}`}>
             {items.map((item) => (
               <button
@@ -446,7 +448,7 @@ function SectionBlock({
         <div className="max-w-6xl mx-auto px-5">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold mb-1">{p.title || cx.productFallback}</h2>
+              <h2 className="text-2xl md:text-3xl font-bold mb-1">{p.title || cx.catalogTitle}</h2>
               <p className="text-sm" style={{ color: theme.muted }}>{p.subtitle}</p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -553,7 +555,7 @@ function SectionBlock({
             className="inline-block px-8 py-3 text-sm font-bold"
             style={{ background: theme.background, color: theme.text, borderRadius: r || 999 }}
           >
-            {p.button || '查看商品'}
+            {p.button || cx.productsNav}
           </a>
         </div>
       </section>

@@ -45,7 +45,7 @@ export default function RegisterPage() {
         }),
       })
       const data = await res.json()
-      if (!res.ok) { setError(data.error || t.auth.registerCta); return }
+      if (!res.ok) { setError(t.auth.network); return }
       login(data.token, data.user)
       track('sign_up_complete', { email: form.email, slug: data.store?.slug }, data.user.id)
       bindUser(data.user.id)

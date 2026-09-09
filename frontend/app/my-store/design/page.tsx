@@ -4,12 +4,12 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../../../contexts/AuthContext'
+import { useI18n } from '../../../contexts/I18nContext'
+import { getMerchantStudioCopy, mapStudioApiError } from '../../../lib/merchantStudioCopy'
 import StoreLayoutView from '../../components/StoreLayoutView'
 import ThemeMockPreview from '../../components/ThemeMockPreview'
 import {
   TEMPLATES,
-  TEMPLATE_TAG_LABELS,
-  SECTION_LABELS,
   HERO_PRESETS,
   parseHeroImages,
   serializeHeroImages,
@@ -40,8 +40,10 @@ type Mode = 'gallery' | 'editor'
 
 export default function StoreDesignPage() {
   const { user, token, isLoading } = useAuth()
+  const { locale } = useI18n()
+  const c = getMerchantStudioCopy(locale)
   const router = useRouter()
-  const [storeName, setStoreName] = useState('我的商店')
+  const [storeName, setStoreName] = useState('')
   const [tagline, setTagline] = useState('')
   const [slug, setSlug] = useState('')
   const [products, setProducts] = useState<PreviewProduct[]>([])
@@ -54,7 +56,7 @@ export default function StoreDesignPage() {
   const [msg, setMsg] = useState('')
   const [error, setError] = useState('')
   const [canOperate, setCanOperate] = useState(true)
-  const [category, setCategory] = useState('全部')
+  const [category, setCategory] = useState('__all__')
   const [panelOpen, setPanelOpen] = useState(true)
   const [dragFrom, setDragFrom] = useState<number | null>(null)
 
@@ -70,9 +72,9 @@ export default function StoreDesignPage() {
         const storeRes = await fetch(`${API}/api/stores/me`, {
           headers: { Authorization: `Bearer ${token}` },
         })
-        if (!storeRes.ok) throw new Error('請先完成註冊開店')
+        if (!storeRes.ok) throw new Error(c.needStore)
         const store = await storeRes.json()
-        setStoreName(store.name || '我的商店')
+        setStoreName(store.name || c.storeFallback)
         setTagline(store.tagline || '')
         setSlug(store.slug || '')
         setCanOperate(store.canOperate !== false)
@@ -83,11 +85,11 @@ export default function StoreDesignPage() {
             ? new URLSearchParams(window.location.search).get('template') || ''
             : ''
         if (wantedTemplate && TEMPLATES.some((t) => t.id === wantedTemplate)) {
-          const next = buildLayoutFromTemplate(wantedTemplate, store.name || '我的商店', store.tagline || '')
+          const next = buildLayoutFromTemplate(wantedTemplate, store.name || c.storeFallback, store.tagline || '')
           setLayout(next)
           setSelectedId(next.sections[0]?.id || null)
           setMode('editor')
-          setMsg(`已套用「${TEMPLATES.find((t) => t.id === wantedTemplate)?.name}」`)
+          setMsg(c.applied.replace('{name}', TEMPLATES.find((t) => t.id === wantedTemplate)?.name || wantedTemplate))
         } else {
           const parsed = parseStoreLayout(store.layout, store.name, store.tagline || '')
           setLayout(parsed)
@@ -110,12 +112,12 @@ export default function StoreDesignPage() {
           if (isBennis) setSlug('bennis')
         }
       } catch (e: any) {
-        setError(e.message || '載入失敗')
+        setError(e.message || c.loadFail)
       } finally {
         setLoading(false)
       }
     })()
-  }, [user, token, isLoading, router])
+  }, [user, token, isLoading, router, c.needStore, c.storeFallback, c.applied, c.loadFail])
 
   const selected = layout?.sections.find((s) => s.id === selectedId) || null
 
@@ -124,7 +126,7 @@ export default function StoreDesignPage() {
     setLayout(next)
     setSelectedId(next.sections[0]?.id || null)
     setMode('editor')
-    setMsg(`已套用「${TEMPLATES.find((t) => t.id === templateId)?.name}」· 可直接在預覽上點區塊編輯`)
+    setMsg(c.appliedHint.replace('{name}', TEMPLATES.find((t) => t.id === templateId)?.name || templateId))
     setError('')
   }
 
@@ -168,7 +170,7 @@ export default function StoreDesignPage() {
   const removeSection = (id: string) => {
     if (!layout) return
     if (layout.sections.length <= 1) {
-      setError('至少保留一個區塊')
+      setError(c.keepOneSection)
       return
     }
     const sections = layout.sections.filter((s) => s.id !== id)
@@ -191,11 +193,11 @@ export default function StoreDesignPage() {
         body: JSON.stringify({ layout }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || '儲存失敗')
+      if (!res.ok) throw new Error(mapStudioApiError(data.code, c))
       setHadSavedLayout(true)
-      setMsg('已發布到你的商店')
+      setMsg(c.published)
     } catch (e: any) {
-      setError(e.message || '儲存失敗')
+      setError(e.message || c.saveFail)
     } finally {
       setSaving(false)
     }
@@ -206,7 +208,7 @@ export default function StoreDesignPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#0E0F16', color: '#fff' }}>
-        <div className="text-sm text-white/50">載入設計器…</div>
+        <div className="text-sm text-white/50">{c.loading}</div>
       </div>
     )
   }
@@ -216,12 +218,12 @@ export default function StoreDesignPage() {
       {/* Top bar — like theme editor */}
       <header className="h-14 flex items-center justify-between gap-3 px-4 border-b shrink-0" style={{ borderColor: 'rgba(255,255,255,0.08)', background: '#151621' }}>
         <div className="flex items-center gap-3 min-w-0">
-          <Link href="/my-store" className="text-sm text-white/60 hover:text-white shrink-0">← 商店</Link>
+          <Link href="/my-store" className="text-sm text-white/60 hover:text-white shrink-0">{c.backStore}</Link>
           <div className="w-px h-4 bg-white/15" />
           <div className="min-w-0">
             <div className="text-sm font-bold truncate">{storeName}</div>
             <div className="text-[11px] text-white/40 truncate">
-              {mode === 'gallery' ? '選擇主題模板' : '所見即所得編輯中'}
+              {mode === 'gallery' ? c.pickTemplate : c.editingLive}
             </div>
           </div>
         </div>
@@ -233,7 +235,7 @@ export default function StoreDesignPage() {
               className="hidden sm:inline-flex px-3 py-1.5 rounded-lg text-xs font-semibold"
               style={{ background: 'rgba(255,255,255,0.08)' }}
             >
-              換模板
+              {c.swapTemplate}
             </button>
           )}
           {slug && (
@@ -242,7 +244,7 @@ export default function StoreDesignPage() {
               className="px-3 py-1.5 rounded-lg text-xs font-semibold"
               style={{ background: 'rgba(255,255,255,0.08)' }}
             >
-              開真實店面
+              {c.openLive}
             </Link>
           )}
           <button
@@ -252,14 +254,14 @@ export default function StoreDesignPage() {
             className="px-4 py-1.5 rounded-lg text-xs font-bold text-white disabled:opacity-40"
             style={{ background: '#5B5FF0' }}
           >
-            {saving ? '發布中…' : '發布'}
+            {saving ? c.publishing : c.publish}
           </button>
         </div>
       </header>
 
       {!canOperate && (
         <div className="px-4 py-2 text-sm text-center" style={{ background: '#3F1D1D', color: '#FECACA' }}>
-          試用已結束，無法改版型。<Link href="/billing" className="underline font-bold ml-1">去開通</Link>
+          {c.trialBanner}<Link href="/billing" className="underline font-bold ml-1">{c.activate}</Link>
         </div>
       )}
       {(msg || error) && (
@@ -273,10 +275,10 @@ export default function StoreDesignPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
             <div className="text-center mb-12 sm:mb-14">
               <h1 className="text-3xl sm:text-5xl font-black mb-4 tracking-tight" style={{ color: '#00142D' }}>
-                多款風格版型主題設計
+                {c.galleryTitle}
               </h1>
               <p className="text-sm sm:text-lg max-w-2xl mx-auto" style={{ color: '#687280' }}>
-                共 {TEMPLATES.length} 款 ARVIX 主題，一鍵套用後可改文字、換主視覺、拖拉區塊排序。
+                {c.gallerySubtitle.replace('{n}', String(TEMPLATES.length))}
               </p>
               {hadSavedLayout && (
                 <button
@@ -285,7 +287,7 @@ export default function StoreDesignPage() {
                   className="mt-5 text-sm font-semibold underline"
                   style={{ color: '#5B5FF0' }}
                 >
-                  繼續編輯目前主題 →
+                  {c.continueEdit}
                 </button>
               )}
             </div>
@@ -307,7 +309,7 @@ export default function StoreDesignPage() {
                   >
                     <ThemeMockPreview
                       template={t}
-                      storeName={storeName || '我的商店'}
+                      storeName={storeName || c.storeFallback}
                       products={products}
                       className="absolute inset-0"
                     />
@@ -319,12 +321,15 @@ export default function StoreDesignPage() {
                         className="px-5 py-2.5 rounded-full text-sm font-bold text-white"
                         style={{ background: '#5B5FF0' }}
                       >
-                        使用此主題
+                        {c.useTheme}
                       </span>
                     </div>
                   </div>
                   <div className="pt-4 px-0.5">
-                    <div className="font-bold text-base mb-2" style={{ color: '#00142D' }}>{t.name}</div>
+                    <div className="font-bold text-base mb-1" style={{ color: '#00142D' }}>{t.name}</div>
+                    {c.templateDescs[t.id] && (
+                      <div className="text-xs mb-2" style={{ color: '#687280' }}>{c.templateDescs[t.id]}</div>
+                    )}
                     {t.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1.5">
                         {t.tags.map((tag) => (
@@ -333,7 +338,7 @@ export default function StoreDesignPage() {
                             className="text-[11px] px-2 py-0.5 rounded-full"
                             style={{ background: '#F1F5F9', color: '#64748B' }}
                           >
-                            {TEMPLATE_TAG_LABELS[tag]}
+                            {c.tags[tag]}
                           </span>
                         ))}
                       </div>
@@ -350,9 +355,9 @@ export default function StoreDesignPage() {
           <aside className="border-r overflow-auto" style={{ borderColor: 'rgba(255,255,255,0.08)', background: '#151621' }}>
             <div className="p-4">
               <div className="mb-3">
-                <div className="text-sm font-black text-white">上下區塊排序</div>
+                <div className="text-sm font-black text-white">{c.sortTitle}</div>
                 <div className="text-[12px] text-white/45 mt-1 leading-relaxed">
-                  抓 ⠿ 拖上下＝對調框的位置。主視覺也可以拖到中間或下面，不是只能在最上面。
+                  {c.sortHint}
                 </div>
               </div>
 
@@ -392,10 +397,10 @@ export default function StoreDesignPage() {
                         opacity: dragFrom === index ? 0.55 : 1,
                       }}
                     >
-                      <span className="text-white/50 text-lg px-1" title="按住拖曳上下換位">⠿</span>
+                      <span className="text-white/50 text-lg px-1">⠿</span>
                       <div className="flex-1 min-w-0">
-                        <div className="text-[11px] text-white/40">第 {index + 1} 框</div>
-                        <div className="text-sm font-bold truncate">{SECTION_LABELS[section.type]}</div>
+                        <div className="text-[11px] text-white/40">{c.frameN.replace('{n}', String(index + 1))}</div>
+                        <div className="text-sm font-bold truncate">{c.sections[section.type]}</div>
                         <div className="text-[11px] text-white/40 truncate">{section.props.title || '—'}</div>
                       </div>
                       <div className="flex flex-col gap-0.5" onClick={(e) => e.stopPropagation()}>
@@ -404,7 +409,7 @@ export default function StoreDesignPage() {
                           disabled={!canOperate || index === 0}
                           className="w-7 h-7 rounded text-sm font-bold disabled:opacity-25"
                           style={{ background: 'rgba(255,255,255,0.1)' }}
-                          title="上移"
+                          title="↑"
                           onClick={() => setLayout({ ...layout, sections: moveSection(layout.sections, index, index - 1) })}
                         >
                           ↑
@@ -414,7 +419,7 @@ export default function StoreDesignPage() {
                           disabled={!canOperate || index === layout.sections.length - 1}
                           className="w-7 h-7 rounded text-sm font-bold disabled:opacity-25"
                           style={{ background: 'rgba(255,255,255,0.1)' }}
-                          title="下移"
+                          title="↓"
                           onClick={() => setLayout({ ...layout, sections: moveSection(layout.sections, index, index + 1) })}
                         >
                           ↓
@@ -425,7 +430,7 @@ export default function StoreDesignPage() {
                 })}
               </div>
 
-              <div className="text-[11px] font-bold tracking-widest text-white/40 mb-2">加一個框</div>
+              <div className="text-[11px] font-bold tracking-widest text-white/40 mb-2">{c.addFrame}</div>
               <div className="flex flex-wrap gap-1.5 mb-5">
                 {ADDABLE.map((type) => (
                   <button
@@ -436,22 +441,22 @@ export default function StoreDesignPage() {
                     className="text-[11px] font-semibold px-2.5 py-1.5 rounded-lg disabled:opacity-40"
                     style={{ background: 'rgba(91,95,240,0.2)', color: '#C7D2FE' }}
                   >
-                    + {SECTION_LABELS[type]}
+                    + {c.sections[type]}
                   </button>
                 ))}
               </div>
 
-              <div className="text-[11px] font-bold tracking-widest text-white/40 mb-2">顏色</div>
+              <div className="text-[11px] font-bold tracking-widest text-white/40 mb-2">{c.colors}</div>
               <label className="flex items-center justify-between text-xs mb-2 text-white/70">
-                主色
+                {c.colorPrimary}
                 <input type="color" value={layout.theme.primary} onChange={(e) => updateTheme('primary', e.target.value)} />
               </label>
               <label className="flex items-center justify-between text-xs mb-2 text-white/70">
-                背景
+                {c.colorBg}
                 <input type="color" value={layout.theme.background} onChange={(e) => updateTheme('background', e.target.value)} />
               </label>
               <label className="flex items-center justify-between text-xs text-white/70">
-                文字
+                {c.colorText}
                 <input type="color" value={layout.theme.text} onChange={(e) => updateTheme('text', e.target.value)} />
               </label>
             </div>
@@ -462,7 +467,7 @@ export default function StoreDesignPage() {
             <div className="mx-auto" style={{ maxWidth: 980 }}>
               <div className="flex items-center justify-between mb-3 px-1">
                 <div className="text-xs text-white/40">
-                  預覽用你店裡真實商品（目前 {products.length} 件）
+                  {c.previewHint.replace('{n}', String(products.length))}
                   {slug ? ` · ${slug}` : ''}
                 </div>
                 <button
@@ -471,7 +476,7 @@ export default function StoreDesignPage() {
                   style={{ background: 'rgba(255,255,255,0.08)' }}
                   onClick={() => setPanelOpen((v) => !v)}
                 >
-                  {panelOpen ? '收合編輯' : '編輯文字'}
+                  {panelOpen ? c.collapse : c.editText}
                 </button>
               </div>
               <div
@@ -511,26 +516,26 @@ export default function StoreDesignPage() {
           >
             <div className="p-4">
               <div className="flex items-center justify-between mb-4">
-                <div className="text-[11px] font-bold tracking-widest text-white/40">編輯區塊</div>
+                <div className="text-[11px] font-bold tracking-widest text-white/40">{c.editSection}</div>
                 {selected && (
                   <button type="button" className="text-[11px] text-red-300" onClick={() => removeSection(selected.id)}>
-                    刪除此區塊
+                    {c.deleteSection}
                   </button>
                 )}
               </div>
               {!selected ? (
-                <p className="text-sm text-white/40">點左邊的框，或點預覽裡的區塊開始改</p>
+                <p className="text-sm text-white/40">{c.clickToEdit}</p>
               ) : (
                 <div className="space-y-3">
                   <div className="text-sm font-bold" style={{ color: '#A5B4FC' }}>
-                    {SECTION_LABELS[selected.type]}
+                    {c.sections[selected.type]}
                   </div>
                   {selected.type === 'hero' && (
                     <div className="space-y-3 pb-2">
                       <div>
-                        <div className="text-xs font-bold text-white/80">主視覺輪播圖</div>
+                        <div className="text-xs font-bold text-white/80">{c.heroSlides}</div>
                         <div className="text-[11px] text-white/40 leading-relaxed mt-1">
-                          可放多張，店面会自動輪播。下面點圖＝加入輪播；已加入的可刪除、上下調順序。
+                          {c.heroSlidesHint}
                         </div>
                       </div>
 
@@ -547,7 +552,7 @@ export default function StoreDesignPage() {
                           <>
                             <div className="space-y-2">
                               {slides.length === 0 && (
-                                <div className="text-[11px] text-white/35 py-2">還沒有圖，從下方選一张加入</div>
+                                <div className="text-[11px] text-white/35 py-2">{c.noSlides}</div>
                               )}
                               {slides.map((url, i) => (
                                 <div
@@ -557,7 +562,7 @@ export default function StoreDesignPage() {
                                 >
                                   {/* eslint-disable-next-line @next/next/no-img-element */}
                                   <img src={url} alt="" className="w-14 h-10 rounded object-cover" />
-                                  <div className="flex-1 text-[11px] text-white/50">第 {i + 1} 張</div>
+                                  <div className="flex-1 text-[11px] text-white/50">{c.slideN.replace('{n}', String(i + 1))}</div>
                                   <button
                                     type="button"
                                     className="w-6 h-6 rounded text-xs disabled:opacity-30"
@@ -589,29 +594,27 @@ export default function StoreDesignPage() {
                                     className="text-[11px] text-red-300 px-1"
                                     onClick={() => setSlides(slides.filter((_, j) => j !== i))}
                                   >
-                                    刪
+                                    {c.del}
                                   </button>
                                 </div>
                               ))}
                             </div>
 
                             <label className="flex items-center justify-between text-xs text-white/70">
-                              幾秒換一张
+                              {c.carouselSec}
                               <select
                                 value={selected.props.carouselSec || '4'}
                                 onChange={(e) => updateProps('carouselSec', e.target.value)}
                                 className="ml-2 rounded px-2 py-1 text-white text-xs"
                                 style={{ background: '#0E0F16', border: '1px solid rgba(255,255,255,0.15)' }}
                               >
-                                <option value="3">3 秒</option>
-                                <option value="4">4 秒</option>
-                                <option value="5">5 秒</option>
-                                <option value="6">6 秒</option>
-                                <option value="8">8 秒</option>
+                                {['3', '4', '5', '6', '8'].map((n) => (
+                                  <option key={n} value={n}>{c.secUnit.replace('{n}', n)}</option>
+                                ))}
                               </select>
                             </label>
 
-                            <div className="text-[11px] font-bold text-white/50 pt-1">點圖加入輪播</div>
+                            <div className="text-[11px] font-bold text-white/50 pt-1">{c.pickSlide}</div>
                             <div className="grid grid-cols-2 gap-2">
                               {HERO_PRESETS.filter((p) => p.url).map((preset) => (
                                 <button
@@ -626,14 +629,14 @@ export default function StoreDesignPage() {
                                   style={{ border: '1px solid rgba(255,255,255,0.12)' }}
                                 >
                                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                                  <img src={preset.url} alt={preset.label} className="w-full h-14 object-cover" />
-                                  <div className="px-1.5 py-1 text-[10px] text-white/70">+ {preset.label}</div>
+                                  <img src={preset.url} alt={c.heroPresets[preset.id] || preset.label} className="w-full h-14 object-cover" />
+                                  <div className="px-1.5 py-1 text-[10px] text-white/70">+ {c.heroPresets[preset.id] || preset.label}</div>
                                 </button>
                               ))}
                             </div>
 
                             <label className="block text-xs text-white/70">
-                              <span className="mb-1.5 block">或貼圖片網址加入</span>
+                              <span className="mb-1.5 block">{c.pasteUrl}</span>
                               <input
                                 defaultValue=""
                                 key={slides.length}
@@ -649,7 +652,7 @@ export default function StoreDesignPage() {
                                   ;(e.target as HTMLInputElement).value = ''
                                 }}
                               />
-                              <span className="text-[10px] text-white/35 mt-1 block">貼完按 Enter 加入</span>
+                              <span className="text-[10px] text-white/35 mt-1 block">{c.pasteEnter}</span>
                             </label>
                           </>
                         )
@@ -660,7 +663,7 @@ export default function StoreDesignPage() {
                     .filter((key) => !(selected.type === 'hero' && (key === 'image' || key === 'images' || key === 'carouselSec')))
                     .map((key) => (
                       <label key={key} className="block text-xs text-white/70">
-                        <span className="mb-1.5 block">{propLabel(key)}</span>
+                        <span className="mb-1.5 block">{c.props[key] || key}</span>
                         {key === 'body' || key === 'subtitle' ? (
                           <textarea
                             rows={key === 'body' ? 5 : 3}
@@ -685,7 +688,7 @@ export default function StoreDesignPage() {
               )}
 
               <div className="mt-6 lg:hidden space-y-2">
-                <div className="text-[11px] font-bold tracking-widest text-white/40 mb-2">新增區塊</div>
+                <div className="text-[11px] font-bold tracking-widest text-white/40 mb-2">{c.addSection}</div>
                 {ADDABLE.map((type) => (
                   <button
                     key={type}
@@ -694,7 +697,7 @@ export default function StoreDesignPage() {
                     className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold"
                     style={{ border: '1px solid rgba(255,255,255,0.08)' }}
                   >
-                    + {SECTION_LABELS[type]}
+                    + {c.sections[type]}
                   </button>
                 ))}
               </div>
@@ -704,19 +707,4 @@ export default function StoreDesignPage() {
       )}
     </div>
   )
-}
-
-function propLabel(key: string) {
-  const map: Record<string, string> = {
-    title: '標題',
-    subtitle: '副標',
-    cta: '按鈕文字',
-    image: '主圖網址',
-    body: '內文',
-    button: '按鈕文字',
-    item1: '特色 1',
-    item2: '特色 2',
-    item3: '特色 3',
-  }
-  return map[key] || key
 }

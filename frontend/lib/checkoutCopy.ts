@@ -68,6 +68,10 @@ export type CheckoutCopy = {
   errAmountLimit: string
   errStripeUnavailable: string
   errStock: string
+  storeFallback: string
+  browseProducts: string
+  slideN: string
+  editingPrefix: string
 }
 
 const zhTW: CheckoutCopy = {
@@ -138,6 +142,10 @@ const zhTW: CheckoutCopy = {
   errAmountLimit: '7-11 取貨單筆上限為 NT$ 20,000',
   errStripeUnavailable: '信用卡付款暫時無法使用，請稍後再試或改選貨到付款',
   errStock: '庫存不足',
+  storeFallback: '我的商店',
+  browseProducts: '瀏覽商品',
+  slideN: '第 {n} 張',
+  editingPrefix: '編輯中 ·',
 }
 
 const zhCN: CheckoutCopy = {
@@ -208,6 +216,10 @@ const zhCN: CheckoutCopy = {
   errAmountLimit: '7-11 取货单笔上限为 NT$ 20,000',
   errStripeUnavailable: '信用卡付款暂时无法使用，请稍后再试或改选货到付款',
   errStock: '库存不足',
+  storeFallback: '我的商店',
+  browseProducts: '浏览商品',
+  slideN: '第 {n} 张',
+  editingPrefix: '编辑中 ·',
 }
 
 const en: CheckoutCopy = {
@@ -278,6 +290,10 @@ const en: CheckoutCopy = {
   errAmountLimit: '7-11 orders are limited to NT$ 20,000',
   errStripeUnavailable: 'Card payment is temporarily unavailable. Try again or use cash on delivery.',
   errStock: 'Not enough stock',
+  storeFallback: 'My store',
+  browseProducts: 'Shop now',
+  slideN: 'Slide {n}',
+  editingPrefix: 'Editing ·',
 }
 
 const ko: CheckoutCopy = {
@@ -348,6 +364,10 @@ const ko: CheckoutCopy = {
   errAmountLimit: '7-11 주문은 NT$ 20,000 한도입니다',
   errStripeUnavailable: '카드 결제를 잠시 사용할 수 없습니다. 나중에 다시 시도하거나 착불을 이용하세요.',
   errStock: '재고가 부족합니다',
+  storeFallback: '내 스토어',
+  browseProducts: '상품 보기',
+  slideN: '{n}번째 슬라이드',
+  editingPrefix: '편집 중 ·',
 }
 
 const ja: CheckoutCopy = {
@@ -418,6 +438,10 @@ const ja: CheckoutCopy = {
   errAmountLimit: '7-11 は 1 件 NT$ 20,000 までです',
   errStripeUnavailable: 'カード決済を一時利用できません。後でもう一度お試しいただくか代金引換をご利用ください。',
   errStock: '在庫が不足しています',
+  storeFallback: 'マイストア',
+  browseProducts: '商品を見る',
+  slideN: '{n}枚目',
+  editingPrefix: '編集中 ·',
 }
 
 const vi: CheckoutCopy = {
@@ -488,6 +512,10 @@ const vi: CheckoutCopy = {
   errAmountLimit: 'Đơn 7-11 tối đa NT$ 20,000',
   errStripeUnavailable: 'Thanh toán thẻ tạm thời không khả dụng. Thử lại hoặc dùng COD.',
   errStock: 'Không đủ tồn kho',
+  storeFallback: 'Cửa hàng của tôi',
+  browseProducts: 'Xem sản phẩm',
+  slideN: 'Ảnh {n}',
+  editingPrefix: 'Đang sửa ·',
 }
 
 const es: CheckoutCopy = {
@@ -558,6 +586,10 @@ const es: CheckoutCopy = {
   errAmountLimit: 'Pedidos 7-11 limitados a NT$ 20,000',
   errStripeUnavailable: 'El pago con tarjeta no está disponible. Inténtalo luego o usa contra reembolso.',
   errStock: 'Stock insuficiente',
+  storeFallback: 'Mi tienda',
+  browseProducts: 'Ver productos',
+  slideN: 'Diapositiva {n}',
+  editingPrefix: 'Editando ·',
 }
 
 const pt: CheckoutCopy = {
@@ -628,6 +660,10 @@ const pt: CheckoutCopy = {
   errAmountLimit: 'Pedidos 7-11 limitados a NT$ 20,000',
   errStripeUnavailable: 'Pagamento com cartão indisponível. Tente depois ou use pagamento na entrega.',
   errStock: 'Estoque insuficiente',
+  storeFallback: 'Minha loja',
+  browseProducts: 'Ver produtos',
+  slideN: 'Slide {n}',
+  editingPrefix: 'Editando ·',
 }
 
 const de: CheckoutCopy = {
@@ -698,6 +734,10 @@ const de: CheckoutCopy = {
   errAmountLimit: '7-11 Bestellungen max. NT$ 20,000',
   errStripeUnavailable: 'Kartenzahlung vorübergehend nicht verfügbar. Später erneut oder Nachnahme.',
   errStock: 'Nicht genug Lagerbestand',
+  storeFallback: 'Mein Shop',
+  browseProducts: 'Produkte ansehen',
+  slideN: 'Folie {n}',
+  editingPrefix: 'Bearbeitung ·',
 }
 
 const fr: CheckoutCopy = {
@@ -768,6 +808,10 @@ const fr: CheckoutCopy = {
   errAmountLimit: 'Commandes 7-11 limitées à NT$ 20,000',
   errStripeUnavailable: 'Paiement par carte indisponible. Réessayez plus tard ou payez à la livraison.',
   errStock: 'Stock insuffisant',
+  storeFallback: 'Ma boutique',
+  browseProducts: 'Voir les produits',
+  slideN: 'Diapositive {n}',
+  editingPrefix: 'Édition ·',
 }
 
 export const checkoutCopyByLocale: Record<Locale, CheckoutCopy> = {

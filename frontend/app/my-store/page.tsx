@@ -6,6 +6,8 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 import { useAuth } from '../../contexts/AuthContext'
 import { useRouter } from 'next/navigation'
+import { useI18n } from '../../contexts/I18nContext'
+import { getMerchantDashCopy } from '../../lib/merchantDashCopy'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://shopline-backend.arvix1413.workers.dev'
 
@@ -36,12 +38,14 @@ const emptyForm = {
   description: '',
   price: '',
   imageUrl: '',
-  category: '一般',
+  category: '',
   stock: '10',
 }
 
 export default function MyStorePage() {
   const { user, token, isLoading } = useAuth()
+  const { locale } = useI18n()
+  const c = getMerchantDashCopy(locale)
   const router = useRouter()
   const [store, setStore] = useState<Store | null>(null)
   const [products, setProducts] = useState<Product[]>([])
@@ -61,7 +65,7 @@ export default function MyStorePage() {
       })
       if (!storeRes.ok) {
         const d = await storeRes.json().catch(() => ({}))
-        throw new Error(d.error || '找不到商店，請先完成註冊開店')
+        throw new Error(c.noStore)
       }
       const storeData = await storeRes.json()
       setStore(storeData)
@@ -71,7 +75,7 @@ export default function MyStorePage() {
       const prodData = prodRes.ok ? await prodRes.json() : []
       setProducts(Array.isArray(prodData) ? prodData : [])
     } catch (e: any) {
-      setError(e.message || '載入失敗')
+      setError(e.message || c.loadFail)
       setStore(null)
       setProducts([])
     } finally {
@@ -95,7 +99,7 @@ export default function MyStorePage() {
       description: p.description || '',
       price: String(p.price ?? ''),
       imageUrl: p.imageUrl || '',
-      category: p.category || '一般',
+      category: p.category || c.general,
       stock: String(p.stock ?? 0),
     })
     setMsg('')
@@ -119,7 +123,7 @@ export default function MyStorePage() {
         description: form.description.trim(),
         price: Number(form.price),
         imageUrl: form.imageUrl.trim(),
-        category: form.category.trim() || '一般',
+        category: form.category.trim() || c.general,
         stock: Number(form.stock) || 0,
       }
       const url = editingId
@@ -134,12 +138,12 @@ export default function MyStorePage() {
         body: JSON.stringify(payload),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || '儲存失敗')
-      setMsg(editingId ? '商品已更新' : '商品已上架到你的商店')
+      if (!res.ok) throw new Error(c.saveFail)
+      setMsg(editingId ? c.saved : c.created)
       resetForm()
       await load(token)
     } catch (err: any) {
-      setError(err.message || '儲存失敗')
+      setError(err.message || c.saveFail)
     } finally {
       setBusy(false)
     }
@@ -147,7 +151,7 @@ export default function MyStorePage() {
 
   const remove = async (id: number, name: string) => {
     if (!token) return
-    if (!confirm(`確定下架「${name}」？`)) return
+    if (!confirm(c.confirmRemove.replace('{name}', name))) return
     setBusy(true)
     try {
       const res = await fetch(`${API}/api/stores/me/products/${id}`, {
@@ -156,12 +160,12 @@ export default function MyStorePage() {
       })
       if (!res.ok) {
         const d = await res.json().catch(() => ({}))
-        throw new Error(d.error || '刪除失敗')
+        throw new Error(c.deleteFail)
       }
-      setMsg('商品已刪除')
+      setMsg(c.deleted)
       await load(token)
     } catch (err: any) {
-      setError(err.message || '刪除失敗')
+      setError(err.message || c.deleteFail)
     } finally {
       setBusy(false)
     }
@@ -176,9 +180,9 @@ export default function MyStorePage() {
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
           <div>
             <p className="text-xs font-bold tracking-widest mb-2" style={{ color: '#5B5FF0' }}>MY STORE</p>
-            <h1 className="text-3xl font-black mb-2">我的商店</h1>
+            <h1 className="text-3xl font-black mb-2">{c.title}</h1>
             <p className="text-sm" style={{ color: '#5C5F7A' }}>
-              上架商品後，客人就能在你的商店頁選購、加入購物車、結帳。
+              {c.subtitle}
             </p>
           </div>
           {store && (
@@ -188,38 +192,38 @@ export default function MyStorePage() {
                 className="inline-flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-bold text-white"
                 style={{ background: '#111827' }}
               >
-                拖拉設計店面
+                {c.design}
               </Link>
               <Link
                 href="/my-store/pages"
                 className="inline-flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-bold border"
               >
-                商店頁面
+                {c.pages}
               </Link>
               <Link
                 href="/my-store/orders"
                 className="inline-flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-bold border"
               >
-                訂單與寄件
+                {c.orders}
               </Link>
               <Link
                 href="/my-store/logistics"
                 className="inline-flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-bold border"
               >
-                收款／物流
+                {c.logistics}
               </Link>
               <Link
                 href={shopUrl}
                 className="inline-flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-bold text-white"
                 style={{ background: '#5B5FF0' }}
               >
-                預覽商店頁
+                {c.preview}
               </Link>
               <Link
                 href="/billing"
                 className="inline-flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-bold border"
               >
-                方案與試用
+                {c.billing}
               </Link>
             </div>
           )}
@@ -227,39 +231,39 @@ export default function MyStorePage() {
 
         {store?.trial?.expired && (
           <div className="mb-6 px-4 py-4 rounded-2xl border text-sm" style={{ background: '#FEF2F2', borderColor: '#FECACA', color: '#B91C1C' }}>
-            試用已結束，商店已暫停接單與上架。請先
-            <Link href="/billing" className="font-bold underline mx-1">開通方案</Link>
-            後繼續營業。
+            {c.trialExpired}{' '}
+            <Link href="/billing" className="font-bold underline mx-1">{c.activatePlan}</Link>
+            {c.thenOperate}
           </div>
         )}
         {store?.trial && !store.trial.expired && store.trial.planStatus !== 'paid' && (
           <div className="mb-6 px-4 py-4 rounded-2xl border text-sm" style={{ background: '#EEF2FF', borderColor: '#C7D2FE', color: '#3730A3' }}>
-            免費試用剩餘 <strong>{store.trial.daysLeft ?? '—'}</strong> 天。試用期間客人可刷卡購物；到期後需訂閱才能繼續。
+            {c.trialLeft.replace('{days}', String(store.trial.daysLeft ?? '—'))}
           </div>
         )}
 
         {loading ? (
-          <div className="bg-white rounded-2xl border p-10 text-center text-sm text-gray-500">載入中...</div>
+          <div className="bg-white rounded-2xl border p-10 text-center text-sm text-gray-500">{c.loading}</div>
         ) : error && !store ? (
           <div className="bg-white rounded-2xl border p-10 text-center">
             <p className="text-red-600 mb-4">{error}</p>
-            <Link href="/register" className="text-sm font-semibold" style={{ color: '#5B5FF0' }}>去註冊開店 →</Link>
+            <Link href="/register" className="text-sm font-semibold" style={{ color: '#5B5FF0' }}>{c.goRegister}</Link>
           </div>
         ) : (
           <>
             <div className="bg-white rounded-2xl border p-5 sm:p-6 mb-6">
               <div className="flex flex-wrap gap-4 justify-between">
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">商店名稱</div>
+                  <div className="text-xs text-gray-500 mb-1">{c.storeName}</div>
                   <div className="font-black text-lg">{store?.name}</div>
                 </div>
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">公開網址</div>
+                  <div className="text-xs text-gray-500 mb-1">{c.publicUrl}</div>
                   <code className="text-sm" style={{ color: '#5B5FF0' }}>arvixai.com{shopUrl}</code>
                 </div>
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">上架商品</div>
-                  <div className="font-bold">{products.length} 件</div>
+                  <div className="text-xs text-gray-500 mb-1">{c.productCount}</div>
+                  <div className="font-bold">{products.length}{c.countUnit ? ` ${c.countUnit}` : ''}</div>
                 </div>
               </div>
             </div>
@@ -272,39 +276,39 @@ export default function MyStorePage() {
 
             <div className="grid lg:grid-cols-5 gap-6">
               <form onSubmit={submit} className="lg:col-span-2 bg-white rounded-2xl border p-5 sm:p-6 space-y-3 h-fit">
-                <h2 className="font-black text-lg mb-1">{editingId ? '編輯商品' : '上架新商品'}</h2>
+                <h2 className="font-black text-lg mb-1">{editingId ? c.editProduct : c.newProduct}</h2>
                 {store?.canOperate === false && (
-                  <p className="text-sm text-red-600 mb-2">試用已結束，無法上架。請先到方案頁開通。</p>
+                  <p className="text-sm text-red-600 mb-2">{c.cannotAdd}</p>
                 )}
                 <fieldset disabled={busy || store?.canOperate === false} className="space-y-3 disabled:opacity-60">
                 <label className="block text-sm">
-                  <span className="font-medium mb-1 block">商品名稱</span>
+                  <span className="font-medium mb-1 block">{c.name}</span>
                   <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
                     className="w-full px-3 py-2.5 rounded-xl border text-sm" />
                 </label>
                 <label className="block text-sm">
-                  <span className="font-medium mb-1 block">價格（NT$）</span>
+                  <span className="font-medium mb-1 block">{c.price}</span>
                   <input required type="number" min="1" step="1" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })}
                     className="w-full px-3 py-2.5 rounded-xl border text-sm" />
                 </label>
                 <label className="block text-sm">
-                  <span className="font-medium mb-1 block">分類</span>
+                  <span className="font-medium mb-1 block">{c.category}</span>
                   <input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}
                     className="w-full px-3 py-2.5 rounded-xl border text-sm" />
                 </label>
                 <label className="block text-sm">
-                  <span className="font-medium mb-1 block">庫存</span>
+                  <span className="font-medium mb-1 block">{c.stock}</span>
                   <input type="number" min="0" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })}
                     className="w-full px-3 py-2.5 rounded-xl border text-sm" />
                 </label>
                 <label className="block text-sm">
-                  <span className="font-medium mb-1 block">圖片網址</span>
+                  <span className="font-medium mb-1 block">{c.imageUrl}</span>
                   <input value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
                     placeholder="https://..."
                     className="w-full px-3 py-2.5 rounded-xl border text-sm" />
                 </label>
                 <label className="block text-sm">
-                  <span className="font-medium mb-1 block">描述</span>
+                  <span className="font-medium mb-1 block">{c.desc}</span>
                   <textarea rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
                     className="w-full px-3 py-2.5 rounded-xl border text-sm" />
                 </label>
@@ -312,11 +316,11 @@ export default function MyStorePage() {
                   <button type="submit" disabled={busy || store?.canOperate === false}
                     className="flex-1 py-2.5 rounded-full text-sm font-bold text-white disabled:opacity-60"
                     style={{ background: '#5B5FF0' }}>
-                    {busy ? '儲存中...' : editingId ? '更新商品' : '上架商品'}
+                    {busy ? c.saving : editingId ? c.update : c.publish}
                   </button>
                   {editingId && (
                     <button type="button" onClick={resetForm} className="px-4 py-2.5 rounded-full text-sm font-semibold border">
-                      取消
+                      {c.cancel}
                     </button>
                   )}
                 </div>
@@ -324,9 +328,9 @@ export default function MyStorePage() {
               </form>
 
               <div className="lg:col-span-3 bg-white rounded-2xl border overflow-hidden">
-                <div className="px-5 py-4 border-b font-black">已上架商品</div>
+                <div className="px-5 py-4 border-b font-black">{c.listed}</div>
                 {products.length === 0 ? (
-                  <div className="p-10 text-center text-sm text-gray-400">還沒有商品，先從左側上架第一件吧</div>
+                  <div className="p-10 text-center text-sm text-gray-400">{c.empty}</div>
                 ) : (
                   <ul className="divide-y">
                     {products.map((p) => (
@@ -340,11 +344,11 @@ export default function MyStorePage() {
                         <div className="flex-1 min-w-0">
                           <div className="font-semibold truncate">{p.name}</div>
                           <div className="text-sm" style={{ color: '#5B5FF0' }}>NT${Math.round(p.price).toLocaleString()}</div>
-                          <div className="text-xs text-gray-400 mt-0.5">{p.category || '一般'} · 庫存 {p.stock ?? 0}</div>
+                          <div className="text-xs text-gray-400 mt-0.5">{p.category || c.general} · {c.stockLabel} {p.stock ?? 0}</div>
                         </div>
                         <div className="flex flex-col gap-1">
-                          <button type="button" onClick={() => startEdit(p)} className="text-xs font-semibold px-3 py-1.5 rounded-lg border">編輯</button>
-                          <button type="button" onClick={() => remove(p.id, p.name)} className="text-xs font-semibold px-3 py-1.5 rounded-lg text-red-600 border border-red-100">刪除</button>
+                          <button type="button" onClick={() => startEdit(p)} className="text-xs font-semibold px-3 py-1.5 rounded-lg border">{c.edit}</button>
+                          <button type="button" onClick={() => remove(p.id, p.name)} className="text-xs font-semibold px-3 py-1.5 rounded-lg text-red-600 border border-red-100">{c.del}</button>
                         </div>
                       </li>
                     ))}
