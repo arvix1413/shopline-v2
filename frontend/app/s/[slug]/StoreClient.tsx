@@ -8,6 +8,13 @@ import StoreLayoutView from '../../components/StoreLayoutView'
 import { parseStoreLayout, type StoreLayout } from '../../../lib/storeLayout'
 import { findStorePage, parseStorePages, type StorePage } from '../../../lib/storePages'
 import { storeHomeUrl } from '../../../lib/storefrontUrl'
+import { useI18n } from '../../../contexts/I18nContext'
+import type { Locale } from '../../../lib/i18n'
+
+/** 7-11 超商取貨／貨到付款僅台灣市場（繁中）；其他語系只宅配＋刷卡 */
+function isTaiwanCheckoutMarket(locale: Locale) {
+  return locale === 'zh-TW'
+}
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://shopline-backend.arvix1413.workers.dev'
 
@@ -102,6 +109,8 @@ export default function BrandStoreClient({
   pageKey?: string
 }) {
   const params = useParams<{ slug: string }>()
+  const { locale } = useI18n()
+  const taiwanMarket = isTaiwanCheckoutMarket(locale)
   const [slug, setSlug] = useState('')
   const [store, setStore] = useState<Store | null>(null)
   const [pages, setPages] = useState<StorePage[]>([])
@@ -116,14 +125,39 @@ export default function BrandStoreClient({
   const [adding, setAdding] = useState(false)
   const [checkingOut, setCheckingOut] = useState(false)
   const [checkoutError, setCheckoutError] = useState('')
-  const [paidNotice, setPaidNotice] = useState<{ orderId: string; method?: string } | null>(null)
+  const [paidNotice, setPaidNotice] = useState<{
+    orderId: string
+    method?: string
+    shipmentCode?: string
+  } | null>(null)
   const [form, setForm] = useState({
-    shippingMethod: 'seven_eleven' as 'seven_eleven' | 'home',
+    shippingMethod: 'home' as 'seven_eleven' | 'home',
     customerName: '',
     customerPhone: '',
     customerEmail: '',
     shippingAddress: '',
+    cvsStoreId: '',
+    cvsStoreName: '',
+    cvsAddress: '',
+    /** 地圖選店時的 IsCollection：Y=貨到付款、N=刷卡取貨 */
+    cvsCollection: 'N' as 'Y' | 'N',
   })
+  const [ecpayMapReady, setEcpayMapReady] = useState(false)
+
+  // 非台灣語系強制宅配，不出現 7-11／貨到付款
+  useEffect(() => {
+    if (!taiwanMarket) {
+      setForm((f) => (f.shippingMethod === 'home' ? f : { ...f, shippingMethod: 'home' }))
+    }
+  }, [taiwanMarket])
+
+  useEffect(() => {
+    if (!taiwanMarket || !slug) return
+    fetch(`${API}/api/logistics/seven/status?slug=${encodeURIComponent(slug)}`)
+      .then((r) => r.json())
+      .then((d) => setEcpayMapReady(Boolean(d.configured)))
+      .catch(() => setEcpayMapReady(false))
+  }, [taiwanMarket, slug])
 
   useEffect(() => {
     const q = new URLSearchParams(window.location.search)
@@ -148,6 +182,23 @@ export default function BrandStoreClient({
     if (paid === '1' && orderId) {
       setPaidNotice({ orderId, method: q.get('session_id') ? 'stripe' : 'cod' })
     }
+    const cvsId = q.get('cvs_id')
+    const cvsName = q.get('cvs_name')
+    const cvsAddr = q.get('cvs_addr')
+    const cvsCollection = q.get('cvs_collection')?.toUpperCase() === 'Y' ? 'Y' : 'N'
+    if (cvsId || cvsName || cvsAddr) {
+      setForm((f) => ({
+        ...f,
+        shippingMethod: 'seven_eleven',
+        cvsStoreId: cvsId || f.cvsStoreId,
+        cvsStoreName: cvsName || f.cvsStoreName,
+        cvsAddress: cvsAddr || f.cvsAddress,
+        cvsCollection: (cvsId || cvsName || cvsAddr ? cvsCollection : f.cvsCollection) as 'Y' | 'N',
+        shippingAddress: [cvsName, cvsId ? `店號 ${cvsId}` : '', cvsAddr].filter(Boolean).join('／') || f.shippingAddress,
+      }))
+      setCartOpen(true)
+    }
+    if (q.get('open_cart') === '1') setCartOpen(true)
   }, [params])
 
   useEffect(() => {
@@ -252,8 +303,9 @@ export default function BrandStoreClient({
 
   const checkout = async (method: 'stripe' | 'cod') => {
     if (!store || !sessionId) return
-    if (method === 'cod' && form.shippingMethod !== 'seven_eleven') {
-      setCheckoutError('貨到付款僅限 7-11 取貨')
+    const shippingMethod = taiwanMarket ? form.shippingMethod : 'home'
+    if (method === 'cod' && (!taiwanMarket || shippingMethod !== 'seven_eleven')) {
+      setCheckoutError(taiwanMarket ? '貨到付款僅限 7-11 取貨' : '此市場不支援貨到付款')
       return
     }
     if (!form.customerName.trim() || form.customerName.trim().length < 2) {
@@ -270,11 +322,16 @@ export default function BrandStoreClient({
           sessionId,
           storeSlug: store.slug,
           method,
-          shippingMethod: form.shippingMethod,
+          shippingMethod,
+          market: taiwanMarket ? 'TW' : 'INTL',
           customerName: form.customerName,
           customerPhone: form.customerPhone,
           customerEmail: form.customerEmail,
           shippingAddress: form.shippingAddress,
+          cvsStoreId: form.cvsStoreId,
+          cvsStoreName: form.cvsStoreName,
+          cvsAddress: form.cvsAddress,
+          cvsCollection: form.cvsCollection,
         }),
       })
       const data = await res.json().catch(() => ({}))
@@ -290,7 +347,11 @@ export default function BrandStoreClient({
         window.location.href = data.redirectUrl
         return
       }
-      setPaidNotice({ orderId: String(data.orderId || ''), method })
+      setPaidNotice({
+        orderId: String(data.orderId || ''),
+        method,
+        shipmentCode: data.shipmentCode || undefined,
+      })
       setCartOpen(false)
       await refreshCart()
     } catch {
@@ -333,6 +394,7 @@ export default function BrandStoreClient({
         <div className="px-5 py-3 text-sm text-center" style={{ background: '#ECFDF5', color: '#065F46' }}>
           訂單 #{paidNotice.orderId} 已成立
           {paidNotice.method === 'stripe' ? '（信用卡付款）' : '（貨到付款）'}。感謝購買！
+          {paidNotice.shipmentCode ? ` 店家寄件代碼已產生。` : ''}
           <button type="button" className="ml-3 underline" onClick={() => setPaidNotice(null)}>關閉</button>
         </div>
       )}
@@ -532,40 +594,86 @@ export default function BrandStoreClient({
                       <span>{formatPrice(cartTotal)}</span>
                     </div>
                     <div className="space-y-3">
-                      <div>
-                        <div className="text-xs font-semibold mb-2" style={{ color: '#4B5563' }}>配送方式</div>
-                        <div className="grid grid-cols-2 gap-2">
-                          <button
-                            type="button"
-                            className="px-3 py-2 text-sm font-semibold text-left"
-                            style={
-                              form.shippingMethod === 'seven_eleven'
-                                ? { background: '#111827', color: '#FAFBFA' }
-                                : { background: '#fff', border: '1px solid rgba(17,24,39,0.12)' }
-                            }
-                            onClick={() => setForm((f) => ({ ...f, shippingMethod: 'seven_eleven' }))}
-                          >
-                            7-11 取貨
-                          </button>
-                          <button
-                            type="button"
-                            className="px-3 py-2 text-sm font-semibold text-left"
-                            style={
-                              form.shippingMethod === 'home'
-                                ? { background: '#111827', color: '#FAFBFA' }
-                                : { background: '#fff', border: '1px solid rgba(17,24,39,0.12)' }
-                            }
-                            onClick={() => setForm((f) => ({ ...f, shippingMethod: 'home' }))}
-                          >
-                            宅配／其他
-                          </button>
+                      {taiwanMarket ? (
+                        <div>
+                          <div className="text-xs font-semibold mb-2" style={{ color: '#4B5563' }}>配送方式</div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <button
+                              type="button"
+                              className="px-3 py-2 text-sm font-semibold text-left"
+                              style={
+                                form.shippingMethod === 'seven_eleven'
+                                  ? { background: '#111827', color: '#FAFBFA' }
+                                  : { background: '#fff', border: '1px solid rgba(17,24,39,0.12)' }
+                              }
+                              onClick={() => setForm((f) => ({ ...f, shippingMethod: 'seven_eleven' }))}
+                            >
+                              7-11 取貨
+                            </button>
+                            <button
+                              type="button"
+                              className="px-3 py-2 text-sm font-semibold text-left"
+                              style={
+                                form.shippingMethod === 'home'
+                                  ? { background: '#111827', color: '#FAFBFA' }
+                                  : { background: '#fff', border: '1px solid rgba(17,24,39,0.12)' }
+                              }
+                              onClick={() => setForm((f) => ({ ...f, shippingMethod: 'home' }))}
+                            >
+                              宅配／其他
+                            </button>
+                          </div>
+                          <p className="text-[11px] mt-2 leading-relaxed" style={{ color: '#9CA3AF' }}>
+                            {form.shippingMethod === 'seven_eleven'
+                              ? '7-11：用地圖選門市後可刷卡或貨到付款；店家會取得 ibon 寄件代碼。'
+                              : '宅配／其他：僅接受信用卡付款。'}
+                          </p>
+                          {form.shippingMethod === 'seven_eleven' && (
+                            <div className="mt-3 space-y-2">
+                              {ecpayMapReady ? (
+                                <>
+                                  <a
+                                    href={`${API}/api/logistics/ecpay/map?slug=${encodeURIComponent(store?.slug || slug)}&collection=N&device=${typeof window !== 'undefined' && window.innerWidth < 768 ? 1 : 0}`}
+                                    className="block w-full text-center px-3 py-2.5 text-sm font-bold text-white"
+                                    style={{ background: '#5B5FF0' }}
+                                  >
+                                    刷卡取貨：開啟地圖選門市
+                                  </a>
+                                  <a
+                                    href={`${API}/api/logistics/ecpay/map?slug=${encodeURIComponent(store?.slug || slug)}&collection=Y&device=${typeof window !== 'undefined' && window.innerWidth < 768 ? 1 : 0}`}
+                                    className="block w-full text-center px-3 py-2.5 text-sm font-bold"
+                                    style={{ background: '#fff', border: '1px solid #5B5FF0', color: '#5B5FF0' }}
+                                  >
+                                    貨到付款：開啟地圖選門市
+                                  </a>
+                                  <p className="text-[11px] leading-relaxed" style={{ color: '#9CA3AF' }}>
+                                    綠界規定：選店時的「是否代收」必須跟付款方式一致，請依上方按鈕分開選。
+                                  </p>
+                                </>
+                              ) : (
+                                <p className="text-[11px]" style={{ color: '#B45309' }}>
+                                  此商店尚未開通 7-11 電子地圖。店家請至後台「收款／物流」依說明向綠界申請並完成串接；開通前可暫時手填門市，但不會有正式寄件代碼。
+                                </p>
+                              )}
+                              {form.cvsStoreId && (
+                                <div className="text-xs px-3 py-2 rounded" style={{ background: '#ECFDF5', color: '#065F46' }}>
+                                  已選門市：{form.cvsStoreName || '7-11'}（{form.cvsStoreId}）
+                                  {form.cvsAddress ? ` · ${form.cvsAddress}` : ''}
+                                  {' · '}
+                                  {form.cvsCollection === 'Y' ? '貨到付款選店' : '刷卡取貨選店'}
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
-                        <p className="text-[11px] mt-2 leading-relaxed" style={{ color: '#9CA3AF' }}>
-                          {form.shippingMethod === 'seven_eleven'
-                            ? '7-11：可刷卡或貨到付款；收貨人請留全名。'
-                            : '宅配／其他：僅接受信用卡付款。'}
-                        </p>
-                      </div>
+                      ) : (
+                        <div>
+                          <div className="text-xs font-semibold mb-2" style={{ color: '#4B5563' }}>Shipping</div>
+                          <p className="text-[11px] leading-relaxed" style={{ color: '#9CA3AF' }}>
+                            Delivery address + card payment only. Convenience-store COD is available in the Taiwan (繁體中文) checkout.
+                          </p>
+                        </div>
+                      )}
                       <input
                         className="w-full px-3 py-2 text-sm border outline-none"
                         placeholder="收貨人全名 *"
@@ -588,10 +696,13 @@ export default function BrandStoreClient({
                         className="w-full px-3 py-2 text-sm border outline-none resize-none"
                         rows={3}
                         placeholder={
-                          form.shippingMethod === 'seven_eleven'
-                            ? '7-11 門市名稱／店號 *'
+                          taiwanMarket && form.shippingMethod === 'seven_eleven'
+                            ? ecpayMapReady
+                              ? '請先用地圖選門市（選完會自動填入）'
+                              : '7-11 門市名稱／店號 *'
                             : '收件地址 *'
                         }
+                        readOnly={Boolean(taiwanMarket && form.shippingMethod === 'seven_eleven' && ecpayMapReady && form.cvsStoreId)}
                         value={form.shippingAddress}
                         onChange={(e) => setForm((f) => ({ ...f, shippingAddress: e.target.value }))}
                       />
@@ -609,7 +720,7 @@ export default function BrandStoreClient({
                   >
                     {checkingOut ? '處理中...' : '信用卡付款'}
                   </button>
-                  {form.shippingMethod === 'seven_eleven' && (
+                  {taiwanMarket && form.shippingMethod === 'seven_eleven' && (
                     <button
                       type="button"
                       disabled={checkingOut}
@@ -621,7 +732,7 @@ export default function BrandStoreClient({
                     </button>
                   )}
                   <p className="text-[11px] leading-relaxed" style={{ color: '#9CA3AF' }}>
-                    {form.shippingMethod === 'seven_eleven'
+                    {taiwanMarket && form.shippingMethod === 'seven_eleven'
                       ? '7-11 取貨可用刷卡或貨到付款；刷卡時收貨人請留全名。'
                       : '此配送方式僅能刷信用卡付款。'}
                   </p>

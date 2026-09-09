@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>7-11 超商取貨開通說明｜ARVIX</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800&family=Noto+Sans+TC:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #F6F7FB;
+      --ink: #12131F;
+      --muted: #5C5F7A;
+      --line: rgba(18,19,31,0.08);
+      --brand: #5B5FF0;
+      --brand-deep: #484CE8;
+      --warn-bg: #FFFBEB;
+      --warn: #92400E;
+      --warn-bd: #FDE68A;
+      --ok-bg: #ECFDF5;
+      --ok: #065F46;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.75;
+    }
+    .top {
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+      padding: 16px 20px;
+    }
+    .top-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .logo {
+      font-family: Outfit, "Noto Sans TC", sans-serif;
+      font-weight: 800;
+      font-size: 26px;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #5B5FF0 0%, #484CE8 55%, #15162A 120%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-decoration: none;
+    }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 36px 20px 80px; }
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      color: var(--brand);
+      margin-bottom: 10px;
+    }
+    h1 { font-size: 28px; font-weight: 900; margin: 0 0 14px; line-height: 1.35; }
+    .lead { color: var(--muted); font-size: 15px; margin: 0 0 20px; }
+    .card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 24px 26px;
+      margin-bottom: 16px;
+    }
+    h2 { font-size: 17px; font-weight: 900; margin: 0 0 12px; }
+    h3 { font-size: 14px; font-weight: 800; margin: 18px 0 6px; color: var(--ink); }
+    p, li { font-size: 14px; color: #374151; }
+    ul, ol { padding-left: 1.25em; margin: 8px 0; }
+    li { margin: 6px 0; }
+    .steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 18px; }
+    .steps > li { display: flex; gap: 12px; align-items: flex-start; }
+    .n {
+      width: 28px; height: 28px; border-radius: 999px;
+      background: #111827; color: #fff;
+      font-size: 12px; font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 2px;
+    }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 11px 18px; border-radius: 999px;
+      background: var(--brand); color: #fff;
+      font-size: 14px; font-weight: 700; text-decoration: none;
+      border: none; cursor: pointer;
+    }
+    .btn:hover { background: var(--brand-deep); }
+    .btn-ghost {
+      background: #fff; color: var(--ink);
+      border: 1px solid var(--line);
+    }
+    .btn-ecpay {
+      background: #00A0E9;
+    }
+    .btn-ecpay:hover { background: #008fcf; }
+    .warn {
+      background: var(--warn-bg); color: var(--warn);
+      border: 1px solid var(--warn-bd);
+      border-radius: 12px; padding: 12px 14px;
+      font-size: 13px; margin-top: 16px;
+    }
+    .ok {
+      background: var(--ok-bg); color: var(--ok);
+      border-radius: 12px; padding: 12px 14px;
+      font-size: 13px; margin-top: 12px;
+    }
+    .muted { color: var(--muted); font-size: 12px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--muted); font-weight: 700; font-size: 12px; width: 34%; }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px; background: #F3F4F6; padding: 2px 6px; border-radius: 6px;
+    }
+    a.ext { color: var(--brand); font-weight: 700; word-break: break-all; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+    .link-box {
+      margin-top: 12px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: #F8FAFC;
+      border: 1px solid var(--line);
+      font-size: 13px;
+    }
+    .link-box p { margin: 0 0 8px; font-size: 13px; }
+    .link-box p:last-child { margin-bottom: 0; }
+    @media print {
+      body { background: #fff; }
+      .top, .no-print { display: none !important; }
+      .card { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="top-inner">
+      <a class="logo" href="https://arvixai.com" target="_blank" rel="noopener">ARVIX</a>
+      <span class="muted">店家操作說明</span>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <p class="badge">MERCHANT GUIDE</p>
+    <h1>7-11 超商取貨／貨到付款<br />開通說明</h1>
+    <p class="lead">
+      本說明協助您啟用「7-11 取貨」與「7-11 貨到付款」。請先至綠界完成物流申請，再由 ARVIX 協助串接至您的商店。完成後，客人即可用地圖選門市，您也可取得寄件代碼至超商列印寄件單。
+    </p>
+
+    <section class="card no-print">
+      <h2>綠界相關連結（請先保留）</h2>
+      <div class="actions">
+        <a class="btn btn-ecpay" href="https://vendor.ecpay.com.tw/User/LogOn_Step1" target="_blank" rel="noopener noreferrer">綠界賣家註冊／登入</a>
+        <a class="btn btn-ghost" href="https://www.ecpay.com.tw/" target="_blank" rel="noopener noreferrer">綠界官網</a>
+        <a class="btn btn-ghost" href="https://support.ecpay.com.tw/26036/" target="_blank" rel="noopener noreferrer">綠界：如何申請物流</a>
+      </div>
+      <div class="link-box">
+        <p>賣家後台登入／註冊：<a class="ext" href="https://vendor.ecpay.com.tw/User/LogOn_Step1" target="_blank" rel="noopener noreferrer">https://vendor.ecpay.com.tw/User/LogOn_Step1</a></p>
+        <p>綠界官網：<a class="ext" href="https://www.ecpay.com.tw/" target="_blank" rel="noopener noreferrer">https://www.ecpay.com.tw/</a></p>
+        <p>官方說明（申請物流）：<a class="ext" href="https://support.ecpay.com.tw/26036/" target="_blank" rel="noopener noreferrer">https://support.ecpay.com.tw/26036/</a></p>
+      </div>
+      <div class="warn">
+        依綠界規定，申請物流時須一併申請金流。物流手續費與貨到付款代收款皆透過綠界帳戶處理。
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>啟用後的使用方式</h2>
+      <ul>
+        <li>客人於結帳頁（繁體中文）開啟 7-11 電子地圖，選擇取貨門市</li>
+        <li>貨到付款：下單成功後，您可於「訂單與寄件」查看寄件代碼</li>
+        <li>信用卡取貨：客人付款成功後，系統才會產生寄件代碼（亦可於「訂單與寄件」手動產生）</li>
+        <li>若為 <strong>C2C 交貨便（UNIMARTC2C）</strong>：請至 7-11 → ibon → 交貨便 → 輸入寄件代碼 → 列印寄件單後寄出</li>
+        <li>若為 <strong>B2C 大宗（UNIMART）</strong>：出貨方式依綠界／大智通流程（通常非上述 ibon 交貨便流程），請以綠界後台說明為準</li>
+      </ul>
+      <div class="warn">
+        <strong>尚未完成串接前：</strong>結帳頁無法使用官方電子地圖，亦無法產生寄件代碼（僅能手填門市文字）。宅配與信用卡付款不受影響。
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>開通流程</h2>
+      <ol class="steps">
+        <li>
+          <span class="n">1</span>
+          <div>
+            <strong>至綠界註冊／登入，並申請 7-11 物流</strong>
+            <p style="margin:6px 0 0">請先開啟綠界賣家頁面：</p>
+            <div class="actions no-print">
+              <a class="btn btn-ecpay" href="https://vendor.ecpay.com.tw/User/LogOn_Step1" target="_blank" rel="noopener noreferrer">開啟綠界賣家註冊／登入</a>
+              <a class="btn btn-ghost" href="https://support.ecpay.com.tw/26036/" target="_blank" rel="noopener noreferrer">閱讀綠界申請說明</a>
+            </div>
+            <ul>
+              <li><strong>新賣家：</strong>依綠界新手申請流程註冊，並同時申請「金流」與「物流」（綠界規定申請物流須一併申請金流）。</li>
+              <li><strong>一般賣家（已有帳號）：</strong>登入後至「廠商專區 → 驗證／服務」自行加開物流。</li>
+              <li><strong>特約賣家：</strong>請聯繫您的綠界銷售顧問協助加開服務。</li>
+              <li>多數店家建議選擇 <code>C2C 門市寄／取件</code>（介接代號 <code>UNIMARTC2C</code>）。出貨量大再評估 B2C 大宗（<code>UNIMART</code>）。</li>
+            </ul>
+            <p class="muted" style="margin:8px 0 0">審核通過後，請至綠界後台「系統開發管理 → 系統介接設定」取得商店代號（MerchantID）、HashKey、HashIV。一般店家申請通過後為<strong>正式環境</strong>；測試環境僅適用綠界提供之測試帳號，請勿與正式金鑰混用。</p>
+          </div>
+        </li>
+        <li>
+          <span class="n">2</span>
+          <div>
+            <strong>提供資料，請 ARVIX 協助串接</strong>
+            <p style="margin:6px 0 0">請來信並提供以下資訊：</p>
+            <ul>
+              <li>商店名稱、商店網址（slug）</li>
+              <li>登入用 Email</li>
+              <li>綠界 MerchantID（商店代號）</li>
+              <li>環境：正式（一般店家）／測試（僅限綠界測試帳號）</li>
+              <li>需求項目：超商取貨、貨到付款（可同時申請）</li>
+              <li>物流類型：C2C（UNIMARTC2C）或 B2C（UNIMART）</li>
+            </ul>
+            <p class="muted">為保護帳號安全，請勿於一般郵件直接傳送完整 HashKey／HashIV；我們將另提供安全傳送方式。</p>
+            <div class="actions no-print">
+              <a class="btn" href="mailto:arvix1413@gmail.com?subject=%E7%94%B3%E8%AB%8B%E5%8D%94%E5%8A%A9%E4%B8%B2%E6%8E%A5%207-11%20%2F%20%E7%B6%A0%E7%95%8C%E7%89%A9%E6%B5%81&body=%E6%82%A8%E5%A5%BD%EF%BC%8C%E6%88%91%E5%B7%B2%E5%AE%8C%E6%88%90%E7%B6%A0%E7%95%8C%E7%89%A9%E6%B5%81%E7%94%B3%E8%AB%8B%EF%BC%8C%E8%AB%8B%E5%8D%94%E5%8A%A9%E5%B0%87%207-11%20%E5%8F%96%E8%B2%A8%EF%BC%8F%E8%B2%A8%E5%88%B0%E4%BB%98%E6%AC%BE%E4%B8%B2%E6%8E%A5%E8%87%B3%E6%88%91%E7%9A%84%20ARVIX%20%E5%95%86%E5%BA%97%E3%80%82%0A%0A%E5%95%86%E5%BA%97%E5%90%8D%E7%A8%B1%EF%BC%9A%0A%E7%99%BB%E5%85%A5%20Email%EF%BC%9A%0A%E5%95%86%E5%BA%97%20slug%EF%BC%9A%0A%E7%B6%A0%E7%95%8C%20MerchantID%EF%BC%9A%0A%E7%92%B0%E5%A2%83%EF%BC%9A%E6%B8%AC%E8%A9%A6%20%2F%20%E6%AD%A3%E5%BC%8F%0A%E7%89%A9%E6%B5%81%E9%A1%9E%E5%9E%8B%EF%BC%9AC2C%20%28UNIMARTC2C%29%20%2F%20B2C%20%28UNIMART%29%0A%E9%9C%80%E6%B1%82%EF%BC%9A%E8%B6%85%E5%95%86%E5%8F%96%E8%B2%A8%20%2F%20%E8%B2%A8%E5%88%B0%E4%BB%98%E6%AC%BE%0A">來信申請串接</a>
+              <button type="button" class="btn btn-ghost" onclick="window.print()">列印或另存 PDF</button>
+            </div>
+            <p class="muted" style="margin-top:8px">客服信箱：arvix1413@gmail.com</p>
+          </div>
+        </li>
+        <li>
+          <span class="n">3</span>
+          <div>
+            <strong>串接完成後即可使用</strong>
+            <ul>
+              <li>客人：網站語系切換為「繁體中文」→ 結帳選擇 7-11 → 依付款方式選擇對應地圖（刷卡取貨／貨到付款）→ 選門市後下單</li>
+              <li>店家：我的商店 → 訂單與寄件 → 查看或產生寄件代碼</li>
+              <li>C2C：至 7-11 ibon 輸入代碼列印寄件單；B2C：依綠界大宗出貨流程處理</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <section class="card">
+      <h2>取貨方式說明</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>項目</th>
+            <th>說明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>信用卡＋7-11 取貨</td>
+            <td>請點「刷卡取貨：開啟地圖選門市」（非代收）。客人先刷卡；付款成功後才會產生寄件代碼。</td>
+          </tr>
+          <tr>
+            <td>7-11 貨到付款</td>
+            <td>請點「貨到付款：開啟地圖選門市」（代收）。客人取件時付款；貨款由綠界／超商代收至您的綠界帳戶。</td>
+          </tr>
+          <tr>
+            <td>宅配</td>
+            <td>無需申請 7-11 綠界物流，請依您慣用的宅配流程出貨。</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="ok">提醒：選店時的「是否代收」須與結帳付款方式一致，否則無法建立物流單。</div>
+    </section>
+
+    <section class="card">
+      <h2>常見問題</h2>
+      <h3>為什麼需要自行向綠界申請？</h3>
+      <p>7-11 取貨與貨到付款須使用店家自己的綠界賣家／物流帳號。ARVIX 可協助將帳號串接至您的商店，但無法代為向綠界申請，亦不會經手物流手續費或貨到付款代收款（該等款項走綠界帳戶）。</p>
+      <h3>金鑰要去哪裡找？</h3>
+      <p>登入綠界賣家後台 →「系統開發管理」→「系統介接設定」，即可查看商店代號（MerchantID）、HashKey、HashIV。</p>
+      <h3>可以自行於後台填寫金鑰嗎？</h3>
+      <p>可以（路徑：我的商店 → 收款／物流）。建議仍通知客服確認環境與物流類型（C2C／B2C），以免出現可選店但無法產生寄件代碼的情況。</p>
+      <h3>其他語系為什麼沒有 7-11 選項？</h3>
+      <p>目前僅在網站語系為「繁體中文（zh-TW）」時顯示 7-11；其他語系僅提供宅配與信用卡付款。</p>
+      <h3>大約需要多久？</h3>
+      <p>綠界審核時程依綠界為準。核准並提供 MerchantID 後，請來信，我們會依序協助完成設定。</p>
+      <h3>客服信箱是哪裡？</h3>
+      <p>請寄至 <code>arvix1413@gmail.com</code>，並附上本說明所列資料。</p>
+    </section>
+
+    <section class="card">
+      <h2>相關頁面</h2>
+      <ul>
+        <li>後台開通頁：<code>/my-store/logistics</code></li>
+        <li>訂單與寄件：<code>/my-store/orders</code></li>
+        <li>本說明文件：<code>/docs/7-11-logistics-guide.html</code></li>
+      </ul>
+      <div class="actions no-print">
+        <a class="btn" href="/my-store/logistics">前往後台開通頁</a>
+        <a class="btn btn-ghost" href="/my-store">返回我的商店</a>
+      </div>
+    </section>
+
+    <p class="muted" style="text-align:center;margin-top:28px">© ARVIX｜店家操作說明｜綠界連結如有異動，以綠界官網為準</p>
+  </main>
+</body>
+</html>

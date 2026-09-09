@@ -898,7 +898,7 @@ const SEO_FIELDS = [
     { key: 'brand_name', label: '品牌名稱', placeholder: 'ARVIX' },
     { key: 'brand_tagline', label: '品牌標語', placeholder: '全方位零售整合專家' },
     { key: 'brand_description', label: '品牌描述', placeholder: 'ARVIX 提供全方位的零售解決方案...', textarea: true },
-    { key: 'contact_email', label: '聯絡 Email', placeholder: 'contact@arvix.com' },
+    { key: 'contact_email', label: '聯絡 Email', placeholder: 'arvix1413@gmail.com' },
     { key: 'contact_phone', label: '聯絡電話', placeholder: '+886-2-1234-5678' },
   ]},
   { section: '各頁面 SEO', fields: [

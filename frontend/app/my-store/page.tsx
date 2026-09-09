@@ -197,6 +197,18 @@ export default function MyStorePage() {
                 商店頁面
               </Link>
               <Link
+                href="/my-store/orders"
+                className="inline-flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-bold border"
+              >
+                訂單與寄件
+              </Link>
+              <Link
+                href="/my-store/logistics"
+                className="inline-flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-bold border"
+              >
+                收款／物流
+              </Link>
+              <Link
                 href={shopUrl}
                 className="inline-flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-bold text-white"
                 style={{ background: '#5B5FF0' }}
@@ -249,6 +261,47 @@ export default function MyStorePage() {
                   <div className="text-xs text-gray-500 mb-1">上架商品</div>
                   <div className="font-bold">{products.length} 件</div>
                 </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border p-5 sm:p-6 mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="text-xs font-bold tracking-widest mb-2" style={{ color: '#5B5FF0' }}>
+                    SETUP
+                  </p>
+                  <h2 className="text-xl font-black mb-2">7-11 超商取貨開通</h2>
+                  <p className="text-sm leading-relaxed" style={{ color: '#5C5F7A' }}>
+                    請先至綠界完成物流申請，再由我們協助串接。完成後，客人即可用地圖選門市，您也可取得寄件代碼。
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm font-bold">
+                    <a
+                      href="https://vendor.ecpay.com.tw/User/LogOn_Step1"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline"
+                      style={{ color: '#00A0E9' }}
+                    >
+                      綠界賣家註冊／登入
+                    </a>
+                    <a
+                      href="/docs/7-11-logistics-guide.html"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline"
+                      style={{ color: '#5B5FF0' }}
+                    >
+                      查看操作說明 →
+                    </a>
+                  </div>
+                </div>
+                <Link
+                  href="/my-store/logistics"
+                  className="inline-flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-bold text-white shrink-0"
+                  style={{ background: '#5B5FF0' }}
+                >
+                  查看開通說明
+                </Link>
               </div>
             </div>
 

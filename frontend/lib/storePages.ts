@@ -25,7 +25,7 @@ export function defaultStorePages(storeName: string): StorePage[] {
     {
       key: 'shipping',
       title: '配送政策',
-      body: '目前支援 7-11 超商取貨與宅配。實際運費與到貨時間依結帳選項與物流狀態為準。',
+      body: '台灣市場可選 7-11 超商取貨（含貨到付款）或宅配。其他語系／市場目前僅支援宅配與信用卡付款。運費與到貨時間由店家說明為準。',
       published: true,
     },
     {

@@ -33,6 +33,15 @@ type Bindings = {
   STRIPE_SECRET_KEY?: string
   STRIPE_WEBHOOK_SECRET?: string
   SITE_URL?: string
+  ECPAY_MERCHANT_ID?: string
+  ECPAY_HASH_KEY?: string
+  ECPAY_HASH_IV?: string
+  ECPAY_LOGISTICS_MODE?: string
+  ECPAY_LOGISTICS_SUBTYPE?: string
+  ECPAY_SENDER_NAME?: string
+  ECPAY_SENDER_PHONE?: string
+  INIT_ADMIN_SECRET?: string
+  AUDIT_INGEST_SECRET?: string
 }
 
 type Variables = {
@@ -280,6 +289,64 @@ app.post('/api/stripe/webhook', async (c) => {
       await c.env.DB.prepare(
         `UPDATE orders SET status='paid', updated_at=datetime('now', '+8 hours') WHERE id=?`
       ).bind(orderId).run().catch(() => {})
+
+      // 刷卡完成後：若是 7-11 取貨且尚無寄件碼，嘗試建立綠界物流單
+      try {
+        const row = await c.env.DB.prepare(
+          `SELECT id, total_amount as totalAmount, shipping_address as shippingAddress FROM orders WHERE id=?`
+        ).bind(orderId).first<any>()
+        if (row?.shippingAddress) {
+          const shipping = JSON.parse(row.shippingAddress)
+          if (
+            shipping.shippingMethod === 'seven_eleven' &&
+            shipping.cvsStoreId &&
+            !shipping.shipmentCode
+          ) {
+            const { resolveEcpayEnv, ecpayCreateReady, createCvsLogisticsOrder } = await import('./ecpayLogistics')
+            const storeSlugForShip = String(shipping.storeSlug || session.metadata?.store_slug || '').trim().toLowerCase()
+            let storeRow: any = null
+            if (storeSlugForShip) {
+              storeRow = await c.env.DB.prepare(
+                `SELECT name, ecpay_merchant_id, ecpay_hash_key, ecpay_hash_iv, ecpay_logistics_mode,
+                        ecpay_logistics_subtype, ecpay_sender_name, ecpay_sender_phone
+                 FROM stores WHERE slug=?`
+              ).bind(storeSlugForShip).first()
+            }
+            const ecpayEnv = resolveEcpayEnv(c.env, storeRow)
+            if (ecpayCreateReady(ecpayEnv)) {
+              const apiOrigin = new URL(c.req.url).origin
+              const created = await createCvsLogisticsOrder({
+                env: ecpayEnv,
+                merchantTradeNo: `P${orderId}${Date.now().toString(36)}`.slice(0, 20),
+                goodsAmount: Number(row.totalAmount || 0),
+                goodsName: String(session.metadata?.store_slug || storeRow?.name || '商品'),
+                isCollection: false,
+                senderName: (ecpayEnv.ECPAY_SENDER_NAME || storeRow?.name || '店家').toString(),
+                senderCellPhone: (ecpayEnv.ECPAY_SENDER_PHONE || '0912345678').toString(),
+                receiverName: String(shipping.name || '顧客'),
+                receiverCellPhone: String(shipping.phone || '0912345678'),
+                receiverStoreId: String(shipping.cvsStoreId),
+                serverReplyUrl: `${apiOrigin}/api/logistics/ecpay/status-callback`,
+                receiverEmail: shipping.email || undefined,
+              })
+              if (created.ok) {
+                shipping.shipmentCode = created.shipmentCode
+                shipping.cvsPaymentNo = created.cvsPaymentNo
+                shipping.cvsValidationNo = created.cvsValidationNo
+                shipping.logisticsId = created.logisticsId
+                shipping.logisticsError = null
+                shipping.logisticsPending = null
+              } else {
+                shipping.logisticsError = created.error
+              }
+              await c.env.DB.prepare(`UPDATE orders SET shipping_address=? WHERE id=?`)
+                .bind(JSON.stringify(shipping), orderId).run()
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Create logistics after Stripe pay failed', e)
+      }
     }
     if (cartSessionId) {
       await c.env.DB.prepare(`DELETE FROM cart_items WHERE session_id=?`).bind(cartSessionId).run().catch(() => {})
@@ -1143,6 +1210,168 @@ app.delete('/api/cart/clear/:sessionId', async (c) => {
   }
 })
 
+// ── ECPay 7-11 電子地圖（綠界物流；優先用店家自備帳號）──────────────────────────
+app.get('/api/logistics/ecpay/status', async (c) => {
+  const {
+    resolveEcpayEnv,
+    ecpayConfigured,
+    ecpayCreateReady,
+    ecpayLogisticsSubtype,
+    ecpayMapUrl,
+  } = await import('./ecpayLogistics')
+  await ensureStoresTable(c.env.DB)
+  const slug = String(c.req.query('slug') || '').trim().toLowerCase()
+  let storeRow: any = null
+  if (slug) {
+    storeRow = await c.env.DB.prepare(
+      `SELECT name, ecpay_merchant_id, ecpay_hash_key, ecpay_hash_iv, ecpay_logistics_mode,
+              ecpay_logistics_subtype, ecpay_sender_name, ecpay_sender_phone
+       FROM stores WHERE slug=?`
+    ).bind(slug).first()
+  }
+  const env = resolveEcpayEnv(c.env, storeRow)
+  const configured = ecpayConfigured(env)
+  return c.json({
+    provider: 'ecpay',
+    configured,
+    source: env.source,
+    mode: (env.ECPAY_LOGISTICS_MODE || 'stage').toLowerCase(),
+    subtype: configured ? ecpayLogisticsSubtype(env) : null,
+    mapUrl: configured ? ecpayMapUrl(env) : null,
+    createReady: ecpayCreateReady(env),
+  })
+})
+
+app.get('/api/logistics/seven/status', async (c) => {
+  const {
+    resolveEcpayEnv,
+    ecpayConfigured,
+    ecpayCreateReady,
+    ecpayLogisticsSubtype,
+    ecpayMapUrl,
+  } = await import('./ecpayLogistics')
+  await ensureStoresTable(c.env.DB)
+  const slug = String(c.req.query('slug') || '').trim().toLowerCase()
+  let storeRow: any = null
+  if (slug) {
+    storeRow = await c.env.DB.prepare(
+      `SELECT name, ecpay_merchant_id, ecpay_hash_key, ecpay_hash_iv, ecpay_logistics_mode,
+              ecpay_logistics_subtype, ecpay_sender_name, ecpay_sender_phone
+       FROM stores WHERE slug=?`
+    ).bind(slug).first()
+  }
+  const env = resolveEcpayEnv(c.env, storeRow)
+  const configured = ecpayConfigured(env)
+  return c.json({
+    provider: 'ecpay',
+    configured,
+    source: env.source,
+    mode: (env.ECPAY_LOGISTICS_MODE || 'stage').toLowerCase(),
+    subtype: configured ? ecpayLogisticsSubtype(env) : null,
+    mapUrl: configured ? ecpayMapUrl(env) : null,
+    createReady: ecpayCreateReady(env),
+    note: configured
+      ? env.source === 'store'
+        ? '此商店已設定自家綠界物流，可開啟 7-11 電子地圖選店'
+        : '使用平台後備綠界帳號（建議改由店家後台填自家帳號）'
+      : '店家尚未在後台填寫綠界 MerchantID；結帳可手填門市，開通後才有正式寄件代碼',
+  })
+})
+
+app.post('/api/logistics/ecpay/status-callback', async (c) => {
+  // 綠界物流狀態通知；先收著避免建單失敗
+  try {
+    await c.req.parseBody()
+  } catch {
+    /* ignore */
+  }
+  return c.text('1|OK')
+})
+
+/** 導向綠界 7-11 電子地圖（回傳 auto-submit HTML；勿用 iframe） */
+app.get('/api/logistics/ecpay/map', async (c) => {
+  try {
+    const {
+      resolveEcpayEnv,
+      ecpayConfigured,
+      ecpayMapUrl,
+      buildCvsMapFormFields,
+      autoSubmitHtml,
+    } = await import('./ecpayLogistics')
+    const storeSlug = String(c.req.query('slug') || '').trim().toLowerCase()
+    if (!storeSlug) return c.json({ error: '缺少商店 slug' }, 400)
+    await ensureStoresTable(c.env.DB)
+    const storeRow = await c.env.DB.prepare(
+      `SELECT id, name, ecpay_merchant_id, ecpay_hash_key, ecpay_hash_iv, ecpay_logistics_mode,
+              ecpay_logistics_subtype, ecpay_sender_name, ecpay_sender_phone
+       FROM stores WHERE slug=? AND status='active'`
+    ).bind(storeSlug).first<any>()
+    if (!storeRow) return c.json({ error: '商店不存在' }, 404)
+    const env = resolveEcpayEnv(c.env, storeRow)
+    if (!ecpayConfigured(env)) {
+      return c.json({
+        error: '此商店尚未設定綠界物流。請店家到「我的商店 → 收款／物流」完成開通。',
+        hint: '綠界測試可用 MerchantID 2000933（C2C）或 2000132（B2C）',
+      }, 503)
+    }
+    const collection = String(c.req.query('collection') || 'N').toUpperCase() === 'Y' ? 'Y' : 'N'
+    const device = String(c.req.query('device') || '0') === '1' ? 1 : 0
+    const apiOrigin = new URL(c.req.url).origin
+    const serverReplyUrl = `${apiOrigin}/api/logistics/ecpay/map-callback`
+    const fields = buildCvsMapFormFields({
+      env,
+      storeId: Number(storeRow.id),
+      serverReplyUrl,
+      isCollection: collection,
+      device: device as 0 | 1,
+    })
+    const html = autoSubmitHtml(ecpayMapUrl(env), fields)
+    return c.html(html)
+  } catch (e: any) {
+    return c.json({ error: String(e?.message || e) }, 500)
+  }
+})
+
+/** 綠界選店後 POST 回來 → 導回商店結帳並帶入門市 */
+app.post('/api/logistics/ecpay/map-callback', async (c) => {
+  try {
+    const { decodeMapExtraData } = await import('./ecpayLogistics')
+    const body = await c.req.parseBody()
+    const decoded = decodeMapExtraData(String(body.ExtraData || ''))
+    const collection = decoded.isCollection
+    let slug = ''
+    await ensureStoresTable(c.env.DB)
+    if (decoded.storeId) {
+      const row = await c.env.DB.prepare(
+        `SELECT slug FROM stores WHERE id=? AND status='active'`
+      ).bind(decoded.storeId).first<{ slug: string }>()
+      slug = (row?.slug || '').toLowerCase()
+    } else if (decoded.legacySlug) {
+      slug = decoded.legacySlug
+    }
+    const cvsId = String(body.CVSStoreID || '').trim()
+    const cvsName = String(body.CVSStoreName || '').trim()
+    const cvsAddr = String(body.CVSAddress || '').trim()
+    const siteUrl = (c.env.SITE_URL || 'https://arvixai.com').replace(/\/$/, '')
+    if (!slug) {
+      return c.html(`<!DOCTYPE html><html><body><p>缺少商店資訊，請關閉此頁回商店重試。</p></body></html>`, 400)
+    }
+    const q = new URLSearchParams({
+      slug,
+      open_cart: '1',
+      shipping: 'seven_eleven',
+      cvs_id: cvsId,
+      cvs_name: cvsName,
+      cvs_addr: cvsAddr,
+      cvs_collection: collection,
+    })
+    const dest = `${siteUrl}/s/shop?${q.toString()}`
+    return c.redirect(dest, 303)
+  } catch (e: any) {
+    return c.json({ error: String(e) }, 500)
+  }
+})
+
 /** Brand store checkout: Stripe card payment or COD (7-11 only). */
 app.post('/api/store-checkout/session', async (c) => {
   try {
@@ -1151,22 +1380,42 @@ app.post('/api/store-checkout/session', async (c) => {
       storeSlug?: string
       method?: string
       shippingMethod?: string
+      market?: string
       customerName?: string
       customerEmail?: string
       customerPhone?: string
       shippingAddress?: string
+      cvsStoreId?: string
+      cvsStoreName?: string
+      cvsAddress?: string
+      cvsCollection?: string
     }
     const sessionId = String(body.sessionId || '').trim()
     const storeSlug = String(body.storeSlug || '').trim().toLowerCase()
     const method = String(body.method || 'stripe').toLowerCase() === 'cod' ? 'cod' : 'stripe'
+    const market = String(body.market || 'TW').trim().toUpperCase() === 'INTL' ? 'INTL' : 'TW'
     const shippingMethodRaw = String(body.shippingMethod || 'home').trim().toLowerCase()
-    const shippingMethod = shippingMethodRaw === 'seven_eleven' || shippingMethodRaw === '711'
+    let shippingMethod = shippingMethodRaw === 'seven_eleven' || shippingMethodRaw === '711'
       ? 'seven_eleven'
       : 'home'
+    // 7-11／貨到付款僅台灣市場
+    if (market !== 'TW') {
+      shippingMethod = 'home'
+      if (method === 'cod') {
+        return c.json({ error: '此市場不支援貨到付款' }, 400)
+      }
+    }
     const customerName = String(body.customerName || '').trim()
     const customerEmail = String(body.customerEmail || '').trim()
     const customerPhone = String(body.customerPhone || '').trim()
     const shippingAddress = String(body.shippingAddress || '').trim()
+    const cvsStoreId = String(body.cvsStoreId || '').trim()
+    const cvsStoreName = String(body.cvsStoreName || '').trim()
+    const cvsAddress = String(body.cvsAddress || '').trim()
+    // 地圖選店時的 IsCollection；建單必須一致
+    let cvsCollection = String(body.cvsCollection || '').trim().toUpperCase() === 'Y' ? 'Y' : 'N'
+    if (method === 'cod') cvsCollection = 'Y'
+    if (method === 'stripe' && shippingMethod === 'seven_eleven') cvsCollection = 'N'
 
     if (!sessionId || !storeSlug) return c.json({ error: '缺少購物車或店舖資訊' }, 400)
     if (!customerName || customerName.length < 2) {
@@ -1175,7 +1424,7 @@ app.post('/api/store-checkout/session', async (c) => {
     if (!customerPhone) return c.json({ error: '請填寫手機號碼' }, 400)
     if (!shippingAddress) {
       return c.json({
-        error: shippingMethod === 'seven_eleven' ? '請填寫 7-11 門市名稱或店號' : '請填寫收件地址',
+        error: shippingMethod === 'seven_eleven' ? '請先選擇 7-11 門市' : '請填寫收件地址',
       }, 400)
     }
     if (method === 'cod' && shippingMethod !== 'seven_eleven') {
@@ -1185,9 +1434,36 @@ app.post('/api/store-checkout/session', async (c) => {
     await ensureStoresTable(c.env.DB)
     await ensureProductsStoreSlug(c.env.DB)
     const store = await c.env.DB.prepare(
-      `SELECT id, slug, name, status, user_id FROM stores WHERE slug=? AND status='active'`
+      `SELECT id, slug, name, status, user_id,
+              ecpay_merchant_id, ecpay_hash_key, ecpay_hash_iv, ecpay_logistics_mode,
+              ecpay_logistics_subtype, ecpay_sender_name, ecpay_sender_phone
+       FROM stores WHERE slug=? AND status='active'`
     ).bind(storeSlug).first<any>()
     if (!store) return c.json({ error: '商店不存在' }, 404)
+
+    const { resolveEcpayEnv, ecpayConfigured, ecpayCreateReady, createCvsLogisticsOrder } = await import('./ecpayLogistics')
+    const ecpayEnv = resolveEcpayEnv(c.env, store)
+    const mapReady = ecpayConfigured(ecpayEnv)
+    const createReady = ecpayCreateReady(ecpayEnv)
+    if (shippingMethod === 'seven_eleven' && mapReady && !cvsStoreId) {
+      return c.json({ error: '請先用電子地圖選擇 7-11 門市', code: 'CVS_MAP_REQUIRED' }, 400)
+    }
+    if (
+      shippingMethod === 'seven_eleven' &&
+      mapReady &&
+      cvsStoreId &&
+      String(body.cvsCollection || '').trim() &&
+      ((method === 'cod' && String(body.cvsCollection).toUpperCase() !== 'Y') ||
+        (method === 'stripe' && String(body.cvsCollection).toUpperCase() === 'Y'))
+    ) {
+      return c.json({
+        error:
+          method === 'cod'
+            ? '此門市是用「刷卡取貨」選的，貨到付款請改點「貨到付款選門市」重選'
+            : '此門市是用「貨到付款」選的，刷卡請改點「刷卡取貨選門市」重選',
+        code: 'CVS_COLLECTION_MISMATCH',
+      }, 400)
+    }
 
     if (store.user_id) {
       const trial = await loadAndSyncTrial(c.env.DB, store.user_id)
@@ -1228,8 +1504,11 @@ app.post('/api/store-checkout/session', async (c) => {
       return sum + Number((item.product as any)?.price || 0) * item.quantity
     }, 0)
     if (totalAmount <= 0) return c.json({ error: '訂單金額無效' }, 400)
+    if (shippingMethod === 'seven_eleven' && totalAmount > 20000) {
+      return c.json({ error: '7-11 取貨／貨到付款單筆金額上限為 NT$ 20,000', code: 'CVS_AMOUNT_LIMIT' }, 400)
+    }
 
-    const shippingPayload = JSON.stringify({
+    const shippingObj: Record<string, unknown> = {
       name: customerName,
       email: customerEmail,
       phone: customerPhone,
@@ -1238,7 +1517,52 @@ app.post('/api/store-checkout/session', async (c) => {
       shippingMethod,
       shippingMethodLabel: shippingMethod === 'seven_eleven' ? '7-11 超商取貨' : '宅配／其他',
       method,
-    })
+      cvsStoreId: cvsStoreId || null,
+      cvsStoreName: cvsStoreName || null,
+      cvsAddress: cvsAddress || null,
+      cvsCollection,
+      logisticsProvider: shippingMethod === 'seven_eleven' ? 'ecpay_unimart' : null,
+      shipmentCode: null as string | null,
+      cvsPaymentNo: null as string | null,
+      cvsValidationNo: null as string | null,
+      logisticsId: null as string | null,
+      logisticsError: null as string | null,
+    }
+
+    // 台灣 7-11：貨到付款當下建物流單；刷卡等付款成功後再建（或店家手動產生）
+    if (shippingMethod === 'seven_eleven' && createReady && cvsStoreId && method === 'cod') {
+      const apiOrigin = new URL(c.req.url).origin
+      const goodsName = String((storeItems[0]?.product as any)?.name || store.name || '商品')
+      const created = await createCvsLogisticsOrder({
+        env: ecpayEnv,
+        merchantTradeNo: `O${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`.slice(0, 20),
+        goodsAmount: totalAmount,
+        goodsName,
+        isCollection: cvsCollection === 'Y',
+        senderName: (ecpayEnv.ECPAY_SENDER_NAME || store.name || '店家').toString(),
+        senderCellPhone: (ecpayEnv.ECPAY_SENDER_PHONE || '0912345678').toString(),
+        receiverName: customerName,
+        receiverCellPhone: customerPhone,
+        receiverStoreId: cvsStoreId,
+        serverReplyUrl: `${apiOrigin}/api/logistics/ecpay/status-callback`,
+        receiverEmail: customerEmail || undefined,
+      })
+      if (created.ok) {
+        shippingObj.shipmentCode = created.shipmentCode || null
+        shippingObj.cvsPaymentNo = created.cvsPaymentNo || null
+        shippingObj.cvsValidationNo = created.cvsValidationNo || null
+        shippingObj.logisticsId = created.logisticsId || null
+      } else {
+        shippingObj.logisticsError = created.error || '建立物流單失敗'
+      }
+    } else if (shippingMethod === 'seven_eleven' && !createReady) {
+      shippingObj.logisticsError = '店家尚未設定完整綠界金鑰（MerchantID／HashKey／HashIV），訂單已成立但尚無寄件代碼'
+      if (method === 'stripe') shippingObj.logisticsPending = 'awaiting_payment'
+    } else if (shippingMethod === 'seven_eleven' && method === 'stripe') {
+      shippingObj.logisticsPending = 'awaiting_payment'
+    }
+
+    const shippingPayload = JSON.stringify(shippingObj)
 
     const order = await db.insert(schema.orders).values({
       totalAmount,
@@ -1277,6 +1601,8 @@ app.post('/api/store-checkout/session', async (c) => {
         shippingMethod,
         orderId: order.id,
         totalAmount,
+        shipmentCode: shippingObj.shipmentCode,
+        logisticsError: shippingObj.logisticsError,
         redirectUrl: successPath,
       })
     }
@@ -2307,9 +2633,121 @@ function mapMerchantProduct(p: any) {
 async function getOwnedStore(c: any, userId: number) {
   await ensureStoresTable(c.env.DB)
   return c.env.DB.prepare(
-    `SELECT id, slug, name, status FROM stores WHERE user_id = ? ORDER BY id ASC LIMIT 1`
-  ).bind(userId).first<{ id: number; slug: string; name: string; status: string }>()
+    `SELECT id, slug, name, status,
+            ecpay_merchant_id, ecpay_hash_key, ecpay_hash_iv, ecpay_logistics_mode,
+            ecpay_logistics_subtype, ecpay_sender_name, ecpay_sender_phone
+     FROM stores WHERE user_id = ? ORDER BY id ASC LIMIT 1`
+  ).bind(userId).first<any>()
 }
+
+/** 店家自備綠界物流設定（不回傳完整 Hash） */
+app.get('/api/stores/me/logistics', requireUser, async (c) => {
+  try {
+    const payload = c.get('userPayload')
+    const store = await getOwnedStore(c, payload.userId)
+    if (!store) return c.json({ error: '尚未建立商店' }, 404)
+    const { resolveEcpayEnv, ecpayConfigured, ecpayCreateReady, ecpayLogisticsSubtype, maskSecret } =
+      await import('./ecpayLogistics')
+    const env = resolveEcpayEnv(c.env, store)
+    return c.json({
+      provider: 'ecpay',
+      merchantId: (store.ecpay_merchant_id || '').trim() || null,
+      hashKeyMasked: maskSecret(store.ecpay_hash_key),
+      hashIvMasked: maskSecret(store.ecpay_hash_iv),
+      hasHashKey: Boolean((store.ecpay_hash_key || '').trim()),
+      hasHashIv: Boolean((store.ecpay_hash_iv || '').trim()),
+      mode: (store.ecpay_logistics_mode || 'stage').toLowerCase(),
+      subtype: (store.ecpay_logistics_subtype || '').trim() || null,
+      senderName: (store.ecpay_sender_name || '').trim() || null,
+      senderPhone: (store.ecpay_sender_phone || '').trim() || null,
+      configured: ecpayConfigured(env),
+      createReady: ecpayCreateReady(env),
+      source: env.source,
+      resolvedSubtype: ecpayConfigured(env) ? ecpayLogisticsSubtype(env) : null,
+      note:
+        'ARVIX 收訂閱費，不代收你的貨款／物流費。請用自己的綠界物流帳號申請 7-11（UNIMART／UNIMARTC2C）。',
+    })
+  } catch (e: any) {
+    return c.json({ error: String(e) }, 500)
+  }
+})
+
+app.put('/api/stores/me/logistics', requireUser, async (c) => {
+  try {
+    const payload = c.get('userPayload')
+    const store = await getOwnedStore(c, payload.userId)
+    if (!store) return c.json({ error: '尚未建立商店' }, 404)
+    const body = await c.req.json() as {
+      merchantId?: string
+      hashKey?: string
+      hashIv?: string
+      mode?: string
+      subtype?: string
+      senderName?: string
+      senderPhone?: string
+      clear?: boolean
+    }
+
+    if (body.clear) {
+      await c.env.DB.prepare(
+        `UPDATE stores SET
+          ecpay_merchant_id=NULL, ecpay_hash_key=NULL, ecpay_hash_iv=NULL,
+          ecpay_logistics_mode=NULL, ecpay_logistics_subtype=NULL,
+          ecpay_sender_name=NULL, ecpay_sender_phone=NULL,
+          updated_at=datetime('now', '+8 hours')
+         WHERE id=?`
+      ).bind(store.id).run()
+      return c.json({ ok: true, cleared: true })
+    }
+
+    const merchantId = body.merchantId !== undefined
+      ? String(body.merchantId || '').trim()
+      : (store.ecpay_merchant_id || '')
+    // 空字串 = 保留原值（避免前端重送把金鑰蓋掉）
+    const hashKey =
+      body.hashKey !== undefined && String(body.hashKey).trim()
+        ? String(body.hashKey).trim()
+        : (store.ecpay_hash_key || null)
+    const hashIv =
+      body.hashIv !== undefined && String(body.hashIv).trim()
+        ? String(body.hashIv).trim()
+        : (store.ecpay_hash_iv || null)
+    const mode = body.mode !== undefined
+      ? (String(body.mode).toLowerCase() === 'production' ? 'production' : 'stage')
+      : (store.ecpay_logistics_mode || 'stage')
+    const subtype = body.subtype !== undefined
+      ? String(body.subtype || '').trim().toUpperCase() || null
+      : (store.ecpay_logistics_subtype || null)
+    const senderName = body.senderName !== undefined
+      ? String(body.senderName || '').trim() || null
+      : (store.ecpay_sender_name || null)
+    const senderPhone = body.senderPhone !== undefined
+      ? String(body.senderPhone || '').replace(/\D/g, '').slice(0, 10) || null
+      : (store.ecpay_sender_phone || null)
+
+    await c.env.DB.prepare(
+      `UPDATE stores SET
+        ecpay_merchant_id=?, ecpay_hash_key=?, ecpay_hash_iv=?,
+        ecpay_logistics_mode=?, ecpay_logistics_subtype=?,
+        ecpay_sender_name=?, ecpay_sender_phone=?,
+        updated_at=datetime('now', '+8 hours')
+       WHERE id=?`
+    ).bind(
+      merchantId || null,
+      hashKey,
+      hashIv,
+      mode,
+      subtype,
+      senderName,
+      senderPhone,
+      store.id
+    ).run()
+
+    return c.json({ ok: true })
+  } catch (e: any) {
+    return c.json({ error: String(e) }, 500)
+  }
+})
 
 app.get('/api/stores/me/products', requireUser, async (c) => {
   try {
@@ -2429,6 +2867,122 @@ app.delete('/api/stores/me/products/:id', requireUser, async (c) => {
     ).bind(Number(countRow?.c || 0), nowIso(), store.id).run().catch(() => {})
 
     return c.json({ ok: true })
+  } catch (e: any) {
+    return c.json({ error: String(e) }, 500)
+  }
+})
+
+app.get('/api/stores/me/orders', requireUser, async (c) => {
+  try {
+    const payload = c.get('userPayload')
+    const store = await getOwnedStore(c, payload.userId)
+    if (!store) return c.json({ error: '尚未建立商店' }, 404)
+    const rows = await c.env.DB.prepare(
+      `SELECT id, total_amount as totalAmount, status, shipping_address as shippingAddress, created_at as createdAt
+       FROM orders WHERE shipping_address LIKE ? ORDER BY id DESC LIMIT 100`
+    ).bind(`%"storeSlug":"${store.slug}"%`).all()
+
+    const orders = (rows.results || []).map((r: any) => {
+      let shipping: any = {}
+      try {
+        shipping = r.shippingAddress ? JSON.parse(r.shippingAddress) : {}
+      } catch {
+        shipping = { address: r.shippingAddress }
+      }
+      return {
+        id: r.id,
+        totalAmount: r.totalAmount,
+        status: r.status,
+        createdAt: r.createdAt,
+        shipping,
+        shipmentCode: shipping.shipmentCode || null,
+        logisticsError: shipping.logisticsError || null,
+        cvsStoreName: shipping.cvsStoreName || null,
+        cvsStoreId: shipping.cvsStoreId || null,
+        customerName: shipping.name || null,
+        customerPhone: shipping.phone || null,
+        shippingMethod: shipping.shippingMethod || null,
+      }
+    })
+    return c.json({ orders })
+  } catch (e: any) {
+    return c.json({ error: String(e) }, 500)
+  }
+})
+
+/** 店家手動／重試產生 7-11 ibon 寄件代碼 */
+app.post('/api/stores/me/orders/:id/create-shipment', requireUser, async (c) => {
+  try {
+    const payload = c.get('userPayload')
+    const store = await getOwnedStore(c, payload.userId)
+    if (!store) return c.json({ error: '尚未建立商店' }, 404)
+    const id = parseInt(c.req.param('id'))
+    const row = await c.env.DB.prepare(
+      `SELECT id, total_amount as totalAmount, status, shipping_address as shippingAddress FROM orders WHERE id=?`
+    ).bind(id).first<any>()
+    if (!row) return c.json({ error: '訂單不存在' }, 404)
+    let shipping: any = {}
+    try {
+      shipping = row.shippingAddress ? JSON.parse(row.shippingAddress) : {}
+    } catch {
+      return c.json({ error: '訂單物流資料損壞' }, 400)
+    }
+    if (shipping.storeSlug !== store.slug) return c.json({ error: '無權限' }, 403)
+    if (shipping.shippingMethod !== 'seven_eleven') {
+      return c.json({ error: '此訂單不是 7-11 取貨' }, 400)
+    }
+    if (!shipping.cvsStoreId) return c.json({ error: '缺少門市代碼，客人需重新用地圖選店' }, 400)
+    const status = String(row.status || '').toLowerCase()
+    const paidOk = status === 'paid' || status === 'cod' || shipping.method === 'cod'
+    if (!paidOk) {
+      return c.json({ error: '訂單尚未付款完成，無法產生寄件代碼', code: 'PAYMENT_REQUIRED' }, 402)
+    }
+    if (Number(row.totalAmount || 0) > 20000) {
+      return c.json({ error: '金額超過 7-11 上限 NT$ 20,000，無法建立物流單' }, 400)
+    }
+
+    const { resolveEcpayEnv, ecpayCreateReady, createCvsLogisticsOrder } = await import('./ecpayLogistics')
+    const ecpayEnv = resolveEcpayEnv(c.env, store)
+    if (!ecpayCreateReady(ecpayEnv)) {
+      return c.json({ error: '請先在「收款／物流」完成綠界 MerchantID／HashKey／HashIV 設定' }, 503)
+    }
+
+    const apiOrigin = new URL(c.req.url).origin
+    const created = await createCvsLogisticsOrder({
+      env: ecpayEnv,
+      merchantTradeNo: `R${id}${Date.now().toString(36)}`.slice(0, 20),
+      goodsAmount: Number(row.totalAmount || 0),
+      goodsName: store.name || '商品',
+      isCollection: shipping.method === 'cod' || shipping.cvsCollection === 'Y',
+      senderName: (ecpayEnv.ECPAY_SENDER_NAME || store.name || '店家').toString(),
+      senderCellPhone: (ecpayEnv.ECPAY_SENDER_PHONE || '0912345678').toString(),
+      receiverName: String(shipping.name || '顧客'),
+      receiverCellPhone: String(shipping.phone || '0912345678'),
+      receiverStoreId: String(shipping.cvsStoreId),
+      serverReplyUrl: `${apiOrigin}/api/logistics/ecpay/status-callback`,
+      receiverEmail: shipping.email || undefined,
+    })
+    if (!created.ok) {
+      shipping.logisticsError = created.error
+      await c.env.DB.prepare(`UPDATE orders SET shipping_address=? WHERE id=?`)
+        .bind(JSON.stringify(shipping), id).run()
+      return c.json({ error: created.error || '建立失敗' }, 502)
+    }
+    shipping.shipmentCode = created.shipmentCode
+    shipping.cvsPaymentNo = created.cvsPaymentNo
+    shipping.cvsValidationNo = created.cvsValidationNo
+    shipping.logisticsId = created.logisticsId
+    shipping.logisticsError = null
+    shipping.logisticsPending = null
+    await c.env.DB.prepare(`UPDATE orders SET shipping_address=? WHERE id=?`)
+      .bind(JSON.stringify(shipping), id).run()
+    return c.json({
+      ok: true,
+      shipmentCode: created.shipmentCode,
+      cvsPaymentNo: created.cvsPaymentNo,
+      cvsValidationNo: created.cvsValidationNo,
+      logisticsId: created.logisticsId,
+    })
   } catch (e: any) {
     return c.json({ error: String(e) }, 500)
   }

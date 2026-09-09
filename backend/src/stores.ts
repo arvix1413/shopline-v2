@@ -50,6 +50,14 @@ export async function ensureStoresTable(db: D1Database) {
     `ALTER TABLE stores ADD COLUMN last_active_at TEXT`,
     `ALTER TABLE stores ADD COLUMN layout_json TEXT`,
     `ALTER TABLE stores ADD COLUMN pages_json TEXT`,
+    // 店家自備綠界物流（平台訂閱費 ≠ 代收物流／貨款）
+    `ALTER TABLE stores ADD COLUMN ecpay_merchant_id TEXT`,
+    `ALTER TABLE stores ADD COLUMN ecpay_hash_key TEXT`,
+    `ALTER TABLE stores ADD COLUMN ecpay_hash_iv TEXT`,
+    `ALTER TABLE stores ADD COLUMN ecpay_logistics_mode TEXT`,
+    `ALTER TABLE stores ADD COLUMN ecpay_logistics_subtype TEXT`,
+    `ALTER TABLE stores ADD COLUMN ecpay_sender_name TEXT`,
+    `ALTER TABLE stores ADD COLUMN ecpay_sender_phone TEXT`,
   ]
   for (const sql of extras) {
     await db.prepare(sql).run().catch(() => {})
