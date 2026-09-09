@@ -88,17 +88,192 @@ const en: PartnersCopy = {
   cta: 'Start free trial',
 }
 
+const ko: PartnersCopy = {
+  title: 'ARVIX 파트너가 함께합니다',
+  subtitle: '브랜드를 위한 큐레이션된 파트너 생태계',
+  becomePartner: '파트너 되기',
+  categories: [
+    {
+      title: '결제 및 물류 옵션',
+      desc: '스토어 카드 결제와 택배. 추가 픽업은 스토어 배송 설정에 따릅니다.',
+      partners: ['ARVIX Payments', '카드 결제', '택배 배송'],
+    },
+    {
+      title: '디자인·마케팅 팀',
+      desc: '최고 수준의 디자인·마케팅 파트너와 함께 브랜드와 성과를 높이세요.',
+      partners: ['브랜드 디자인 스튜디오', '디지털 에이전시', 'SEO 서비스', '소셜 미디어 관리', '매체 구매', '콘텐츠 팀'],
+    },
+    {
+      title: '모든 필요를 위한 서비스',
+      desc: 'ERP, CRM, 물류 창고 등 — 완전한 커머스 생태계.',
+      partners: ['ERP 연동', 'CRM', '창고·물류', '고객지원 시스템', '분석 도구', 'AI 마케팅 도구'],
+    },
+  ],
+  ctaTitle: '전 세계 60만+ 판매자가 ARVIX를 신뢰합니다',
+  cta: '무료 체험 시작',
+}
+
+const ja: PartnersCopy = {
+  title: 'ARVIX パートナーが支えるビジネス',
+  subtitle: '厳選されたパートナーエコシステムで専門支援を',
+  becomePartner: 'パートナーになる',
+  categories: [
+    {
+      title: '決済・物流オプション',
+      desc: '店舗のカード決済と宅配。追加の受け取り方法は店舗の配送設定によります。',
+      partners: ['ARVIX Payments', 'カード決済', '宅配'],
+    },
+    {
+      title: 'デザイン・マーケティングチーム',
+      desc: 'トップクラスのデザイン・マーケティングパートナーとブランドと成果を高めます。',
+      partners: ['ブランドデザイン', 'デジタル代理店', 'SEO', 'SNS運用', '広告運用', 'コンテンツチーム'],
+    },
+    {
+      title: 'あらゆるニーズに対応',
+      desc: 'ERP、CRM、倉庫など — 完全なコマースエコシステム。',
+      partners: ['ERP 連携', 'CRM', '倉庫・物流', 'サポートシステム', '分析ツール', 'AI マーケツール'],
+    },
+  ],
+  ctaTitle: '世界中 60 万以上の加盟店が ARVIX を利用',
+  cta: '無料トライアルを開始',
+}
+
+const vi: PartnersCopy = {
+  title: 'Đối tác ARVIX đồng hành cùng bạn',
+  subtitle: 'Hệ sinh thái đối tác được tuyển chọn cho hỗ trợ chuyên nghiệp',
+  becomePartner: 'Trở thành đối tác',
+  categories: [
+    {
+      title: 'Thanh toán & vận chuyển',
+      desc: 'Thanh toán thẻ và giao tận nhà. Nhận hàng thêm tùy thiết lập cửa hàng.',
+      partners: ['ARVIX Payments', 'Thanh toán thẻ', 'Giao tận nhà'],
+    },
+    {
+      title: 'Đội ngũ thiết kế & marketing',
+      desc: 'Làm việc với đối tác thiết kế và marketing hàng đầu để nâng tầm thương hiệu.',
+      partners: ['Studio thiết kế', 'Agency số', 'SEO', 'Quản lý mạng xã hội', 'Mua media', 'Đội nội dung'],
+    },
+    {
+      title: 'Dịch vụ cho mọi nhu cầu',
+      desc: 'ERP, CRM, kho bãi và hơn thế — hệ sinh thái thương mại đầy đủ.',
+      partners: ['Tích hợp ERP', 'CRM', 'Kho & logistics', 'Hệ thống hỗ trợ', 'Công cụ phân tích', 'AI marketing'],
+    },
+  ],
+  ctaTitle: 'Hơn 600.000 người bán tin dùng ARVIX',
+  cta: 'Bắt đầu dùng thử miễn phí',
+}
+
+const es: PartnersCopy = {
+  title: 'Los socios de ARVIX te respaldan',
+  subtitle: 'Un ecosistema de partners seleccionado para soporte profesional',
+  becomePartner: 'Hazte partner',
+  categories: [
+    {
+      title: 'Pagos y logística',
+      desc: 'Checkout con tarjeta y entrega a domicilio. Otras recogidas dependen de la tienda.',
+      partners: ['ARVIX Payments', 'Pago con tarjeta', 'Entrega a domicilio'],
+    },
+    {
+      title: 'Equipos de diseño y marketing',
+      desc: 'Trabaja con partners top de diseño y marketing para elevar marca y resultados.',
+      partners: ['Estudios de marca', 'Agencias digitales', 'SEO', 'Redes sociales', 'Compra de medios', 'Equipos de contenido'],
+    },
+    {
+      title: 'Servicios para cada necesidad',
+      desc: 'ERP, CRM, almacenes y más — un ecosistema de comercio completo.',
+      partners: ['Integración ERP', 'CRM', 'Almacén y logística', 'Sistemas de soporte', 'Analítica', 'Marketing con IA'],
+    },
+  ],
+  ctaTitle: 'Más de 600.000 comercios confían en ARVIX',
+  cta: 'Empieza la prueba gratis',
+}
+
+const pt: PartnersCopy = {
+  title: 'Parceiros ARVIX ao seu lado',
+  subtitle: 'Ecossistema de parceiros selecionados para suporte profissional',
+  becomePartner: 'Seja um parceiro',
+  categories: [
+    {
+      title: 'Pagamentos e logística',
+      desc: 'Checkout com cartão e entrega em domicílio. Outras retiradas dependem da loja.',
+      partners: ['ARVIX Payments', 'Pagamento com cartão', 'Entrega em domicílio'],
+    },
+    {
+      title: 'Equipes de design e marketing',
+      desc: 'Trabalhe com parceiros top de design e marketing para elevar marca e resultados.',
+      partners: ['Estúdios de marca', 'Agências digitais', 'SEO', 'Redes sociais', 'Mídia', 'Equipes de conteúdo'],
+    },
+    {
+      title: 'Serviços para cada necessidade',
+      desc: 'ERP, CRM, armazéns e mais — um ecossistema completo de comércio.',
+      partners: ['Integração ERP', 'CRM', 'Armazém e logística', 'Sistemas de suporte', 'Analytics', 'Marketing com IA'],
+    },
+  ],
+  ctaTitle: 'Mais de 600.000 lojistas confiam na ARVIX',
+  cta: 'Começar teste grátis',
+}
+
+const de: PartnersCopy = {
+  title: 'ARVIX-Partner an Ihrer Seite',
+  subtitle: 'Kuratiertes Partner-Ökosystem für professionelle Unterstützung',
+  becomePartner: 'Partner werden',
+  categories: [
+    {
+      title: 'Zahlungen & Logistik',
+      desc: 'Kartencheckout und Lieferung nach Hause. Weitere Abholung je nach Shop-Einstellung.',
+      partners: ['ARVIX Payments', 'Kartenzahlung', 'Lieferung nach Hause'],
+    },
+    {
+      title: 'Design- & Marketing-Teams',
+      desc: 'Arbeiten Sie mit Top-Partnern für Design und Marketing.',
+      partners: ['Brand-Design-Studios', 'Digitalagenturen', 'SEO', 'Social Media', 'Media Buying', 'Content-Teams'],
+    },
+    {
+      title: 'Services für jeden Bedarf',
+      desc: 'ERP, CRM, Lager und mehr — ein komplettes Commerce-Ökosystem.',
+      partners: ['ERP-Integration', 'CRM', 'Lager & Logistik', 'Support-Systeme', 'Analytik', 'KI-Marketing'],
+    },
+  ],
+  ctaTitle: 'Über 600.000 Händler vertrauen ARVIX',
+  cta: 'Kostenlos testen',
+}
+
+const fr: PartnersCopy = {
+  title: 'Les partenaires ARVIX à vos côtés',
+  subtitle: 'Un écosystème de partenaires sélectionnés pour un soutien pro',
+  becomePartner: 'Devenir partenaire',
+  categories: [
+    {
+      title: 'Paiements et logistique',
+      desc: 'Paiement par carte et livraison à domicile. Autres retraits selon la boutique.',
+      partners: ['ARVIX Payments', 'Paiement par carte', 'Livraison à domicile'],
+    },
+    {
+      title: 'Équipes design et marketing',
+      desc: 'Travaillez avec des partenaires design et marketing de premier plan.',
+      partners: ['Studios de marque', 'Agences digitales', 'SEO', 'Réseaux sociaux', 'Achat média', 'Équipes contenu'],
+    },
+    {
+      title: 'Services pour chaque besoin',
+      desc: 'ERP, CRM, entrepôts et plus — un écosystème commerce complet.',
+      partners: ['Intégration ERP', 'CRM', 'Entrepôt et logistique', 'Systèmes support', 'Analytique', 'Marketing IA'],
+    },
+  ],
+  ctaTitle: 'Plus de 600 000 marchands font confiance à ARVIX',
+  cta: 'Démarrer l’essai gratuit',
+}
+
 const copy: Partial<Record<Locale, PartnersCopy>> & { 'zh-TW': PartnersCopy; en: PartnersCopy } = {
   'zh-TW': zhTW,
   'zh-CN': zhCN,
   en,
-  ko: en,
-  ja: en,
-  vi: en,
-  es: en,
-  pt: en,
-  de: en,
-  fr: en,
+  ko,
+  ja,
+  vi,
+  es,
+  pt,
+  de,
+  fr,
 }
 
 export default function SelectedPartnersPage() {

@@ -138,17 +138,304 @@ const en: PricingModuleCopy = {
   cta: 'Start free trial',
 }
 
+const ko: PricingModuleCopy = {
+  title: '추가 모듈 요금',
+  subtitle: '필요한 모듈을 선택해 핵심 플랜과 함께 구성하세요',
+  viewPlans: '핵심 플랜 요금 보기',
+  freeTrial: '무료 체험',
+  modules: [
+    {
+      category: '마케팅',
+      items: [
+        { name: 'RFIM 세그먼트', price: 'NT$990/월', desc: '마케팅 ROI를 높이는 정밀 세그먼트' },
+        { name: 'LINE Official Account', price: 'NT$490/월', desc: 'LINE OA를 연결해 회원에게 바로 도달' },
+        { name: '공동구매', price: 'NT$690/월', desc: '인플루언서·그룹 커머스를 한곳에서' },
+      ],
+    },
+    {
+      category: '분석',
+      items: [
+        { name: 'Shoplytics 분석', price: 'NT$790/월', desc: '사람·상품·매장 인사이트' },
+        { name: 'AI 전략 인사이트', price: 'NT$490/월', desc: '실행 가능한 추천을 제공하는 AI 분석' },
+      ],
+    },
+    {
+      category: '옴니채널',
+      items: [
+        { name: 'Smart OMO', price: 'NT$1,490/월', desc: '매장과 온라인 스토어를 스마트하게 연결' },
+        { name: 'Shopper App', price: 'NT$1,990/월', desc: '브랜드 전용 회원 쇼핑 앱' },
+        { name: 'POS 리테일 시스템', price: '맞춤 견적', desc: '매장 결제와 재고 관리' },
+      ],
+    },
+    {
+      category: '결제',
+      items: [
+        { name: 'ARVIX Payments', price: '사용량 기반', desc: '스토어를 위한 카드 결제' },
+      ],
+    },
+  ],
+  ctaTitle: '비즈니스를 위한 더 많은 솔루션',
+  ctaSubtitle: '전 세계 60만+ 판매자가 ARVIX를 신뢰합니다',
+  cta: '무료 체험 시작',
+}
+
+const ja: PricingModuleCopy = {
+  title: 'アドオンモジュール料金',
+  subtitle: '必要なモジュールを選び、コアプランと組み合わせて構築',
+  viewPlans: 'コアプラン料金を見る',
+  freeTrial: '無料トライアル',
+  modules: [
+    {
+      category: 'マーケティング',
+      items: [
+        { name: 'RFIM セグメンテーション', price: 'NT$990/月', desc: 'マーケティング ROI を高める精緻なセグメント' },
+        { name: 'LINE Official Account', price: 'NT$490/月', desc: 'LINE OA を接続し会員に直接リーチ' },
+        { name: 'グループ購入', price: 'NT$690/月', desc: 'インフルエンサーとグループコマースを一元管理' },
+      ],
+    },
+    {
+      category: '分析',
+      items: [
+        { name: 'Shoplytics 分析', price: 'NT$790/月', desc: '人・商品・場所のインサイト' },
+        { name: 'AI 戦略インサイト', price: 'NT$490/月', desc: '実行可能な提案付きの AI 分析' },
+      ],
+    },
+    {
+      category: 'オムニチャネル',
+      items: [
+        { name: 'Smart OMO', price: 'NT$1,490/月', desc: '店舗とオンラインをスマートに接続' },
+        { name: 'Shopper App', price: 'NT$1,990/月', desc: 'ブランド専用会員ショッピングアプリ' },
+        { name: 'POS リテールシステム', price: '個別見積', desc: '店頭チェックアウトと在庫管理' },
+      ],
+    },
+    {
+      category: '決済',
+      items: [
+        { name: 'ARVIX Payments', price: '従量課金', desc: 'ストア向けカード決済' },
+      ],
+    },
+  ],
+  ctaTitle: 'ビジネスのためのさらなるソリューション',
+  ctaSubtitle: '世界中 60 万以上の加盟店が ARVIX を利用',
+  cta: '無料トライアルを開始',
+}
+
+const vi: PricingModuleCopy = {
+  title: 'Giá module bổ sung',
+  subtitle: 'Chọn module theo nhu cầu và kết hợp với gói chính',
+  viewPlans: 'Xem giá gói chính',
+  freeTrial: 'Dùng thử miễn phí',
+  modules: [
+    {
+      category: 'Marketing',
+      items: [
+        { name: 'Phân khúc RFIM', price: 'NT$990/tháng', desc: 'Phân khúc chính xác giúp tăng ROI marketing' },
+        { name: 'LINE Official Account', price: 'NT$490/tháng', desc: 'Kết nối LINE OA và tiếp cận hội viên trực tiếp' },
+        { name: 'Mua nhóm', price: 'NT$690/tháng', desc: 'Thương mại influencer và nhóm tại một nơi' },
+      ],
+    },
+    {
+      category: 'Phân tích',
+      items: [
+        { name: 'Phân tích Shoplytics', price: 'NT$790/tháng', desc: 'Insight về người, sản phẩm và điểm bán' },
+        { name: 'Insight chiến lược AI', price: 'NT$490/tháng', desc: 'Phân tích AI kèm đề xuất hành động' },
+      ],
+    },
+    {
+      category: 'Omnichannel',
+      items: [
+        { name: 'Smart OMO', price: 'NT$1,490/tháng', desc: 'Kết nối cửa hàng và online thông minh' },
+        { name: 'Shopper App', price: 'NT$1,990/tháng', desc: 'App mua sắm hội viên riêng của thương hiệu' },
+        { name: 'Hệ thống POS bán lẻ', price: 'Báo giá tùy chỉnh', desc: 'Thanh toán tại cửa hàng và quản lý tồn kho' },
+      ],
+    },
+    {
+      category: 'Thanh toán',
+      items: [
+        { name: 'ARVIX Payments', price: 'Theo mức sử dụng', desc: 'Thanh toán thẻ cho cửa hàng của bạn' },
+      ],
+    },
+  ],
+  ctaTitle: 'Thêm giải pháp cho doanh nghiệp của bạn',
+  ctaSubtitle: 'Được hơn 600.000 người bán trên thế giới tin dùng',
+  cta: 'Bắt đầu dùng thử miễn phí',
+}
+
+const es: PricingModuleCopy = {
+  title: 'Precios de módulos adicionales',
+  subtitle: 'Elige módulos según necesites y combínalos con un plan principal',
+  viewPlans: 'Ver precios del plan principal',
+  freeTrial: 'Prueba gratis',
+  modules: [
+    {
+      category: 'Marketing',
+      items: [
+        { name: 'Segmentación RFIM', price: 'NT$990/mes', desc: 'Segmentos precisos que mejoran el ROI de marketing' },
+        { name: 'LINE Official Account', price: 'NT$490/mes', desc: 'Conecta LINE OA y llega a miembros directamente' },
+        { name: 'Compra grupal', price: 'NT$690/mes', desc: 'Comercio de influencers y grupos en un solo lugar' },
+      ],
+    },
+    {
+      category: 'Analítica',
+      items: [
+        { name: 'Analítica Shoplytics', price: 'NT$790/mes', desc: 'Insights de personas, productos y puntos de venta' },
+        { name: 'Insights de estrategia con IA', price: 'NT$490/mes', desc: 'Análisis con IA y recomendaciones accionables' },
+      ],
+    },
+    {
+      category: 'Omnicanal',
+      items: [
+        { name: 'Smart OMO', price: 'NT$1,490/mes', desc: 'Conecta tiendas y online de forma inteligente' },
+        { name: 'Shopper App', price: 'NT$1,990/mes', desc: 'App de compra para miembros de la marca' },
+        { name: 'Sistema POS retail', price: 'Cotización a medida', desc: 'Checkout en tienda e inventario' },
+      ],
+    },
+    {
+      category: 'Pagos',
+      items: [
+        { name: 'ARVIX Payments', price: 'Según uso', desc: 'Pago con tarjeta para tu tienda' },
+      ],
+    },
+  ],
+  ctaTitle: 'Más soluciones para tu negocio',
+  ctaSubtitle: 'Más de 600.000 comercios confían en ARVIX',
+  cta: 'Empieza la prueba gratis',
+}
+
+const pt: PricingModuleCopy = {
+  title: 'Preços de módulos adicionais',
+  subtitle: 'Escolha módulos conforme a necessidade e combine com um plano principal',
+  viewPlans: 'Ver preços do plano principal',
+  freeTrial: 'Teste grátis',
+  modules: [
+    {
+      category: 'Marketing',
+      items: [
+        { name: 'Segmentação RFIM', price: 'NT$990/mês', desc: 'Segmentos precisos que elevam o ROI de marketing' },
+        { name: 'LINE Official Account', price: 'NT$490/mês', desc: 'Conecte o LINE OA e alcance membros diretamente' },
+        { name: 'Compra em grupo', price: 'NT$690/mês', desc: 'Comércio de influenciadores e grupos em um só lugar' },
+      ],
+    },
+    {
+      category: 'Analytics',
+      items: [
+        { name: 'Analytics Shoplytics', price: 'NT$790/mês', desc: 'Insights de pessoas, produtos e pontos de venda' },
+        { name: 'Insights de estratégia com IA', price: 'NT$490/mês', desc: 'Análise com IA e recomendações acionáveis' },
+      ],
+    },
+    {
+      category: 'Omnichannel',
+      items: [
+        { name: 'Smart OMO', price: 'NT$1,490/mês', desc: 'Conecte lojas e online de forma inteligente' },
+        { name: 'Shopper App', price: 'NT$1,990/mês', desc: 'App de compras para membros da marca' },
+        { name: 'Sistema POS varejo', price: 'Orçamento sob medida', desc: 'Checkout na loja e estoque' },
+      ],
+    },
+    {
+      category: 'Pagamentos',
+      items: [
+        { name: 'ARVIX Payments', price: 'Conforme uso', desc: 'Checkout com cartão para sua loja' },
+      ],
+    },
+  ],
+  ctaTitle: 'Mais soluções para o seu negócio',
+  ctaSubtitle: 'Mais de 600.000 lojistas confiam na ARVIX',
+  cta: 'Começar teste grátis',
+}
+
+const de: PricingModuleCopy = {
+  title: 'Preise für Zusatzmodule',
+  subtitle: 'Module nach Bedarf wählen und mit einem Kernplan kombinieren',
+  viewPlans: 'Kernplan-Preise ansehen',
+  freeTrial: 'Kostenlos testen',
+  modules: [
+    {
+      category: 'Marketing',
+      items: [
+        { name: 'RFIM-Segmentierung', price: 'NT$990/Mon.', desc: 'Präzise Segmente, die den Marketing-ROI steigern' },
+        { name: 'LINE Official Account', price: 'NT$490/Mon.', desc: 'LINE OA verbinden und Mitglieder direkt erreichen' },
+        { name: 'Gruppenkauf', price: 'NT$690/Mon.', desc: 'Influencer- und Gruppen-Commerce an einem Ort' },
+      ],
+    },
+    {
+      category: 'Analytics',
+      items: [
+        { name: 'Shoplytics-Analytics', price: 'NT$790/Mon.', desc: 'Insights zu Menschen, Produkten und Orten' },
+        { name: 'KI-Strategie-Insights', price: 'NT$490/Mon.', desc: 'KI-Analyse mit umsetzbaren Empfehlungen' },
+      ],
+    },
+    {
+      category: 'Omnichannel',
+      items: [
+        { name: 'Smart OMO', price: 'NT$1,490/Mon.', desc: 'Filialen und Online smart verbinden' },
+        { name: 'Shopper App', price: 'NT$1,990/Mon.', desc: 'Markeneigene Mitglieder-Shopping-App' },
+        { name: 'POS-Retail-System', price: 'Individuelles Angebot', desc: 'Filial-Checkout und Bestand' },
+      ],
+    },
+    {
+      category: 'Zahlungen',
+      items: [
+        { name: 'ARVIX Payments', price: 'Nutzungsbasiert', desc: 'Kartencheckout für Ihren Shop' },
+      ],
+    },
+  ],
+  ctaTitle: 'Mehr Lösungen für Ihr Business',
+  ctaSubtitle: 'Über 600.000 Händler weltweit vertrauen ARVIX',
+  cta: 'Kostenlos testen',
+}
+
+const fr: PricingModuleCopy = {
+  title: 'Tarifs des modules complémentaires',
+  subtitle: 'Choisissez des modules selon vos besoins et associez-les à un forfait principal',
+  viewPlans: 'Voir les tarifs du forfait principal',
+  freeTrial: 'Essai gratuit',
+  modules: [
+    {
+      category: 'Marketing',
+      items: [
+        { name: 'Segmentation RFIM', price: 'NT$990/mois', desc: 'Segments précis qui boostent le ROI marketing' },
+        { name: 'LINE Official Account', price: 'NT$490/mois', desc: 'Connectez LINE OA et touchez les membres directement' },
+        { name: 'Achat groupé', price: 'NT$690/mois', desc: 'Commerce influenceurs et groupes en un seul endroit' },
+      ],
+    },
+    {
+      category: 'Analytics',
+      items: [
+        { name: 'Analytics Shoplytics', price: 'NT$790/mois', desc: 'Insights personnes, produits et points de vente' },
+        { name: 'Insights stratégie IA', price: 'NT$490/mois', desc: 'Analyse IA avec recommandations actionnables' },
+      ],
+    },
+    {
+      category: 'Omnicanal',
+      items: [
+        { name: 'Smart OMO', price: 'NT$1,490/mois', desc: 'Connectez magasins et en ligne intelligemment' },
+        { name: 'Shopper App', price: 'NT$1,990/mois', desc: 'App shopping membres de la marque' },
+        { name: 'Système POS retail', price: 'Devis sur mesure', desc: 'Checkout en magasin et stock' },
+      ],
+    },
+    {
+      category: 'Paiements',
+      items: [
+        { name: 'ARVIX Payments', price: 'Selon usage', desc: 'Paiement par carte pour votre boutique' },
+      ],
+    },
+  ],
+  ctaTitle: 'Plus de solutions pour votre activité',
+  ctaSubtitle: 'Plus de 600 000 marchands font confiance à ARVIX',
+  cta: 'Démarrer l’essai gratuit',
+}
+
 const copy: Partial<Record<Locale, PricingModuleCopy>> & { 'zh-TW': PricingModuleCopy; en: PricingModuleCopy } = {
   'zh-TW': zhTW,
   'zh-CN': zhCN,
   en,
-  ko: en,
-  ja: en,
-  vi: en,
-  es: en,
-  pt: en,
-  de: en,
-  fr: en,
+  ko,
+  ja,
+  vi,
+  es,
+  pt,
+  de,
+  fr,
 }
 
 export default function PricingModulePage() {
